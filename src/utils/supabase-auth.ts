@@ -28,11 +28,14 @@ const {data, error} = await supabase.auth.signInWithPassword({
 })
 if (error){
   console.log("failed sign in: ", error)
-  return
+ 
 } else {
   console.log("successful sign in: ", data)
+
 }
+
 return {data, error}
+
 
 }
 

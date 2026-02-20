@@ -26,7 +26,7 @@ const SignIn = () => {
 
   const handleSubmit = async (e: React.SubmitEvent) => {
     e.preventDefault();
-    const { error } = await signUpUser(emailVal, passwordVal);
+    const { error } = await signInUser(emailVal, passwordVal);
 
     if (error) {
       setSignUpMessage("failure");
