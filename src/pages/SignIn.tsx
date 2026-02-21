@@ -1,18 +1,18 @@
+import type { AuthResponse } from "@supabase/supabase-js";
 import Auth from "../components/Auth";
 import { signInUser } from "../utils/supabase-auth";
 import { type Dispatch, useState, type SetStateAction } from "react";
 
-const SignIn = () => {
+interface Props {
+  handleUserAuth: (data: AuthResponse["data"]) => void;
+}
+
+const SignIn = ({ handleUserAuth }: Props) => {
   const [emailVal, setEmailVal] = useState<string>("");
   const [passwordVal, setPasswordVal] = useState<string>("");
   const [signUpMessage, setSignUpMessage] = useState("");
 
   //i thought of creating one state object to hold all values but thought only necessary for bigger multi input forms not just two inputs
-
-  const valConfig: Record<string, string> = {
-    email: emailVal,
-    password: passwordVal,
-  };
 
   const setterConfig: Record<string, Dispatch<SetStateAction<string>>> = {
     email: setEmailVal,
@@ -21,30 +21,33 @@ const SignIn = () => {
 
   const handleChange = (inputKey: string, value: string) => {
     setterConfig[inputKey](value);
-    console.log("changing: ", inputKey);
   };
 
-  const handleSubmit = async (e: React.SubmitEvent) => {
+  const handleSignIn = async (e: React.SubmitEvent) => {
     e.preventDefault();
-    const { error } = await signInUser(emailVal, passwordVal);
 
-    if (error) {
+    const { data, error } = await signInUser(emailVal, passwordVal);
+
+    if (error && data.user) {
       setSignUpMessage("failure");
     } else {
+      handleUserAuth(data);
       setSignUpMessage("success");
+      setEmailVal("");
+      setPasswordVal("");
     }
   };
 
   return (
     <div>
-      <h3>Sign In.</h3>
+      <h3>Sign In</h3>
       <Auth
         emailLabel="Enter your email"
         passwordLabel="Enter your password"
         onChange={handleChange}
-        emailVal={valConfig.emailVal}
-        passwordVal={valConfig.passwordVal}
-        handleSubmit={handleSubmit}
+        emailVal={emailVal}
+        passwordVal={passwordVal}
+        handleSubmit={handleSignIn}
         signUpMessage={signUpMessage}
       />
     </div>

@@ -39,6 +39,7 @@ const Auth = ({
             <input
               type={input.type}
               required
+              //⛔️come back and fix below it is brittle⛔️
               value={input.key === "email" ? emailVal : passwordVal}
               onChange={(e) => onChange(input.key, e.target.value)}
             />

@@ -9,11 +9,6 @@ const SignUp = () => {
 
   //i thought of creating one state object to hold all values but thought only necessary for bigger multi input forms not just two inputs
 
-  const valConfig: Record<string, string> = {
-    email: emailVal,
-    password: passwordVal,
-  };
-
   const setterConfig: Record<string, Dispatch<SetStateAction<string>>> = {
     email: setEmailVal,
     password: setPasswordVal,
@@ -26,12 +21,14 @@ const SignUp = () => {
 
   const handleSubmit = async (e: React.SubmitEvent) => {
     e.preventDefault();
-    const { error } = await signUpUser(emailVal, passwordVal);
+    const { data, error } = await signUpUser(emailVal, passwordVal);
 
-    if (error) {
+    if (error && data.user) {
       setSignUpMessage("failure");
     } else {
       setSignUpMessage("success");
+      setEmailVal("");
+      setPasswordVal("");
     }
   };
 
@@ -42,8 +39,8 @@ const SignUp = () => {
         emailLabel="Add your Email"
         passwordLabel="Create a password"
         onChange={handleChange}
-        emailVal={valConfig.emailVal}
-        passwordVal={valConfig.passwordVal}
+        emailVal={emailVal}
+        passwordVal={passwordVal}
         handleSubmit={handleSubmit}
         signUpMessage={signUpMessage}
       />
