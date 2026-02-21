@@ -2,6 +2,7 @@ import type { AuthResponse } from "@supabase/supabase-js";
 import Auth from "../components/Auth";
 import { signInUser } from "../utils/supabase-auth";
 import { type Dispatch, useState, type SetStateAction } from "react";
+import { Navigate } from "react-router";
 
 interface Props {
   handleUserAuth: (data: AuthResponse["data"]) => void;
@@ -35,6 +36,7 @@ const SignIn = ({ handleUserAuth }: Props) => {
       setSignUpMessage("success");
       setEmailVal("");
       setPasswordVal("");
+      Navigate({ to: "/dashboard" });
     }
   };
 

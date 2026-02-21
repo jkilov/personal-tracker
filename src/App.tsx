@@ -3,22 +3,29 @@ import "./App.css";
 import Dashboard from "./pages/Dashboard";
 import SignIn from "./pages/SignIn";
 import SignUp from "./pages/SignUp";
-import type { AuthResponse } from "@supabase/supabase-js";
+import type { AuthResponse, User } from "@supabase/supabase-js";
+import { Route, Routes } from "react-router";
+import ProtectedRoutes from "./components/ProtectedRoutes";
 
 function App() {
-  const [user, setUser] = useState({});
+  const [userAuthDetails, setUserAuthDetails] = useState<any>();
 
   const handleUserAuth = (data: AuthResponse["data"]) => {
-    setUser(data);
+    setUserAuthDetails(data);
   };
 
-  console.log("app: ", user);
+  console.log("app: ", userAuthDetails);
 
   return (
     <>
-      {/* <SignUp /> */}
-      <SignIn handleUserAuth={handleUserAuth} />
-      <Dashboard />
+      <Routes>
+        <Route
+          element={<ProtectedRoutes userAuthDetails={userAuthDetails} />}
+        />
+        <Route path="/" element={<SignIn handleUserAuth={handleUserAuth} />} />
+        <Route path="/sign-up" element={<SignUp />} />
+        <Route path="/dashboard" element={<Dashboard />} />
+      </Routes>
     </>
   );
 }
