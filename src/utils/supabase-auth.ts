@@ -1,4 +1,4 @@
-import { createClient } from "@supabase/supabase-js";
+import { createClient, type Session } from "@supabase/supabase-js";
 
 const supabase = createClient(
   import.meta.env.VITE_API_URL,
@@ -34,6 +34,17 @@ export const getUser = async() => {
   const {data : {user}} = await supabase.auth.getUser()
 
   return user
+}
+
+
+
+export const authenticationCheck = (callback: (session: Session | null) => void ) => {
+
+  const {data: {subscription}} = supabase.auth.onAuthStateChange((_,session) => {
+    callback(session)
+  })
+
+  return subscription
 }
 
 

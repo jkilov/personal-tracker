@@ -1,19 +1,17 @@
-import type { User } from "@supabase/supabase-js";
 import { Navigate } from "react-router";
-import { Outlet } from "react-router";
+
+import Dashboard from "../pages/Dashboard";
 
 interface Props {
-  userAuthDetails: User;
+  isAuthenticated: boolean;
 }
 
-const ProtectedRoutes = ({ userAuthDetails }: Props) => {
-  const isAuthenticated =
-    userAuthDetails.role === "authenticated" ? true : false;
-  return userAuthDetails && isAuthenticated ? (
-    <Outlet />
-  ) : (
-    <Navigate to="/" replace />
-  );
+const ProtectedRoutes = ({ isAuthenticated }: Props) => {
+  if (isAuthenticated) {
+    return <Dashboard />;
+  } else {
+    return <Navigate to="/sign-in" replace />;
+  }
 };
 
 export default ProtectedRoutes;

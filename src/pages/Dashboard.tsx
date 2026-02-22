@@ -9,7 +9,6 @@ const Dashboard = () => {
     const getUserDetails = async () => {
       const user = await getUser();
       setAuthData(user);
-      console.log("d ", authData?.email);
     };
 
     getUserDetails();

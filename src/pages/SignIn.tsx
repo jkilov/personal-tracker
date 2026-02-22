@@ -1,14 +1,15 @@
-import type { AuthResponse } from "@supabase/supabase-js";
 import Auth from "../components/Auth";
 import { signInUser } from "../utils/supabase-auth";
-import { type Dispatch, useState, type SetStateAction } from "react";
-import { Navigate } from "react-router";
+import { type Dispatch, useState, type SetStateAction, useEffect } from "react";
+import { useNavigate } from "react-router";
 
 interface Props {
-  handleUserAuth: (data: AuthResponse["data"]) => void;
+  isAuthenticated: boolean;
 }
 
-const SignIn = ({ handleUserAuth }: Props) => {
+const SignIn = ({ isAuthenticated }: Props) => {
+  let navigate = useNavigate();
+
   const [emailVal, setEmailVal] = useState<string>("");
   const [passwordVal, setPasswordVal] = useState<string>("");
   const [signUpMessage, setSignUpMessage] = useState("");
@@ -32,13 +33,19 @@ const SignIn = ({ handleUserAuth }: Props) => {
     if (error && data.user) {
       setSignUpMessage("failure");
     } else {
-      handleUserAuth(data);
+      // handleUserAuth(data);
       setSignUpMessage("success");
       setEmailVal("");
       setPasswordVal("");
-      Navigate({ to: "/dashboard" });
+      navigate("/");
     }
   };
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      navigate("/");
+    }
+  }, [isAuthenticated]);
 
   return (
     <div>
