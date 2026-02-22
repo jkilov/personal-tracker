@@ -8,17 +8,20 @@ import SignUp from "./pages/SignUp";
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    const subscription = authenticationCheck((session) =>
-      setIsAuthenticated(!!session)
-    );
+    const subscription = authenticationCheck((session) => {
+      setIsAuthenticated(!!session);
+      setIsLoading(false);
+    });
 
     console.log("auth: ", isAuthenticated);
-    //why is this showing false but my login logic is working fine - eg when user logged in they sees  dashboard, when they are not they are shown sign in
 
     return () => subscription.unsubscribe();
   }, []);
+
+  if (isLoading) return <div>Loading...</div>;
 
   return (
     <>

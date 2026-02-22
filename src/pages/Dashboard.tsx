@@ -6,12 +6,20 @@ const Dashboard = () => {
   const [authData, setAuthData] = useState<User | null>(null);
 
   useEffect(() => {
+    let isMounted = true;
+
     const getUserDetails = async () => {
       const user = await getUser();
-      setAuthData(user);
+      if (isMounted) {
+        setAuthData(user);
+      }
     };
 
     getUserDetails();
+
+    return () => {
+      isMounted = false;
+    };
   }, []);
 
   return (

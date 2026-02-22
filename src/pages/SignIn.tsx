@@ -30,7 +30,7 @@ const SignIn = ({ isAuthenticated }: Props) => {
 
     const { data, error } = await signInUser(emailVal, passwordVal);
 
-    if (error && data.user) {
+    if (error) {
       setSignUpMessage("failure");
     } else {
       // handleUserAuth(data);
@@ -45,7 +45,7 @@ const SignIn = ({ isAuthenticated }: Props) => {
     if (isAuthenticated) {
       navigate("/");
     }
-  }, [isAuthenticated]);
+  }, [isAuthenticated, navigate]);
 
   return (
     <div>

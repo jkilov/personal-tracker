@@ -40,8 +40,8 @@ export const getUser = async() => {
 
 export const authenticationCheck = (callback: (session: Session | null) => void ) => {
 
-  const {data: {subscription}} = supabase.auth.onAuthStateChange((_,session) => {
-    callback(session)
+  const {data: {subscription}} = supabase.auth.onAuthStateChange((_, session) => {
+    callback(session);
   })
 
   return subscription

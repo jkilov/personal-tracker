@@ -23,7 +23,7 @@ const SignUp = () => {
     e.preventDefault();
     const { data, error } = await signUpUser(emailVal, passwordVal);
 
-    if (error && data.user) {
+    if (error) {
       setSignUpMessage("failure");
     } else {
       setSignUpMessage("success");
