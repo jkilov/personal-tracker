@@ -7,6 +7,22 @@ interface Props {
   isAuthenticated: boolean;
 }
 
+export type SignInConfigType = {
+  key: string;
+  type: string;
+};
+
+const signInConfig: SignInConfigType[] = [
+  {
+    key: "email",
+    type: "email",
+  },
+  {
+    key: "password",
+    type: "password",
+  },
+];
+
 const SignIn = ({ isAuthenticated }: Props) => {
   let navigate = useNavigate();
 
@@ -58,6 +74,7 @@ const SignIn = ({ isAuthenticated }: Props) => {
         passwordVal={passwordVal}
         handleSubmit={handleSignIn}
         signUpMessage={signUpMessage}
+        signInConfig={signInConfig}
       />
     </div>
   );

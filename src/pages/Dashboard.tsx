@@ -22,10 +22,13 @@ const Dashboard = () => {
     };
   }, []);
 
+  const handleAddSession = () => {};
+
   return (
     <div>
       <h1>Dashboard</h1>
       <span>{authData?.email}</span>
+      <button>Add Session</button>
     </div>
   );
 };
