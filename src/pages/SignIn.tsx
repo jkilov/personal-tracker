@@ -34,6 +34,7 @@ const SignIn = ({ isAuthenticated }: Props) => {
 
     if (error) {
       setSignUpMessage("failure");
+      console.log(error);
     } else {
       // handleUserAuth(data);
       setSignUpMessage("success");

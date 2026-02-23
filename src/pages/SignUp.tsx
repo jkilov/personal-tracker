@@ -1,5 +1,6 @@
 import Auth from "../components/Auth";
 import { signUpUser } from "../utils/supabase/auth-supabase";
+import { createUserData } from "../utils/supabase/user.ts";
 import { useState } from "react";
 
 import { useNavigate } from "react-router";
@@ -30,12 +31,22 @@ const SignUp = () => {
   const handleSubmit = async (e: React.SubmitEvent) => {
     e.preventDefault();
     const { data, error } = await signUpUser(values.email, values.password);
-
+    const userId = data.user?.id;
     if (error) {
       setSignUpMessage("failure");
+      console.log(error.message);
     } else {
       setSignUpMessage("success");
+      const result = createUserData(
+        userId!,
+        values.fName!,
+        values.lName!,
+        values.email
+      );
+      console.log((await result).error);
       setValues({ fName: "", lName: "", email: "", password: "" });
+      console.log(data);
+      //insert add data to table here
     }
   };
 

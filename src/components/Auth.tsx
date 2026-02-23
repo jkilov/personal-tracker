@@ -57,8 +57,7 @@ const Auth = ({
   formKey,
   buttonCTA,
   values,
-}: //⬜️ here : i have added yhe prop - i need to then add the fact its option and then render one or the other based on whats been fed to this child component.
-Props) => {
+}: Props) => {
   //i thought of creating one state object to hold all values but thought only necessary for bigger multi input forms not just two inputs
 
   const updatedArr = authConfig.filter((input) => input.form === formKey);
@@ -69,13 +68,11 @@ Props) => {
         {updatedArr.map((input) => (
           <div key={input.key}>
             <span>{input.label}</span>
-            {/* //⛔️come back and fix above it is brittle⛔️ */}
             <input
               type={input.type}
-              required
-              //⛔️come back and fix below it is brittle⛔️
               value={values[input.key] as keyof AuthValues}
               onChange={(e) => onChange(input.key, e.target.value)}
+              required
             />
           </div>
         ))}
