@@ -44,6 +44,10 @@ const SignIn = ({ isAuthenticated }: Props) => {
     }
   };
 
+  const handleCreateAccount = () => {
+    navigate("/sign-up");
+  };
+
   useEffect(() => {
     if (isAuthenticated) {
       navigate("/");
@@ -60,7 +64,9 @@ const SignIn = ({ isAuthenticated }: Props) => {
         handleSubmit={handleSignIn}
         signUpMessage={signUpMessage}
         formKey="signIn"
+        buttonCTA="Sign In"
       />
+      <button onClick={handleCreateAccount}>Create Account</button>
     </div>
   );
 };

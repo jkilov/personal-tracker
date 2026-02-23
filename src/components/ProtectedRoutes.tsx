@@ -1,6 +1,4 @@
-import { Navigate } from "react-router";
-
-import Dashboard from "../pages/Dashboard";
+import { Navigate, Outlet } from "react-router";
 
 interface Props {
   isAuthenticated: boolean;
@@ -8,7 +6,7 @@ interface Props {
 
 const ProtectedRoutes = ({ isAuthenticated }: Props) => {
   if (isAuthenticated) {
-    return <Dashboard />;
+    return <Outlet />;
   } else {
     return <Navigate to="/sign-in" replace />;
   }

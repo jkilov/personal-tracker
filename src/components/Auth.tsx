@@ -46,6 +46,7 @@ interface Props {
   onChange: (inputKey: string, value: string) => void;
   handleSubmit: (e: React.SubmitEvent) => void;
   formKey: string;
+  buttonCTA: string;
 }
 
 const Auth = ({
@@ -55,6 +56,7 @@ const Auth = ({
   passwordVal,
   signUpMessage,
   formKey,
+  buttonCTA,
 }: //⬜️ here : i have added yhe prop - i need to then add the fact its option and then render one or the other based on whats been fed to this child component.
 Props) => {
   //i thought of creating one state object to hold all values but thought only necessary for bigger multi input forms not just two inputs
@@ -79,7 +81,7 @@ Props) => {
             />
           </div>
         ))}
-        <button type="submit">Create</button>
+        <button type="submit">{buttonCTA}</button>
       </form>
 
       <br />

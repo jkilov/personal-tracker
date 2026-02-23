@@ -34,13 +34,13 @@ const SignUp = () => {
     <div>
       <h3>Create an account.</h3>
       <Auth
-        emailLabel="Add your Email"
-        passwordLabel="Create a password"
         onChange={handleChange}
         emailVal={emailVal}
         passwordVal={passwordVal}
         handleSubmit={handleSubmit}
         signUpMessage={signUpMessage}
+        formKey="signUp"
+        buttonCTA="Create Account"
       />
     </div>
   );

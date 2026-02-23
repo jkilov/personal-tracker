@@ -5,6 +5,7 @@ import { Route, Routes } from "react-router";
 import ProtectedRoutes from "./components/ProtectedRoutes";
 import { authenticationCheck } from "./utils/supabase-auth";
 import SignUp from "./pages/SignUp";
+import Dashboard from "./pages/Dashboard";
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -13,6 +14,7 @@ function App() {
   useEffect(() => {
     const subscription = authenticationCheck((session) => {
       setIsAuthenticated(!!session);
+      ``;
       setIsLoading(false);
     });
 
@@ -29,7 +31,9 @@ function App() {
         <Route
           path="/"
           element={<ProtectedRoutes isAuthenticated={isAuthenticated} />}
-        />
+        >
+          <Route path="/dashboard" element={<Dashboard />} />
+        </Route>
         <Route
           path="/sign-in"
           element={<SignIn isAuthenticated={isAuthenticated} />}
