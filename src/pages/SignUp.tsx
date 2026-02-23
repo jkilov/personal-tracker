@@ -7,8 +7,6 @@ const SignUp = () => {
   const [passwordVal, setPasswordVal] = useState<string>("");
   const [signUpMessage, setSignUpMessage] = useState("");
 
-  //i thought of creating one state object to hold all values but thought only necessary for bigger multi input forms not just two inputs
-
   const setterConfig: Record<string, Dispatch<SetStateAction<string>>> = {
     email: setEmailVal,
     password: setPasswordVal,

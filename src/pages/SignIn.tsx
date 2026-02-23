@@ -12,25 +12,12 @@ export type SignInConfigType = {
   type: string;
 };
 
-const signInConfig: SignInConfigType[] = [
-  {
-    key: "email",
-    type: "email",
-  },
-  {
-    key: "password",
-    type: "password",
-  },
-];
-
 const SignIn = ({ isAuthenticated }: Props) => {
   let navigate = useNavigate();
 
   const [emailVal, setEmailVal] = useState<string>("");
   const [passwordVal, setPasswordVal] = useState<string>("");
   const [signUpMessage, setSignUpMessage] = useState("");
-
-  //i thought of creating one state object to hold all values but thought only necessary for bigger multi input forms not just two inputs
 
   const setterConfig: Record<string, Dispatch<SetStateAction<string>>> = {
     email: setEmailVal,
@@ -67,14 +54,12 @@ const SignIn = ({ isAuthenticated }: Props) => {
     <div>
       <h3>Sign In</h3>
       <Auth
-        emailLabel="Enter your email"
-        passwordLabel="Enter your password"
         onChange={handleChange}
         emailVal={emailVal}
         passwordVal={passwordVal}
         handleSubmit={handleSignIn}
         signUpMessage={signUpMessage}
-        signInConfig={signInConfig}
+        formKey="signIn"
       />
     </div>
   );

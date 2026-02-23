@@ -1,46 +1,74 @@
-import type { SignInConfigType } from "../pages/SignIn";
+type authConfigType = {
+  key: string;
+  label: string;
+  type: string;
+  form: string;
+};
 
-const signUpConfig = [
+const authConfig: authConfigType[] = [
   {
-    key: "email",
+    key: "email-signIn",
+    label: "Enter your email",
     type: "email",
+    form: "signIn",
   },
   {
-    key: "password",
+    key: "password-signIn",
+    label: "Enter your password",
     type: "password",
+    form: "signIn",
+  },
+  { key: "fName", label: "Enter your name", type: "string", form: "signUp" },
+  {
+    key: "lName",
+    label: "Enter your last name",
+    type: "string",
+    form: "signUp",
+  },
+  {
+    key: "email-signUp",
+    label: "Enter your email",
+    type: "email",
+    form: "signUp",
+  },
+  {
+    key: "password-signUp",
+    label: "Enter your password",
+    type: "password",
+    form: "signUp",
   },
 ];
 
 interface Props {
-  emailLabel: string;
-  passwordLabel: string;
   emailVal: string;
   passwordVal: string;
   signUpMessage: string;
   onChange: (inputKey: string, value: string) => void;
   handleSubmit: (e: React.SubmitEvent) => void;
-  signInConfig: SignInConfigType[];
+  formKey: string;
 }
 
 const Auth = ({
-  emailLabel,
-  passwordLabel,
   onChange,
   handleSubmit,
   emailVal,
   passwordVal,
   signUpMessage,
-  signInConfig,
+  formKey,
 }: //⬜️ here : i have added yhe prop - i need to then add the fact its option and then render one or the other based on whats been fed to this child component.
 Props) => {
   //i thought of creating one state object to hold all values but thought only necessary for bigger multi input forms not just two inputs
 
+  const updatedArr = authConfig.filter((input) => input.form === formKey);
+
+  console.log("UA", updatedArr);
+
   return (
     <div>
       <form onSubmit={handleSubmit}>
-        {signUpConfig.map((input) => (
+        {updatedArr.map((input) => (
           <div key={input.key}>
-            <span>{input.key === "email" ? emailLabel : passwordLabel}</span>
+            <span>{input.label}</span>
             {/* //⛔️come back and fix above it is brittle⛔️ */}
             <input
               type={input.type}
