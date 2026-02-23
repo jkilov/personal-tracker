@@ -8,7 +8,7 @@ const ProtectedRoutes = ({ isAuthenticated }: Props) => {
   if (isAuthenticated) {
     return <Outlet />;
   } else {
-    return <Navigate to="/sign-in" replace />;
+    return <Navigate to="/" replace />;
   }
 };
 

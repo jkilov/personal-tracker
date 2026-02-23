@@ -1,8 +1,7 @@
-import { createClient, type Session } from "@supabase/supabase-js";
+import { type Session } from "@supabase/supabase-js";
+import { supabase } from "./client-supabase";
 
-const supabase = createClient(
-  import.meta.env.VITE_API_URL,
-import.meta.env.VITE_API_KEY);
+
 
 export const signUpUser = async (email: string, password: string) => {
   const { data, error } = await supabase.auth.signUp({

@@ -1,7 +1,8 @@
+import { useEffect, useState } from "react";
 import Auth from "../components/Auth";
-import { signInUser } from "../utils/supabase-auth";
-import { type Dispatch, useState, type SetStateAction, useEffect } from "react";
+import { signInUser } from "../utils/supabase/auth-supabase";
 import { useNavigate } from "react-router";
+import type { AuthValues } from "./SignUp";
 
 interface Props {
   isAuthenticated: boolean;
@@ -15,32 +16,29 @@ export type SignInConfigType = {
 const SignIn = ({ isAuthenticated }: Props) => {
   let navigate = useNavigate();
 
-  const [emailVal, setEmailVal] = useState<string>("");
-  const [passwordVal, setPasswordVal] = useState<string>("");
   const [signUpMessage, setSignUpMessage] = useState("");
 
-  const setterConfig: Record<string, Dispatch<SetStateAction<string>>> = {
-    email: setEmailVal,
-    password: setPasswordVal,
-  };
+  const [values, setValues] = useState<AuthValues>({
+    email: "",
+    password: "",
+  });
 
   const handleChange = (inputKey: string, value: string) => {
-    setterConfig[inputKey](value);
+    setValues((prev) => ({ ...prev, [inputKey]: value }));
   };
 
   const handleSignIn = async (e: React.SubmitEvent) => {
     e.preventDefault();
 
-    const { data, error } = await signInUser(emailVal, passwordVal);
+    const { data, error } = await signInUser(values.email, values.password);
 
     if (error) {
       setSignUpMessage("failure");
     } else {
       // handleUserAuth(data);
       setSignUpMessage("success");
-      setEmailVal("");
-      setPasswordVal("");
-      navigate("/");
+      setValues({ email: "", password: "" });
+      navigate("/dashboard");
     }
   };
 
@@ -50,7 +48,7 @@ const SignIn = ({ isAuthenticated }: Props) => {
 
   useEffect(() => {
     if (isAuthenticated) {
-      navigate("/");
+      navigate("/dashboard");
     }
   }, [isAuthenticated, navigate]);
 
@@ -59,8 +57,7 @@ const SignIn = ({ isAuthenticated }: Props) => {
       <h3>Sign In</h3>
       <Auth
         onChange={handleChange}
-        emailVal={emailVal}
-        passwordVal={passwordVal}
+        values={values}
         handleSubmit={handleSignIn}
         signUpMessage={signUpMessage}
         formKey="signIn"

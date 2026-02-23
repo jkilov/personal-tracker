@@ -1,5 +1,7 @@
+import type { AuthValues } from "../pages/SignUp";
+
 type authConfigType = {
-  key: string;
+  key: keyof AuthValues;
   label: string;
   type: string;
   form: string;
@@ -7,13 +9,13 @@ type authConfigType = {
 
 const authConfig: authConfigType[] = [
   {
-    key: "email-signIn",
+    key: "email",
     label: "Enter your email",
     type: "email",
     form: "signIn",
   },
   {
-    key: "password-signIn",
+    key: "password",
     label: "Enter your password",
     type: "password",
     form: "signIn",
@@ -26,13 +28,13 @@ const authConfig: authConfigType[] = [
     form: "signUp",
   },
   {
-    key: "email-signUp",
+    key: "email",
     label: "Enter your email",
     type: "email",
     form: "signUp",
   },
   {
-    key: "password-signUp",
+    key: "password",
     label: "Enter your password",
     type: "password",
     form: "signUp",
@@ -40,8 +42,7 @@ const authConfig: authConfigType[] = [
 ];
 
 interface Props {
-  emailVal: string;
-  passwordVal: string;
+  values: AuthValues;
   signUpMessage: string;
   onChange: (inputKey: string, value: string) => void;
   handleSubmit: (e: React.SubmitEvent) => void;
@@ -52,18 +53,15 @@ interface Props {
 const Auth = ({
   onChange,
   handleSubmit,
-  emailVal,
-  passwordVal,
   signUpMessage,
   formKey,
   buttonCTA,
+  values,
 }: //⬜️ here : i have added yhe prop - i need to then add the fact its option and then render one or the other based on whats been fed to this child component.
 Props) => {
   //i thought of creating one state object to hold all values but thought only necessary for bigger multi input forms not just two inputs
 
   const updatedArr = authConfig.filter((input) => input.form === formKey);
-
-  console.log("UA", updatedArr);
 
   return (
     <div>
@@ -76,7 +74,7 @@ Props) => {
               type={input.type}
               required
               //⛔️come back and fix below it is brittle⛔️
-              value={input.key === "email" ? emailVal : passwordVal}
+              value={values[input.key] as keyof AuthValues}
               onChange={(e) => onChange(input.key, e.target.value)}
             />
           </div>

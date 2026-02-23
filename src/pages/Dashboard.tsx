@@ -1,6 +1,6 @@
 import type { User } from "@supabase/supabase-js";
 import { useEffect, useState } from "react";
-import { getUser } from "../utils/supabase-auth";
+import { getUser } from "../utils/supabase/auth-supabase";
 
 const Dashboard = () => {
   const [authData, setAuthData] = useState<User | null>(null);

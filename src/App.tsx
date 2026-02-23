@@ -3,7 +3,7 @@ import "./App.css";
 import SignIn from "./pages/SignIn";
 import { Route, Routes } from "react-router";
 import ProtectedRoutes from "./components/ProtectedRoutes";
-import { authenticationCheck } from "./utils/supabase-auth";
+import { authenticationCheck } from "./utils/supabase/auth-supabase";
 import SignUp from "./pages/SignUp";
 import Dashboard from "./pages/Dashboard";
 
@@ -28,14 +28,11 @@ function App() {
   return (
     <>
       <Routes>
-        <Route
-          path="/"
-          element={<ProtectedRoutes isAuthenticated={isAuthenticated} />}
-        >
+        <Route element={<ProtectedRoutes isAuthenticated={isAuthenticated} />}>
           <Route path="/dashboard" element={<Dashboard />} />
         </Route>
         <Route
-          path="/sign-in"
+          path="/"
           element={<SignIn isAuthenticated={isAuthenticated} />}
         />
         <Route path="/sign-up" element={<SignUp />} />
