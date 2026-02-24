@@ -28,8 +28,7 @@ const SignUp = () => {
     console.log("type: ", inputKey, value);
   };
 
-  const handleSubmit = async (e: React.SubmitEvent) => {
-    e.preventDefault();
+  const handleAuthSignUp = async () => {
     const { data, error } = await signUpUser(values.email, values.password);
     const userId = data.user?.id;
     if (error) {
@@ -44,10 +43,13 @@ const SignUp = () => {
         values.email
       );
       console.log((await result).error);
-      setValues({ fName: "", lName: "", email: "", password: "" });
-      console.log(data);
-      //insert add data to table here
     }
+  };
+
+  const handleSubmit = (e: React.SubmitEvent) => {
+    e.preventDefault();
+    handleAuthSignUp();
+    setValues({ fName: "", lName: "", email: "", password: "" });
   };
 
   const handleSignInAccount = () => {

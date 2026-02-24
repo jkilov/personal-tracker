@@ -14,7 +14,6 @@ function App() {
   useEffect(() => {
     const subscription = authenticationCheck((session) => {
       setIsAuthenticated(!!session);
-      ``;
       setIsLoading(false);
     });
 

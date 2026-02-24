@@ -10,3 +10,14 @@ export const createUserData = async(userId: string, fName: string, lName: string
 
     return {error, status, statusText}
 }
+
+
+//READ
+
+export const readUserData = async()=> {
+    const {data,status, error} = await supabase
+    .from("user")
+    .select()
+
+    return {data,status, error}
+}
