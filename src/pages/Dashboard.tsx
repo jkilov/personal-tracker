@@ -1,31 +1,15 @@
-import type { User } from "@supabase/supabase-js";
-import { useEffect, useState } from "react";
-import { getUser } from "../utils/supabase/auth-supabase";
+import { useState } from "react";
+
 import { readUserData } from "../utils/supabase/user";
 import { createSession } from "../utils/supabase/session";
 
+import { useNavigate } from "react-router";
+
 const Dashboard = () => {
-  const [authData, setAuthData] = useState<User | null>(null);
+  const navigate = useNavigate();
   const [userId, setUserId] = useState("");
 
-  // useEffect(() => {
-  //   let isMounted = true;
-
-  //   const getUserDetails = async () => {
-  //     const user = await getUser();
-  //     if (isMounted) {
-  //       setAuthData(user);
-  //     }
-  //   };
-
-  //   getUserDetails();
-
-  //   return () => {
-  //     isMounted = false;
-  //   };
-  // }, []);
-
-  //the below is how we get the user_id from the user table - we may need this in our sessions table
+  //does the above need to be in a useEffect as we are making server calls - lso needs loading state
 
   const handleCreateSession = async () => {
     const { data } = await readUserData();
@@ -36,6 +20,8 @@ const Dashboard = () => {
     const { status, error } = await createSession(userId);
     console.log("error: ", error);
     console.log("status: ", status);
+
+    navigate("/modal");
   };
 
   return (

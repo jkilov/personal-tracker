@@ -6,6 +6,7 @@ import ProtectedRoutes from "./components/ProtectedRoutes";
 import { authenticationCheck } from "./utils/supabase/auth-supabase";
 import SignUp from "./pages/SignUp";
 import Dashboard from "./pages/Dashboard";
+import SessionModal from "./components/SessionModal";
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -35,6 +36,7 @@ function App() {
           element={<SignIn isAuthenticated={isAuthenticated} />}
         />
         <Route path="/sign-up" element={<SignUp />} />
+        <Route path="/modal" element={<SessionModal />} />
       </Routes>
     </>
   );
