@@ -2,7 +2,9 @@ const SessionModal = () => {
   return (
     <div>
       <div>SessionModal</div>
-      <form action=""></form>
+      <form>
+        <span>Select Exercise</span>
+      </form>
     </div>
   );
 };
