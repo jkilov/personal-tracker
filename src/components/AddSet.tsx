@@ -2,16 +2,15 @@ import { useState } from "react";
 
 type NewSet = {
   id: string;
-  title: string;
+  title?: string;
   repLabel: string;
   repInputType: string;
   weightLabel: string;
   weightInputType: string;
 };
 
-const newSetTemplat: NewSet = {
+const newSetTemplate: NewSet = {
   id: crypto.randomUUID(),
-  title: "Set",
   repLabel: "Reps",
   repInputType: "number",
   weightLabel: "Weight",
@@ -31,10 +30,18 @@ const AddSet = () => {
     },
   ]);
 
+  const addSet = () => {
+    const newCount = 1 + count;
+    setCount(newCount);
+
+    const newSet = { title: `Set ${newCount}`, ...newSetTemplate };
+    setCreateSet((prev) => [...prev, newSet]);
+  };
+
   return (
     <div>
       {createSet.map((set) => (
-        <div key={set.id}>
+        <div key={`${set.id}-${count}`}>
           <h4>{set.title}</h4>
           <label htmlFor={set.repLabel}>{set.repLabel}</label>
           <input type={set.repInputType} />
@@ -43,7 +50,7 @@ const AddSet = () => {
         </div>
       ))}
       <span>kg</span>
-      <button>+</button>
+      <button onClick={addSet}>+</button>
     </div>
   );
 };

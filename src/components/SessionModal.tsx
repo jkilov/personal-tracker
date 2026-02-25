@@ -17,12 +17,6 @@ const SessionModal = () => {
     null
   );
 
-  const test = async () => {
-    const data = await readExerciseData();
-    console.log("D", data);
-    setExerciseData(data);
-  };
-
   useEffect(() => {
     let isMounted: boolean;
     isMounted = true;
