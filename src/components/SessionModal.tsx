@@ -12,7 +12,9 @@ type ExerciseData = {
 const SessionModal = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [exerciseData, setExerciseData] = useState<ExerciseData[] | null>([]);
-  const [selectedExercise, setSelectedExercise] = useState<string | null>(null);
+  const [selectedExercise, setSelectedExercise] = useState<ExerciseData | null>(
+    null
+  );
 
   const test = async () => {
     const data = await readExerciseData();
@@ -38,6 +40,14 @@ const SessionModal = () => {
     };
   }, []);
 
+  const handleExerciseSelection = (selectedExerciseName: string) => {
+    const selectedExerciseData = exerciseData?.find(
+      (element) => element.exercise_name === selectedExerciseName
+    );
+
+    setSelectedExercise(selectedExerciseData!);
+  };
+
   if (isLoading) return <div>Loading.</div>;
 
   return (
@@ -49,15 +59,14 @@ const SessionModal = () => {
         <select
           name="exerciseList"
           id="exerciseList"
-          onChange={(e) =>
-            console.log(e.currentTarget.selectedOptions[0].dataset.userExercise)
-          }
+          onChange={(e) => handleExerciseSelection(e.target.value)}
         >
           <option value="" disabled selected>
             Select an exercise
           </option>
           {exerciseData?.map((exercise) => (
             <option
+              id={exercise.exercise_id}
               value={exercise.exercise_name}
               key={exercise.exercise_id}
               data-user-exercise="test"
