@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { readExerciseData } from "../utils/supabase/exercise";
+import AddSet from "./AddSet";
 
 type ExerciseData = {
   exercise_id: string;
@@ -50,6 +51,8 @@ const SessionModal = () => {
 
   if (isLoading) return <div>Loading.</div>;
 
+  console.log(selectedExercise);
+
   return (
     <div>
       <h3>Add Workout</h3>
@@ -77,7 +80,13 @@ const SessionModal = () => {
         </select>
       </form>
 
-      <button onClick={test}>test</button>
+      {selectedExercise && (
+        <div>
+          <AddSet />
+          <button>Cancel</button>
+          <button>Save</button>
+        </div>
+      )}
     </div>
   );
 };
