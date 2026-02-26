@@ -46,23 +46,21 @@ const AddSet = () => {
     const newCount = 1 + count;
     setCount(newCount);
 
+    const title = `Set ${newCount}`;
+
     const newSet = {
-      title: `Set ${newCount}`,
+      title,
       id: crypto.randomUUID(),
       ...newSetTemplate,
+      ...stateSetValues[title],
     };
     setCreateSet((prev) => [...prev, newSet]);
   };
 
-  const handleValChange = (
-    title: string,
-
-    input: string,
-    value: string | number
-  ) => {
+  const handleChange = (title: string, inputVal: string, value: string) => {
     setRepData((prev) => ({
       ...prev,
-      [title]: { ...[title], [input]: value },
+      [title]: { ...prev[title], [inputVal]: value },
     }));
   };
 
@@ -76,12 +74,16 @@ const AddSet = () => {
           <label htmlFor={set.repLabel}>{set.repLabel}</label>
           <input
             type={set.repInputType}
-            value={stateSetValues[set.title!].repVal}
+            value={repData[set.title!].repVal}
+            onChange={(e) => handleChange(set.title!, "repVal", e.target.value)}
           />
           <label htmlFor={set.weightLabel}>{set.weightLabel}</label>
           <input
             type={set.weightInputType}
-            value={stateSetValues[set.title!].weightVal}
+            value={repData[set.title!].weightVal}
+            onChange={(e) =>
+              handleChange(set.title!, "weightVal", e.target.value)
+            }
           />
         </div>
       ))}
