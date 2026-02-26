@@ -2,45 +2,59 @@ import { useState } from "react";
 
 type NewSet = {
   id?: string;
-  title?: string;
+  title: string;
   repLabel: string;
   repInputType: string;
   weightLabel: string;
   weightInputType: string;
 };
 
-type SetValuesConfig = {
+type RepValuesConfig = {
   el: NewSet;
   repVal: number;
   weightVal: number;
 };
 
-const newSetTemplate: NewSet = {
-  repLabel: "Reps",
-  repInputType: "number",
-  weightLabel: "Weight",
-  weightInputType: "number",
-};
+const newSetConfig: NewSet[] = [
+  {
+    title: "Set 1",
+    repLabel: "Reps",
+    repInputType: "number",
+    weightLabel: "Weight",
+    weightInputType: "number",
+  },
+];
 
 const AddSet = () => {
   const [count, setCount] = useState(1);
-  const [createSet, setCreateSet] = useState<NewSet[]>([
-    {
-      id: crypto.randomUUID(),
-      title: `Set ${count}`,
-      repLabel: "Reps",
-      repInputType: "number",
-      weightLabel: "Weight",
-      weightInputType: "number",
-    },
-  ]);
+  const [createSet, setCreateSet] = useState(newSetConfig);
 
-  const stateSetValues = createSet.reduce<any>((acc, el) => {
-    acc[el.title] = { ...el, repVal: 0, weightVal: 0 };
+  const repValueConfig = createSet.reduce<any>((acc, el) => {
+    acc[el.title] = {
+      ...el,
+      id: crypto.randomUUID(),
+      repValue: 0,
+      weightValue: 0,
+    };
     return acc;
   }, {});
 
-  const [repData, setRepData] = useState(stateSetValues);
+  const addSetTemplate = {
+    repLabel: "Reps",
+    repInputType: "number",
+    weightLabel: "Weight",
+    weightInputType: "number",
+  };
+  // const [createSet, setCreateSet] = useState<NewSet[]>([
+  //   {
+  //     id: crypto.randomUUID(),
+  //     title: `Set ${count}`,
+  //     repLabel: "Reps",
+  //     repInputType: "number",
+  //     weightLabel: "Weight",
+  //     weightInputType: "number",
+  //   },
+  // ]);
 
   const addSet = () => {
     const newCount = 1 + count;
@@ -51,21 +65,14 @@ const AddSet = () => {
     const newSet = {
       title,
       id: crypto.randomUUID(),
-      ...newSetTemplate,
-      ...stateSetValues[title],
+      ...addSetTemplate,
     };
     setCreateSet((prev) => [...prev, newSet]);
   };
 
-  const handleChange = (title: string, inputVal: string, value: string) => {
-    setRepData((prev) => ({
-      ...prev,
-      [title]: { ...prev[title], [inputVal]: value },
-    }));
-  };
-
-  console.log("D", repData);
-
+  console.log("count", count);
+  console.log("createSet", createSet);
+  console.log("repValuesConfig", repValueConfig);
   return (
     <div>
       {createSet.map((set) => (
@@ -74,16 +81,12 @@ const AddSet = () => {
           <label htmlFor={set.repLabel}>{set.repLabel}</label>
           <input
             type={set.repInputType}
-            value={repData[set.title!].repVal}
-            onChange={(e) => handleChange(set.title!, "repVal", e.target.value)}
+            value={repValueConfig[set.title].repValue}
           />
           <label htmlFor={set.weightLabel}>{set.weightLabel}</label>
           <input
             type={set.weightInputType}
-            value={repData[set.title!].weightVal}
-            onChange={(e) =>
-              handleChange(set.title!, "weightVal", e.target.value)
-            }
+            value={repValueConfig[set.title].weightValue}
           />
         </div>
       ))}
