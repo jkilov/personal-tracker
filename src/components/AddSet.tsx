@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useNavigate } from "react-router";
+import { useNavigate, useParams } from "react-router";
 
 type NewSet = {
   id?: string;
@@ -27,25 +27,22 @@ const newSetConfig: NewSet[] = [
   },
 ];
 
-const AddSet = () => {
+const addSetTemplate = {
+  repLabel: "Reps",
+  repInputType: "number",
+  weightLabel: "Weight",
+  weightInputType: "number",
+};
+
+interface Props {
+  exerciseId: string;
+}
+
+const AddSet = ({ exerciseId }: Props) => {
+  const { sessionId } = useParams();
   const navigate = useNavigate();
   const [count, setCount] = useState(1);
   const [createSet, setCreateSet] = useState(newSetConfig);
-
-  // const repValueConfig = createSet.reduce<any>((acc, el) => {
-  //   acc[el.title] = {
-  //     repValue: 0,
-  //     weightValue: 0,
-  //   };
-  //   return acc;
-  // }, {});
-
-  const addSetTemplate = {
-    repLabel: "Reps",
-    repInputType: "number",
-    weightLabel: "Weight",
-    weightInputType: "number",
-  };
 
   const setValuesBuilder = (set: NewSet[]) => {
     return set.reduce<
@@ -76,12 +73,42 @@ const AddSet = () => {
     }));
   };
 
+  const submit = () => {
+    // const testKeys = Object.keys(setVals);
+    // const testVals = Object.values(setVals);
+    // console.log(createSet);
+
+    // const testArr = [];
+
+    const newArr = createSet.reduce((acc, el) => {
+      const mergeSet = {
+        session_id: sessionId,
+        exercise_id: exerciseId,
+        title: el.title,
+        set_id: el.id,
+        reps: setVals[el.title].repValue,
+        weight: setVals[el.title].weightValue,
+      };
+      acc.push(mergeSet);
+      return acc;
+    }, []);
+    console.log(newArr);
+
+    // for (let i = 0; i < testVals.length; i++) {
+    //   let tempObj = {title: testKeys[i], ...testVals[i]};
+    //   testArr.push(tempObj);
+    // }
+    // console.log(testArr);
+  };
+
   const testChange = (title: string, input: string, value: number) => {
     setSetVals((prev) => ({
       ...prev,
       [title]: { ...prev[title], [input]: value },
     }));
   };
+
+  console.log([setVals]);
 
   return (
     <div>
@@ -117,6 +144,7 @@ const AddSet = () => {
         cancel
       </button>
       <button>Save</button>
+      <button onClick={submit}>TEST</button>
     </div>
   );
 };

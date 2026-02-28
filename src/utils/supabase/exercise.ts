@@ -8,5 +8,6 @@ const {data} = await supabase
 .from("exercise")
 .select()
 
+
 return data
 }

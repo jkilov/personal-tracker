@@ -33,7 +33,7 @@ const SessionModal = () => {
       getExerciseData();
     }
 
-    console.log(sessionId);
+    console.log(exerciseData);
 
     return () => {
       isMounted = false;
@@ -78,10 +78,9 @@ const SessionModal = () => {
           ))}
         </select>
       </form>
-      <button>test session</button>
       {selectedExercise && (
         <div>
-          <AddSet />
+          <AddSet exerciseId={selectedExercise.exercise_id} />
         </div>
       )}
     </div>
