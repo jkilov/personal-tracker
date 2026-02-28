@@ -2,9 +2,10 @@ import { supabase } from "./client-supabase";
 
 
 
-export const createSet = async() => {
+export const createNewSet = async(setArr: any) => {
 
     const {data, error} = await supabase
     .from("sets")
-    .insert([])
+    .insert(setArr)
+    return {data, error}
 }

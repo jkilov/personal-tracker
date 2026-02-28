@@ -1,5 +1,15 @@
 import { useState } from "react";
 import { useNavigate, useParams } from "react-router";
+import { createNewSet } from "../utils/supabase/set";
+
+type MergeSet = {
+  session_id: string | undefined;
+  exercise_id: string;
+
+  set_id: string | undefined;
+  reps: number;
+  weight: number;
+};
 
 type NewSet = {
   id?: string;
@@ -8,12 +18,6 @@ type NewSet = {
   repInputType: string;
   weightLabel: string;
   weightInputType: string;
-};
-
-type RepValuesConfig = {
-  el: NewSet;
-  repVal: number;
-  weightVal: number;
 };
 
 const newSetConfig: NewSet[] = [
@@ -73,18 +77,11 @@ const AddSet = ({ exerciseId }: Props) => {
     }));
   };
 
-  const submit = () => {
-    // const testKeys = Object.keys(setVals);
-    // const testVals = Object.values(setVals);
-    // console.log(createSet);
-
-    // const testArr = [];
-
-    const newArr = createSet.reduce((acc, el) => {
-      const mergeSet = {
+  const saveSets = async () => {
+    const newArr = createSet.reduce<MergeSet[]>((acc, el) => {
+      const mergeSet: MergeSet = {
         session_id: sessionId,
         exercise_id: exerciseId,
-        title: el.title,
         set_id: el.id,
         reps: setVals[el.title].repValue,
         weight: setVals[el.title].weightValue,
@@ -92,13 +89,11 @@ const AddSet = ({ exerciseId }: Props) => {
       acc.push(mergeSet);
       return acc;
     }, []);
-    console.log(newArr);
 
-    // for (let i = 0; i < testVals.length; i++) {
-    //   let tempObj = {title: testKeys[i], ...testVals[i]};
-    //   testArr.push(tempObj);
-    // }
-    // console.log(testArr);
+    console.log(newArr);
+    const { data, error } = await createNewSet(newArr);
+
+    console.log(error);
   };
 
   const testChange = (title: string, input: string, value: number) => {
@@ -143,8 +138,7 @@ const AddSet = ({ exerciseId }: Props) => {
       >
         cancel
       </button>
-      <button>Save</button>
-      <button onClick={submit}>TEST</button>
+      <button onClick={saveSets}>Save</button>
     </div>
   );
 };
