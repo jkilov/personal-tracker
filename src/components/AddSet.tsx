@@ -5,7 +5,7 @@ import { createNewSet } from "../utils/supabase/set";
 type MergeSet = {
   session_id: string | undefined;
   exercise_id: string;
-
+  set_number: number;
   set_id: string | undefined;
   reps: number;
   weight: number;
@@ -13,6 +13,7 @@ type MergeSet = {
 
 type NewSet = {
   id?: string;
+  setNo: number;
   title: string;
   repLabel: string;
   repInputType: string;
@@ -23,6 +24,7 @@ type NewSet = {
 const newSetConfig: NewSet[] = [
   {
     id: crypto.randomUUID(),
+    setNo: 1,
     title: "Set 1",
     repLabel: "Reps",
     repInputType: "number",
@@ -67,6 +69,7 @@ const AddSet = ({ exerciseId }: Props) => {
 
     const newSet = {
       title,
+      setNo: newCount,
       id: crypto.randomUUID(),
       ...addSetTemplate,
     };
@@ -81,6 +84,7 @@ const AddSet = ({ exerciseId }: Props) => {
     const newArr = createSet.reduce<MergeSet[]>((acc, el) => {
       const mergeSet: MergeSet = {
         session_id: sessionId,
+        set_number: el.setNo,
         exercise_id: exerciseId,
         set_id: el.id,
         reps: setVals[el.title].repValue,
@@ -103,7 +107,7 @@ const AddSet = ({ exerciseId }: Props) => {
     }));
   };
 
-  console.log([setVals]);
+  console.log("c", createSet);
 
   return (
     <div>
