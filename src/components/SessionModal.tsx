@@ -1,5 +1,4 @@
 import { useState, useEffect } from "react";
-import { useParams } from "react-router";
 import { readExerciseData } from "../utils/supabase/exercise";
 import AddSet from "./AddSet";
 
@@ -17,8 +16,6 @@ const SessionModal = () => {
   const [selectedExercise, setSelectedExercise] = useState<ExerciseData | null>(
     null
   );
-
-  const { sessionId } = useParams();
 
   useEffect(() => {
     let isMounted: boolean;

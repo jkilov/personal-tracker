@@ -1,8 +1,10 @@
-import { useState } from "react";
+import { useState, useContext } from "react";
 import { useNavigate, useParams } from "react-router";
 import { createNewSet } from "../utils/supabase/set";
+import { AuthContext } from "../App";
 
 type MergeSet = {
+  user_id: string | undefined;
   session_id: string | undefined;
   exercise_id: string;
   set_number: number;
@@ -49,6 +51,7 @@ const AddSet = ({ exerciseId }: Props) => {
   const navigate = useNavigate();
   const [count, setCount] = useState(1);
   const [createSet, setCreateSet] = useState(newSetConfig);
+  const session = useContext(AuthContext);
 
   const setValuesBuilder = (set: NewSet[]) => {
     return set.reduce<
@@ -83,6 +86,7 @@ const AddSet = ({ exerciseId }: Props) => {
   const saveSets = async () => {
     const newArr = createSet.reduce<MergeSet[]>((acc, el) => {
       const mergeSet: MergeSet = {
+        user_id: session?.user.id,
         session_id: sessionId,
         set_number: el.setNo,
         exercise_id: exerciseId,
@@ -94,13 +98,13 @@ const AddSet = ({ exerciseId }: Props) => {
       return acc;
     }, []);
 
-    console.log(newArr);
+    console.log("t", newArr);
     const { data, error } = await createNewSet(newArr);
 
     console.log(error);
   };
 
-  const testChange = (title: string, input: string, value: number) => {
+  const handleChange = (title: string, input: string, value: number) => {
     setSetVals((prev) => ({
       ...prev,
       [title]: { ...prev[title], [input]: value },
@@ -119,7 +123,7 @@ const AddSet = ({ exerciseId }: Props) => {
             type={set.repInputType}
             value={setVals[set.title].repValue}
             onChange={(e) =>
-              testChange(set.title, "repValue", parseInt(e.target.value))
+              handleChange(set.title, "repValue", parseInt(e.target.value))
             }
           />
 
@@ -128,7 +132,7 @@ const AddSet = ({ exerciseId }: Props) => {
             type={set.weightInputType}
             value={setVals[set.title].weightValue}
             onChange={(e) =>
-              testChange(set.title, "weightValue", parseInt(e.target.value))
+              handleChange(set.title, "weightValue", parseInt(e.target.value))
             }
           />
         </div>
