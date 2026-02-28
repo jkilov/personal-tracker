@@ -2,7 +2,11 @@
 import { supabase } from "./client-supabase"
 
 export const createSession = async(userId: string) => {
-const {error, status, statusText} = await supabase.from("session").insert({user_id: userId})
+const {data, error, status, statusText} = await supabase.from("session").insert({user_id: userId}).select("session_id").single()
 
-return {error, status, statusText}
+return {data, error, status, statusText}
+
+
 }
+
+

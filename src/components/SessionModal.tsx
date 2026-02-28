@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useParams } from "react-router";
 import { readExerciseData } from "../utils/supabase/exercise";
 import AddSet from "./AddSet";
 
@@ -17,6 +18,8 @@ const SessionModal = () => {
     null
   );
 
+  const { sessionId } = useParams();
+
   useEffect(() => {
     let isMounted: boolean;
     isMounted = true;
@@ -29,6 +32,8 @@ const SessionModal = () => {
       };
       getExerciseData();
     }
+
+    console.log(sessionId);
 
     return () => {
       isMounted = false;
@@ -73,12 +78,10 @@ const SessionModal = () => {
           ))}
         </select>
       </form>
-
+      <button>test session</button>
       {selectedExercise && (
         <div>
           <AddSet />
-          <button>Cancel</button>
-          <button>Save</button>
         </div>
       )}
     </div>

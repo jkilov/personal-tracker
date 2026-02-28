@@ -18,6 +18,7 @@ export const readUserData = async()=> {
     const {data,status, error} = await supabase
     .from("user")
     .select()
+    .single()
 
     return {data,status, error}
 }

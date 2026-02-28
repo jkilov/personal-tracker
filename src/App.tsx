@@ -36,7 +36,7 @@ function App() {
           element={<SignIn isAuthenticated={isAuthenticated} />}
         />
         <Route path="/sign-up" element={<SignUp />} />
-        <Route path="/modal" element={<SessionModal />} />
+        <Route path="/modal/:sessionId" element={<SessionModal />} />
       </Routes>
     </>
   );

@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useNavigate } from "react-router";
 
 type NewSet = {
   id?: string;
@@ -27,6 +28,7 @@ const newSetConfig: NewSet[] = [
 ];
 
 const AddSet = () => {
+  const navigate = useNavigate();
   const [count, setCount] = useState(1);
   const [createSet, setCreateSet] = useState(newSetConfig);
 
@@ -45,14 +47,16 @@ const AddSet = () => {
     weightInputType: "number",
   };
 
-  const [setVals, setSetVals] = useState(() =>
-    newSetConfig.reduce<
+  const setValuesBuilder = (set: NewSet[]) => {
+    return set.reduce<
       Record<string, { repValue: number; weightValue: number }>
     >((acc, el) => {
       acc[el.title] = { repValue: 0, weightValue: 0 };
       return acc;
-    }, {} as Record<string, { repValue: number; weightValue: number }>)
-  );
+    }, {} as Record<string, { repValue: number; weightValue: number }>);
+  };
+
+  const [setVals, setSetVals] = useState(() => setValuesBuilder(newSetConfig));
 
   const addSet = () => {
     const newCount = 1 + count;
@@ -79,10 +83,6 @@ const AddSet = () => {
     }));
   };
 
-  console.log("count", count);
-  console.log("createSet", createSet);
-
-  console.log("setVals", setVals);
   return (
     <div>
       {createSet.map((set) => (
@@ -109,6 +109,14 @@ const AddSet = () => {
       ))}
       <span>kg</span>
       <button onClick={addSet}>+</button>
+      <button
+        onClick={() => {
+          navigate(-1);
+        }}
+      >
+        cancel
+      </button>
+      <button>Save</button>
     </div>
   );
 };

@@ -12,17 +12,19 @@ const Dashboard = () => {
   //does the above need to be in a useEffect as we are making server calls - lso needs loading state
 
   const handleCreateSession = async () => {
-    const { data } = await readUserData();
+    const { data: userData } = await readUserData();
 
-    const userId = data![0].user_id;
-    setUserId(userId);
+    const uid = userData.user_id;
+    setUserId(uid);
 
-    const { status, error } = await createSession(userId);
-    console.log("error: ", error);
-    console.log("status: ", status);
+    const { data } = await createSession(uid);
 
-    navigate("/modal");
+    const sessionId = data?.session_id;
+
+    navigate(`/modal/${sessionId}`);
   };
+
+  console.log(userId);
 
   return (
     <div>
