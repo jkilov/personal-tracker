@@ -6,7 +6,17 @@ const {data, error, status, statusText} = await supabase.from("session").insert(
 
 return {data, error, status, statusText}
 
+}
 
+
+export const fetchSessionData = async(columnName: string) => {
+
+    const {data, error, status} = await supabase
+    .from("session")
+    .select(columnName)
+
+
+    return {data, error, status}
 }
 
 
