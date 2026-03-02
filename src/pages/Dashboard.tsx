@@ -3,7 +3,7 @@ import { Toaster, toast } from "sonner";
 import { readUserData } from "../utils/supabase/user";
 import { createSession, fetchSessionData } from "../utils/supabase/session";
 import { useNavigate } from "react-router";
-import { ClipLoader } from "react-spinners";
+import { PulseLoader } from "react-spinners";
 import "../App.css";
 
 const Dashboard = () => {
@@ -20,6 +20,8 @@ const Dashboard = () => {
   //TODO: the below needs to be broken jp into helper functions
   //TODO: need to add some loading indicators when API calls are being made
   const handleCreateSession = async () => {
+    setIsLoading(true);
+
     const data = await fetchSessionData("created_at");
     const sessionCreatedDate = data.data;
     const newArr = sessionCreatedDate?.map((date) =>
@@ -34,6 +36,7 @@ const Dashboard = () => {
       toast.error("session already exists", {
         style: { background: "var(--toast-error)" },
       });
+      setIsLoading(false);
       return;
     }
 
@@ -60,7 +63,11 @@ const Dashboard = () => {
       <h1>Dashboard</h1>
 
       <button onClick={handleCreateSession}>
-        {isLoading ? <ClipLoader /> : "Add Session"}
+        {isLoading ? (
+          <PulseLoader color={"var(--toast-neutral)"} size={5} />
+        ) : (
+          "Add Session"
+        )}
       </button>
       <Toaster />
     </div>
