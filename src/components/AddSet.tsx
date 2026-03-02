@@ -111,8 +111,9 @@ const AddSet = ({ exerciseId }: Props) => {
     }));
   };
 
-  console.log("c", createSet);
-
+  const handleInputValidation = (value: number) => {
+    return value < 1;
+  };
   return (
     <div>
       {createSet.map((set) => (
@@ -121,14 +122,19 @@ const AddSet = ({ exerciseId }: Props) => {
           <label htmlFor={set.repLabel}>{set.repLabel}</label>
           <input
             type={set.repInputType}
+            required
             value={setVals[set.title].repValue}
             onChange={(e) =>
               handleChange(set.title, "repValue", parseInt(e.target.value))
             }
+            onBlur={() => handleInputValidation(setVals[set.title].repValue)}
           />
-
+          {handleInputValidation(setVals[set.title].repValue) ? (
+            <span>"help</span>
+          ) : null}
           <label htmlFor={set.weightLabel}>{set.weightLabel}</label>
           <input
+            required
             type={set.weightInputType}
             value={setVals[set.title].weightValue}
             onChange={(e) =>

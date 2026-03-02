@@ -18,8 +18,7 @@ const SessionModal = () => {
   );
 
   useEffect(() => {
-    let isMounted: boolean;
-    isMounted = true;
+    let isMounted = true;
 
     if (isMounted) {
       const getExerciseData = async () => {
@@ -46,8 +45,6 @@ const SessionModal = () => {
   };
 
   if (isLoading) return <div>Loading.</div>;
-
-  console.log(selectedExercise);
 
   return (
     <div>

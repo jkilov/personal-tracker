@@ -43,7 +43,7 @@ const authConfig: authConfigType[] = [
 
 interface Props {
   values: AuthValues;
-  signUpMessage: string;
+
   onChange: (inputKey: string, value: string) => void;
   handleSubmit: (e: React.SubmitEvent) => void;
   formKey: string;
@@ -53,7 +53,7 @@ interface Props {
 const Auth = ({
   onChange,
   handleSubmit,
-  signUpMessage,
+
   formKey,
   buttonCTA,
   values,
@@ -80,7 +80,6 @@ const Auth = ({
       </form>
 
       <br />
-      <span>{signUpMessage}</span>
     </div>
   );
 };

@@ -19,7 +19,6 @@ export type SignInConfigType = {
 const SignIn = ({ isAuthenticated }: Props) => {
   let navigate = useNavigate();
 
-  const [signUpMessage, setSignUpMessage] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
   const [values, setValues] = useState<AuthValues>({
@@ -50,7 +49,7 @@ const SignIn = ({ isAuthenticated }: Props) => {
       setIsLoading(false);
     } else {
       // handleUserAuth(data);
-      setSignUpMessage("success");
+
       setValues({ email: "", password: "" });
       setIsLoading(false);
       navigate("/dashboard");
@@ -74,7 +73,6 @@ const SignIn = ({ isAuthenticated }: Props) => {
         onChange={handleChange}
         values={values}
         handleSubmit={handleSignIn}
-        signUpMessage={signUpMessage}
         formKey="signIn"
         buttonCTA={"Sign In"}
       />

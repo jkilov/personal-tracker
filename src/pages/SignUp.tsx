@@ -2,8 +2,11 @@ import Auth from "../components/Auth";
 import { signUpUser } from "../utils/supabase/auth-supabase";
 import { createUserData } from "../utils/supabase/user.ts";
 import { useState } from "react";
+import { Toaster, toast } from "sonner";
 
 import { useNavigate } from "react-router";
+
+import "../App.css";
 
 export type AuthValues = {
   fName?: string;
@@ -32,24 +35,28 @@ const SignUp = () => {
     const { data, error } = await signUpUser(values.email, values.password);
     const userId = data.user?.id;
     if (error) {
-      setSignUpMessage("failure");
-      console.log(error.message);
+      toast.error(error.message, {
+        style: {
+          background: "var(--toast-error)",
+        },
+      });
     } else {
-      setSignUpMessage("success");
+      toast.success("Successfully created account", {
+        style: { background: "var(--toast-success" },
+      });
       const result = createUserData(
         userId!,
         values.fName!,
         values.lName!,
         values.email
       );
-      console.log((await result).error);
+      setValues({ fName: "", lName: "", email: "", password: "" });
     }
   };
 
   const handleSubmit = (e: React.SubmitEvent) => {
     e.preventDefault();
     handleAuthSignUp();
-    setValues({ fName: "", lName: "", email: "", password: "" });
   };
 
   const handleSignInAccount = () => {
@@ -68,6 +75,7 @@ const SignUp = () => {
         buttonCTA="Create Account"
       />
       <button onClick={handleSignInAccount}>Sign in</button>
+      <Toaster />
     </div>
   );
 };
