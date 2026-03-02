@@ -1,8 +1,7 @@
 import { useState } from "react";
-
+import { Toaster, toast } from "sonner";
 import { readUserData } from "../utils/supabase/user";
 import { createSession, fetchSessionData } from "../utils/supabase/session";
-
 import { useNavigate } from "react-router";
 
 const Dashboard = () => {
@@ -26,18 +25,20 @@ const Dashboard = () => {
     setIsSessionExists(sessionExists);
 
     if (sessionExists) {
-      console.log("session already exists");
+      toast.error("session already exists", {
+        style: { background: "#EF6461" },
+      });
       return;
     }
 
     const { data: userData } = await readUserData();
-
     const uid = userData.user_id;
     setUserId(uid);
 
     const { data: sessionData } = await createSession(uid);
 
     const sessionId = sessionData?.session_id;
+    toast.success("New session created", { style: { background: "#A9E5BB" } });
 
     navigate(`/modal/${sessionId}`);
   };
@@ -49,6 +50,7 @@ const Dashboard = () => {
       <h1>Dashboard</h1>
 
       <button onClick={handleCreateSession}>Add Session</button>
+      <Toaster />
     </div>
   );
 };
