@@ -3,6 +3,9 @@ import Auth from "../components/Auth";
 import { signInUser } from "../utils/supabase/auth-supabase";
 import { useNavigate } from "react-router";
 import type { AuthValues } from "./SignUp";
+import { Spinner } from "react-bootstrap";
+import { Toaster, toast } from "sonner";
+import "../App.css";
 
 interface Props {
   isAuthenticated: boolean;
@@ -17,6 +20,7 @@ const SignIn = ({ isAuthenticated }: Props) => {
   let navigate = useNavigate();
 
   const [signUpMessage, setSignUpMessage] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
 
   const [values, setValues] = useState<AuthValues>({
     email: "",
@@ -29,16 +33,26 @@ const SignIn = ({ isAuthenticated }: Props) => {
 
   const handleSignIn = async (e: React.SubmitEvent) => {
     e.preventDefault();
+    setIsLoading(true);
 
     const { data, error } = await signInUser(values.email, values.password);
 
     if (error) {
-      setSignUpMessage("failure");
-      console.log(error);
+      toast.error(
+        <div className="toast">
+          <span>
+            <strong>There was an error</strong>.
+          </span>
+          <span>{error.message}</span>
+        </div>,
+        { style: { background: "var(--toast-error)" } }
+      );
+      setIsLoading(false);
     } else {
       // handleUserAuth(data);
       setSignUpMessage("success");
       setValues({ email: "", password: "" });
+      setIsLoading(false);
       navigate("/dashboard");
     }
   };
@@ -62,8 +76,9 @@ const SignIn = ({ isAuthenticated }: Props) => {
         handleSubmit={handleSignIn}
         signUpMessage={signUpMessage}
         formKey="signIn"
-        buttonCTA="Sign In"
+        buttonCTA={"Sign In"}
       />
+      <Toaster />
       <button onClick={handleCreateAccount}>Create Account</button>
     </div>
   );

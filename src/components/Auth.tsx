@@ -47,7 +47,7 @@ interface Props {
   onChange: (inputKey: string, value: string) => void;
   handleSubmit: (e: React.SubmitEvent) => void;
   formKey: string;
-  buttonCTA: string;
+  buttonCTA: string | any;
 }
 
 const Auth = ({

@@ -1,11 +1,11 @@
 /**VARIABLE COLOURS**/
 
 :root {
-  --toast-error: #EF6461
-  --toast-success: #034C3C | #A9E5BB
-  --toast-neutral: #E0DFD5
-  --toast-other: #E8E9EB
-  --toast-warning: #E4B363
+  --toast-error: #EF6461;
+  --toast-success:  #A9E5BB;
+  --toast-neutral: #E0DFD5;
+  --toast-other: #E8E9EB;
+  --toast-warning: #E4B363;
 }
 
 
@@ -50,4 +50,12 @@
 
 .read-the-docs {
   color: #888;
+}
+
+
+.toast {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
 }

@@ -3,6 +3,8 @@ import { Toaster, toast } from "sonner";
 import { readUserData } from "../utils/supabase/user";
 import { createSession, fetchSessionData } from "../utils/supabase/session";
 import { useNavigate } from "react-router";
+import { ClipLoader } from "react-spinners";
+import "../App.css";
 
 const Dashboard = () => {
   const navigate = useNavigate();
@@ -11,8 +13,12 @@ const Dashboard = () => {
     false
   );
 
+  const [isLoading, setIsLoading] = useState(false);
+
   //does the above need to be in a useEffect as we are making server calls - lso needs loading state
 
+  //TODO: the below needs to be broken jp into helper functions
+  //TODO: need to add some loading indicators when API calls are being made
   const handleCreateSession = async () => {
     const data = await fetchSessionData("created_at");
     const sessionCreatedDate = data.data;
@@ -26,7 +32,7 @@ const Dashboard = () => {
 
     if (sessionExists) {
       toast.error("session already exists", {
-        style: { background: "#EF6461" },
+        style: { background: "var(--toast-error)" },
       });
       return;
     }
@@ -38,18 +44,24 @@ const Dashboard = () => {
     const { data: sessionData } = await createSession(uid);
 
     const sessionId = sessionData?.session_id;
-    toast.success("New session created", { style: { background: "#A9E5BB" } });
-
-    navigate(`/modal/${sessionId}`);
+    setIsLoading(true);
+    toast.success("New session created", {
+      duration: 2000,
+      style: { background: "var(--toast-success)" },
+      onAutoClose: () => {
+        setIsLoading(false);
+        navigate(`/modal/${sessionId}`);
+      },
+    });
   };
-
-  console.log("is", isSessionExists);
 
   return (
     <div>
       <h1>Dashboard</h1>
 
-      <button onClick={handleCreateSession}>Add Session</button>
+      <button onClick={handleCreateSession}>
+        {isLoading ? <ClipLoader /> : "Add Session"}
+      </button>
       <Toaster />
     </div>
   );
