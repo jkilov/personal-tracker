@@ -34,7 +34,7 @@ const Dashboard = () => {
 
     if (sessionExists) {
       toast.error("session already exists", {
-        style: { background: "var(--toast-error)" },
+        style: { background: "var(--error)" },
       });
       setIsLoading(false);
       return;
@@ -50,7 +50,7 @@ const Dashboard = () => {
     setIsLoading(true);
     toast.success("New session created", {
       duration: 2000,
-      style: { background: "var(--toast-success)" },
+      style: { background: "var(--success)" },
       onAutoClose: () => {
         setIsLoading(false);
         navigate(`/modal/${sessionId}`);
@@ -64,7 +64,7 @@ const Dashboard = () => {
 
       <button onClick={handleCreateSession}>
         {isLoading ? (
-          <PulseLoader color={"var(--toast-neutral)"} size={5} />
+          <PulseLoader color={"var(--neutral)"} size={5} />
         ) : (
           "Add Session"
         )}

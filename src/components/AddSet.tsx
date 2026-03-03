@@ -2,6 +2,7 @@ import { useState, useContext } from "react";
 import { useNavigate, useParams } from "react-router";
 import { createNewSet } from "../utils/supabase/set";
 import { AuthContext } from "../App";
+import "../App.css";
 
 type MergeSet = {
   user_id: string | undefined;
@@ -17,9 +18,9 @@ type NewSet = {
   id?: string;
   setNo: number;
   title: string;
-  repLabel: string;
+  repLabel: FieldKey;
   repInputType: string;
-  weightLabel: string;
+  weightLabel: FieldKey;
   weightInputType: string;
 };
 
@@ -40,11 +41,13 @@ const addSetTemplate = {
   repInputType: "number",
   weightLabel: "Weight",
   weightInputType: "number",
-};
+} as const;
 
 interface Props {
   exerciseId: string;
 }
+
+type FieldKey = "Reps" | "Weight";
 
 const AddSet = ({ exerciseId }: Props) => {
   const { sessionId } = useParams();
@@ -59,19 +62,19 @@ const AddSet = ({ exerciseId }: Props) => {
       Record<
         string,
         {
-          repValue: number;
-          weightValue: number;
+          Reps: number;
+          Weight: number;
           touched: Record<string, boolean>;
         }
       >
     >((acc, el) => {
       acc[el.title] = {
-        repValue: 0,
-        weightValue: 0,
+        Reps: 0,
+        Weight: 0,
         touched: { Reps: false, Weight: false },
       };
       return acc;
-    }, {} as Record<string, { repValue: number; weightValue: number; touched: Record<string, boolean> }>);
+    }, {} as Record<string, { Reps: number; Weight: number; touched: Record<string, boolean> }>);
   };
 
   const [setVals, setSetVals] = useState(() => setValuesBuilder(newSetConfig));
@@ -92,8 +95,8 @@ const AddSet = ({ exerciseId }: Props) => {
     setSetVals((prev) => ({
       ...prev,
       [title]: {
-        repValue: 0,
-        weightValue: 0,
+        Reps: 0,
+        Weight: 0,
         touched: { Reps: false, Weight: false },
       },
     }));
@@ -107,8 +110,8 @@ const AddSet = ({ exerciseId }: Props) => {
         set_number: el.setNo,
         exercise_id: exerciseId,
         set_id: el.id,
-        reps: setVals[el.title].repValue,
-        weight: setVals[el.title].weightValue,
+        reps: setVals[el.title].Reps,
+        weight: setVals[el.title].Weight,
       };
       acc.push(mergeSet);
       return acc;
@@ -120,22 +123,25 @@ const AddSet = ({ exerciseId }: Props) => {
     console.log(error);
   };
 
-  const handleChange = (title: string, input: string, value: number) => {
+  const handleChange = (title: string, field: FieldKey, value: number) => {
     setSetVals((prev) => ({
       ...prev,
-      [title]: { ...prev[title], [input]: value },
+      [title]: { ...prev[title], [field]: value },
     }));
   };
 
-  const handleBlur = (set: string, input: string) => {
+  const handleBlur = (set: string, field: FieldKey) => {
     setSetVals((prev) => ({
       ...prev,
-      [set]: { ...prev[set], touched: { ...prev[set].touched, [input]: true } },
+      [set]: { ...prev[set], touched: { ...prev[set].touched, [field]: true } },
     }));
   };
 
-  const handleValidation = (set: string, input: string, value: string) => {
-    if (setVals[set].touched[input] && setVals[set][value] < 1) {
+  const handleValidation = (set: string, field: FieldKey) => {
+    if (
+      setVals[set].touched[field] &&
+      (setVals[set][field] < 1 || isNaN(setVals[set][field]))
+    ) {
       return true;
     }
   };
@@ -153,28 +159,32 @@ const AddSet = ({ exerciseId }: Props) => {
             id={set.repLabel}
             type={set.repInputType}
             required
-            value={setVals[set.title].repValue}
+            value={setVals[set.title].Reps}
             onChange={(e) =>
-              handleChange(set.title, "repValue", parseInt(e.target.value))
+              handleChange(set.title, set.repLabel, parseInt(e.target.value))
             }
-            onBlur={() => handleBlur(set.title, set.repLabel)}
+            onBlur={() => handleBlur(set.title, "Reps")}
           />
-          {handleValidation(set.title, set.repLabel, "repValue") && (
-            <span>Value must be greater than 1</span>
+          {handleValidation(set.title, set.repLabel) && (
+            <span className="error-text">Value must be greater than 1</span>
           )}
 
           {/* //BUG: the above is not correct validation */}
           <label htmlFor={set.weightLabel}>{set.weightLabel}</label>
           <input
+            min={1}
             id={set.weightLabel}
             required
             type={set.weightInputType}
-            value={setVals[set.title].weightValue}
+            value={setVals[set.title].Weight}
             onChange={(e) =>
-              handleChange(set.title, "weightValue", parseInt(e.target.value))
+              handleChange(set.title, set.weightLabel, parseInt(e.target.value))
             }
-            onBlur={() => handleBlur(set.title, set.weightLabel)}
+            onBlur={() => handleBlur(set.title, "Weight")}
           />
+          {handleValidation(set.title, set.weightLabel) && (
+            <span className="error-text">Value must be greater than 1</span>
+          )}
         </div>
       ))}
       <span>kg</span>

@@ -1,11 +1,11 @@
 /**VARIABLE COLOURS**/
 
 :root {
-  --toast-error: #EF6461;
-  --toast-success:  #A9E5BB;
-  --toast-neutral: #E0DFD5;
-  --toast-other: #E8E9EB;
-  --toast-warning: #E4B363;
+  --error: #EF6461;
+  --success:  #A9E5BB;
+  --neutral: #E0DFD5;
+  --ther: #E8E9EB;
+  --warning: #E4B363;
 }
 
 
@@ -63,4 +63,9 @@
 .loading-indicator {
   display: flex;
   align-items: center;
+}
+
+.error-text {
+  font-size: 0.75rem;
+  color: var(--error);
 }
