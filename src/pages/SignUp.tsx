@@ -17,7 +17,6 @@ export type AuthValues = {
 
 const SignUp = () => {
   const navigate = useNavigate();
-  const [signUpMessage, setSignUpMessage] = useState("");
 
   const [values, setValues] = useState<AuthValues>({
     fName: "",
@@ -70,7 +69,6 @@ const SignUp = () => {
         onChange={handleChange}
         values={values}
         handleSubmit={handleSubmit}
-        signUpMessage={signUpMessage}
         formKey="signUp"
         buttonCTA="Create Account"
       />

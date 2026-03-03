@@ -50,16 +50,28 @@ const AddSet = ({ exerciseId }: Props) => {
   const { sessionId } = useParams();
   const navigate = useNavigate();
   const [count, setCount] = useState(1);
+
   const [createSet, setCreateSet] = useState(newSetConfig);
   const session = useContext(AuthContext);
 
   const setValuesBuilder = (set: NewSet[]) => {
     return set.reduce<
-      Record<string, { repValue: number; weightValue: number }>
+      Record<
+        string,
+        {
+          repValue: number;
+          weightValue: number;
+          touched: Record<string, boolean>;
+        }
+      >
     >((acc, el) => {
-      acc[el.title] = { repValue: 0, weightValue: 0 };
+      acc[el.title] = {
+        repValue: 0,
+        weightValue: 0,
+        touched: { Reps: false, Weight: false },
+      };
       return acc;
-    }, {} as Record<string, { repValue: number; weightValue: number }>);
+    }, {} as Record<string, { repValue: number; weightValue: number; touched: Record<string, boolean> }>);
   };
 
   const [setVals, setSetVals] = useState(() => setValuesBuilder(newSetConfig));
@@ -79,7 +91,11 @@ const AddSet = ({ exerciseId }: Props) => {
     setCreateSet((prev) => [...prev, newSet]);
     setSetVals((prev) => ({
       ...prev,
-      [title]: { repValue: 0, weightValue: 0 },
+      [title]: {
+        repValue: 0,
+        weightValue: 0,
+        touched: { Reps: false, Weight: false },
+      },
     }));
   };
 
@@ -99,7 +115,7 @@ const AddSet = ({ exerciseId }: Props) => {
     }, []);
 
     console.log("t", newArr);
-    const { data, error } = await createNewSet(newArr);
+    const { error } = await createNewSet(newArr);
 
     console.log(error);
   };
@@ -111,9 +127,21 @@ const AddSet = ({ exerciseId }: Props) => {
     }));
   };
 
-  const handleInputValidation = (value: number) => {
-    return value < 1;
+  const handleBlur = (set: string, input: string) => {
+    setSetVals((prev) => ({
+      ...prev,
+      [set]: { ...prev[set], touched: { ...prev[set].touched, [input]: true } },
+    }));
   };
+
+  const handleValidation = (set: string, input: string, value: string) => {
+    if (setVals[set].touched[input] && setVals[set][value] < 1) {
+      return true;
+    }
+  };
+
+  console.log("ss", setVals);
+  console.log("L", createSet);
   return (
     <div>
       {createSet.map((set) => (
@@ -121,25 +149,31 @@ const AddSet = ({ exerciseId }: Props) => {
           <h4>{set.title}</h4>
           <label htmlFor={set.repLabel}>{set.repLabel}</label>
           <input
+            min={1}
+            id={set.repLabel}
             type={set.repInputType}
             required
             value={setVals[set.title].repValue}
             onChange={(e) =>
               handleChange(set.title, "repValue", parseInt(e.target.value))
             }
-            onBlur={() => handleInputValidation(setVals[set.title].repValue)}
+            onBlur={() => handleBlur(set.title, set.repLabel)}
           />
-          {handleInputValidation(setVals[set.title].repValue) ? (
-            <span>"help</span>
-          ) : null}
+          {handleValidation(set.title, set.repLabel, "repValue") && (
+            <span>Value must be greater than 1</span>
+          )}
+
+          {/* //BUG: the above is not correct validation */}
           <label htmlFor={set.weightLabel}>{set.weightLabel}</label>
           <input
+            id={set.weightLabel}
             required
             type={set.weightInputType}
             value={setVals[set.title].weightValue}
             onChange={(e) =>
               handleChange(set.title, "weightValue", parseInt(e.target.value))
             }
+            onBlur={() => handleBlur(set.title, set.weightLabel)}
           />
         </div>
       ))}

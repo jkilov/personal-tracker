@@ -51,7 +51,7 @@ const SessionModal = () => {
       <h3>Add Workout</h3>
 
       <form>
-        <h4>Select Exercise</h4>
+        <label htmlFor="exerciseList">Select Exercise</label>
         <select
           name="exerciseList"
           id="exerciseList"
