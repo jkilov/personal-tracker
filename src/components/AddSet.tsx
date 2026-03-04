@@ -14,6 +14,9 @@ type MergeSet = {
   weight: number;
 };
 
+type FieldKey = "Reps" | "Weight";
+type TouchedKey = `${FieldKey}Touched`;
+
 type NewSet = {
   id?: string;
   setNo: number;
@@ -47,8 +50,6 @@ interface Props {
   exerciseId: string;
 }
 
-type FieldKey = "Reps" | "Weight";
-
 const AddSet = ({ exerciseId }: Props) => {
   const { sessionId } = useParams();
   const navigate = useNavigate();
@@ -64,17 +65,19 @@ const AddSet = ({ exerciseId }: Props) => {
         {
           Reps: number;
           Weight: number;
-          touched: Record<string, boolean>;
+          RepsTouched: boolean;
+          WeightTouched: boolean;
         }
       >
     >((acc, el) => {
       acc[el.title] = {
         Reps: 0,
         Weight: 0,
-        touched: { Reps: false, Weight: false },
+        RepsTouched: false,
+        WeightTouched: false,
       };
       return acc;
-    }, {} as Record<string, { Reps: number; Weight: number; touched: Record<string, boolean> }>);
+    }, {} as Record<string, { Reps: number; Weight: number; RepsTouched: boolean; WeightTouched: boolean }>);
   };
 
   const [setVals, setSetVals] = useState(() => setValuesBuilder(newSetConfig));
@@ -97,7 +100,8 @@ const AddSet = ({ exerciseId }: Props) => {
       [title]: {
         Reps: 0,
         Weight: 0,
-        touched: { Reps: false, Weight: false },
+        RepsTouched: false,
+        WeightTouched: false,
       },
     }));
   };
@@ -131,23 +135,53 @@ const AddSet = ({ exerciseId }: Props) => {
   };
 
   const handleBlur = (set: string, field: FieldKey) => {
+    // setSetVals((prev) => ({
+    //   ...prev,
+    //   [set]: { ...prev[set],  `${field}+Touched`: true  },
+    // });
+
+    const touchedField = `${field}Touched`;
+
     setSetVals((prev) => ({
       ...prev,
-      [set]: { ...prev[set], touched: { ...prev[set].touched, [field]: true } },
+      [set]: { ...prev[set], [touchedField]: true },
     }));
   };
 
   const handleValidation = (set: string, field: FieldKey) => {
+    const touchedField = `${field}Touched` as TouchedKey;
+
     if (
-      setVals[set].touched[field] &&
+      setVals[set][touchedField] &&
       (setVals[set][field] < 1 || isNaN(setVals[set][field]))
     ) {
       return true;
     }
   };
 
-  console.log("ss", setVals);
-  console.log("L", createSet);
+  const isSaveDisabed = () => {
+    let field = "Reps" || ("Weight" as FieldKey);
+    const valuesArr = Object.values(setVals);
+    const targetValue = 0;
+    const targetBoolean = false;
+
+    const hasValue = valuesArr.some(
+      (set) =>
+        set.Reps === 0 ||
+        set.Weight === 0 ||
+        set.RepsTouched === false ||
+        set.WeightTouched === false
+    );
+
+    return hasValue;
+  };
+
+  //TODO: the above works but now needs to be heavily refactored
+
+  console.log("S", setVals);
+
+  console.log(setVals);
+
   return (
     <div>
       {createSet.map((set) => (
@@ -196,7 +230,12 @@ const AddSet = ({ exerciseId }: Props) => {
       >
         cancel
       </button>
-      <button onClick={saveSets}>Save</button>
+      <button disabled={isSaveDisabed()} onClick={saveSets}>
+        Save
+      </button>
+      <button onClick={() => isSaveDisabed()}>test</button>
+      //TODO: need to add disable to save button until all validation has been
+      met
     </div>
   );
 };

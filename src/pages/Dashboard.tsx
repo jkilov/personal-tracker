@@ -8,10 +8,10 @@ import "../App.css";
 
 const Dashboard = () => {
   const navigate = useNavigate();
-  const [userId, setUserId] = useState("");
-  const [isSessionExists, setIsSessionExists] = useState<boolean | undefined>(
-    false
-  );
+  // const [userId, setUserId] = useState("");
+  // const [isSessionExists, setIsSessionExists] = useState<boolean | undefined>(
+  //   false
+  // );
 
   const [isLoading, setIsLoading] = useState(false);
 
@@ -30,7 +30,7 @@ const Dashboard = () => {
     const justDate = newArr?.map((date) => date[0]);
     const todayUTC = new Date().toISOString().split("T")[0];
     const sessionExists = justDate?.includes(todayUTC);
-    setIsSessionExists(sessionExists);
+    // setIsSessionExists(sessionExists);
 
     if (sessionExists) {
       toast.error("session already exists", {
@@ -42,7 +42,7 @@ const Dashboard = () => {
 
     const { data: userData } = await readUserData();
     const uid = userData.user_id;
-    setUserId(uid);
+    // setUserId(uid);
 
     const { data: sessionData } = await createSession(uid);
 
