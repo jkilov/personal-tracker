@@ -32,25 +32,30 @@ const SignUp = () => {
 
   const handleAuthSignUp = async () => {
     const { data, error } = await signUpUser(values.email, values.password);
-    const userId = data.user?.id;
     if (error) {
       toast.error(error.message, {
         style: {
           background: "var(--toast-error)",
         },
       });
-    } else {
-      toast.success("Successfully created account", {
-        style: { background: "var(--toast-success" },
-      });
-      const result = createUserData(
-        userId!,
-        values.fName!,
-        values.lName!,
-        values.email
-      );
-      setValues({ fName: "", lName: "", email: "", password: "" });
+      return;
     }
+    const userId = data.user?.id;
+    const { error: userError } = await createUserData(
+      userId!,
+      values.fName!,
+      values.lName!,
+      values.email
+    );
+    if (userError) {
+      toast.error("Failed to create user profile");
+      return;
+    }
+
+    toast.success("Successfully created account", {
+      style: { background: "var(--toast-success" },
+    });
+    setValues({ fName: "", lName: "", email: "", password: "" });
   };
 
   const handleSubmit = (e: React.SubmitEvent) => {

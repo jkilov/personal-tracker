@@ -135,11 +135,6 @@ const AddSet = ({ exerciseId }: Props) => {
   };
 
   const handleBlur = (set: string, field: FieldKey) => {
-    // setSetVals((prev) => ({
-    //   ...prev,
-    //   [set]: { ...prev[set],  `${field}+Touched`: true  },
-    // });
-
     const touchedField = `${field}Touched`;
 
     setSetVals((prev) => ({
@@ -159,28 +154,19 @@ const AddSet = ({ exerciseId }: Props) => {
     }
   };
 
-  const isSaveDisabed = () => {
-    let field = "Reps" || ("Weight" as FieldKey);
+  const isSaveDisabled = () => {
     const valuesArr = Object.values(setVals);
-    const targetValue = 0;
-    const targetBoolean = false;
 
-    const hasValue = valuesArr.some(
+    const hasInvalidSet = valuesArr.some(
       (set) =>
         set.Reps === 0 ||
         set.Weight === 0 ||
         set.RepsTouched === false ||
         set.WeightTouched === false
     );
-
-    return hasValue;
+    console.log("V", valuesArr);
+    return hasInvalidSet;
   };
-
-  //TODO: the above works but now needs to be heavily refactored
-
-  console.log("S", setVals);
-
-  console.log(setVals);
 
   return (
     <div>
@@ -230,12 +216,9 @@ const AddSet = ({ exerciseId }: Props) => {
       >
         cancel
       </button>
-      <button disabled={isSaveDisabed()} onClick={saveSets}>
+      <button disabled={isSaveDisabled()} onClick={saveSets}>
         Save
       </button>
-      <button onClick={() => isSaveDisabed()}>test</button>
-      //TODO: need to add disable to save button until all validation has been
-      met
     </div>
   );
 };

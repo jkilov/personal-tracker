@@ -29,8 +29,6 @@ const SessionModal = () => {
       getExerciseData();
     }
 
-    console.log(exerciseData);
-
     return () => {
       isMounted = false;
     };
