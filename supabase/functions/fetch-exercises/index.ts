@@ -8,23 +8,21 @@ import "@supabase/functions-js/edge-runtime.d.ts"
 console.log("Hello from Functions!")
 
 Deno.serve(async (req) => {
-  // const { name } = await req.json()
-  // const data = {
-  //   message: `Hello ${name}!`,
-  // }
+
+
 
   const url ="https://exercisedb.p.rapidapi.com/exercises"
   const options = {
     method: "GET",
     headers: {
       "x-rapidapi-key": Deno.env.get("RAPID_API_KEY"),
-      "x-rapidapi-host": Deno.env.get("RAPID_API_HOST")
+      "x-rapidapi-host": Deno.env.get("RAPID_API_HOST"),
     }
   }
 
   const request = await fetch(url, options)
 const data = await request.json()
-  console.log(data)
+  console.log(data[0].bodyPart)
 
   return new Response(
     JSON.stringify({message: request}),
