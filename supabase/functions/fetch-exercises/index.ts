@@ -4,8 +4,15 @@
 
 // Setup type definitions for built-in Supabase Runtime APIs
 import "@supabase/functions-js/edge-runtime.d.ts"
+import {createClient} from  "jsr:@supabase/supabase-js@2"
 
 console.log("Hello from Functions!")
+
+
+const supabase = createClient(
+  Deno.env.get("SUPABASE_URL")!,
+  Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!,
+)
 
 Deno.serve(async (req) => {
 
@@ -20,15 +27,40 @@ Deno.serve(async (req) => {
     }
   }
 
-  const request = await fetch(url, options)
-const data = await request.json()
-  console.log(data[0].bodyPart)
 
-  return new Response(
-    JSON.stringify({message: request}),
-    { headers: { "Content-Type": "application/json" } },
-  )
+  try {
+
+
+    const request = await fetch(url, options)
+    const exerciseData = await request.json()
+      
+    
+    const rows = exerciseData.map(exercise => ({exercise_id: exercise.id, exercise_name: exercise.name, body_part: exercise.bodyPart, media_url: "", equipment: exercise.equipment }))
+
+
+    const {data, error} = await supabase
+    .from("exercise")
+    .insert(rows)
+
+    if (error) {
+      throw error
+    }
+    
+      return new Response(
+        JSON.stringify({message: data}),
+        { headers: { "Content-Type": "application/json" } },
+      )
+    
+
+    
+  } catch (error) {
+    return new Response (
+      JSON.stringify({message: error.message}), 
+      { headers: { "Content-Type": "application/json" } },
+    )
+  }
 })
+  
 
 /* To invoke locally:
 
