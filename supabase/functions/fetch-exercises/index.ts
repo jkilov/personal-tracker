@@ -10,8 +10,8 @@ console.log("Hello from Functions!")
 
 
 const supabase = createClient(
-  Deno.env.get("SUPABASE_URL")!,
-  Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!,
+  Deno.env.get("REMOTE_SUPABASE_URL")!,
+  Deno.env.get("REMOTE_SUPABASE_SERVICE_ROLE_KEY")!,
 )
 
 
@@ -31,9 +31,12 @@ const rowCleanUp = (str: string) => {
 
 Deno.serve(async (req) => {
 
+//TODO: update rapiddb subscription to get full list of exercises
+//download all images and store these witihn supabase
+//link exercise table to storage to get exercises
 
 
-  const url ="https://exercisedb.p.rapidapi.com/exercises"
+  const url ="https://exercisedb.p.rapidapi.com/exercises?limit=0"
   const options = {
     method: "GET",
     headers: {
@@ -64,8 +67,16 @@ Deno.serve(async (req) => {
 
     
     
-    const rows = exerciseData.map(exercise => ({external_id: exercise.id, exercise_name: rowCleanUp(exercise.name), body_part: rowCleanUp(exercise.bodyPart), media_url: "", equipment: rowCleanUp(exercise.equipment), source: "exercisedb" }))
+const apiKey = Deno.env.get("RAPID_API_KEY")
 
+const rows = exerciseData.map(exercise => ({
+  external_id: exercise.id,
+  exercise_name: rowCleanUp(exercise.name),
+  body_part: rowCleanUp(exercise.bodyPart),
+  media_url: `https://exercisedb.p.rapidapi.com/image?exerciseId=${exercise.id}&resolution=180`,
+  equipment: rowCleanUp(exercise.equipment),
+  source: "exercisedb"
+}))
 
     const {data, error, count} = await supabase
     .from("exercise")
