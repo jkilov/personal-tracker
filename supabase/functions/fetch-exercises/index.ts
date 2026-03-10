@@ -10,9 +10,11 @@ console.log("Hello from Functions!")
 
 
 const supabase = createClient(
-  Deno.env.get("SUPABASE_URL")!,
-  Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!,
+  Deno.env.get("REMOTE_SUPABASE_URL")!,
+  Deno.env.get("REMOTE_SUPABASE_SERVICE_ROLE_KEY")!,
 )
+
+
 
 Deno.serve(async (req) => {
 
@@ -30,24 +32,51 @@ Deno.serve(async (req) => {
 
   try {
 
+    const {count: existingCount, error: countError} = await supabase
+    .from("exercise")
+    .select("*", {count: "exact", head: true})
+
+    if (countError) {
+      throw countError
+    }
+
+    if((existingCount ?? 0) > 0) {
+      return new Response(JSON.stringify({message: " Exercise already seeded. Import skipped", inserted: 0, existingCount}),
+    {headers: {"Content-Type": "application/json"}}
+    )
+    }
 
     const request = await fetch(url, options)
     const exerciseData = await request.json()
+
+    const rowCleanUp = (str: string) => {
+      const toLowerCase = str.toLowerCase()
+
+      const words = toLowerCase.split(" ")
+
+        const capitalisedWords = words.map(word => { 
+          if (word.length === 0) return "";
+        return word.charAt(0).toUpperCase() + word.slice(1)
+        })
+        return capitalisedWords.join(" ")
+    }
       
     
-    const rows = exerciseData.map(exercise => ({exercise_id: exercise.id, exercise_name: exercise.name, body_part: exercise.bodyPart, media_url: "", equipment: exercise.equipment }))
+    const rows = exerciseData.map(exercise => ({external_id: exercise.id, exercise_name: rowCleanUp(exercise.name), body_part: rowCleanUp(exercise.bodyPart), media_url: "", equipment: rowCleanUp(exercise.equipment), source: "exercisedb" }))
 
 
-    const {data, error} = await supabase
+    console.log("R", rows)
+
+    const {data, error, count} = await supabase
     .from("exercise")
-    .insert(rows)
+    .insert(rows, {ignoreDuplicates: true, count: "exact"})
 
     if (error) {
       throw error
     }
     
       return new Response(
-        JSON.stringify({message: data}),
+        JSON.stringify({success: true, inserted: count}),
         { headers: { "Content-Type": "application/json" } },
       )
     
