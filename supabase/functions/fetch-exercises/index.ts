@@ -10,10 +10,23 @@ console.log("Hello from Functions!")
 
 
 const supabase = createClient(
-  Deno.env.get("REMOTE_SUPABASE_URL")!,
-  Deno.env.get("REMOTE_SUPABASE_SERVICE_ROLE_KEY")!,
+  Deno.env.get("SUPABASE_URL")!,
+  Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!,
 )
 
+
+const rowCleanUp = (str: string) => {
+  const toLowerCase = str.toLowerCase()
+
+  const words = toLowerCase.split(/\s+/)
+
+    const capitalisedWords = words.map(word => { 
+      if (word.length === 0) return "";
+    return word.charAt(0).toUpperCase() + word.slice(1)
+    })
+    return capitalisedWords.join(" ")
+}
+  
 
 
 Deno.serve(async (req) => {
@@ -49,23 +62,10 @@ Deno.serve(async (req) => {
     const request = await fetch(url, options)
     const exerciseData = await request.json()
 
-    const rowCleanUp = (str: string) => {
-      const toLowerCase = str.toLowerCase()
-
-      const words = toLowerCase.split(" ")
-
-        const capitalisedWords = words.map(word => { 
-          if (word.length === 0) return "";
-        return word.charAt(0).toUpperCase() + word.slice(1)
-        })
-        return capitalisedWords.join(" ")
-    }
-      
+    
     
     const rows = exerciseData.map(exercise => ({external_id: exercise.id, exercise_name: rowCleanUp(exercise.name), body_part: rowCleanUp(exercise.bodyPart), media_url: "", equipment: rowCleanUp(exercise.equipment), source: "exercisedb" }))
 
-
-    console.log("R", rows)
 
     const {data, error, count} = await supabase
     .from("exercise")
