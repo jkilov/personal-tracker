@@ -18,12 +18,19 @@ const supabase = createClient(
 
 
 Deno.serve(async (req) => {
-let exerciseIds = []
+const exerciseIds = []
+let from = 0
+const pageSize = 1000 
+
+while (true){
 
   const {data, error} = await supabase.from("exercise")
   .select("external_id")
+  .range(from, from + pageSize - 1)
 
   const exerciseExternalIds  = data.map(exercise => exercise.external_id)
+
+  if (!exerciseExternalIds || exerciseExternalIds.length === 0) break;
 
 
  try {
@@ -33,12 +40,16 @@ let exerciseIds = []
     exerciseIds.push(exerciseExternalIds[i])
   }
 
+  from += pageSize
+  continue;
+
 
   
  } catch (error) {
   console.log(error)
   
  }
+}
 
  return new Response(
   JSON.stringify(exerciseIds.length),
