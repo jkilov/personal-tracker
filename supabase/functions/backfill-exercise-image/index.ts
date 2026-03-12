@@ -25,29 +25,27 @@ Deno.serve(async (req) => {
 const exerciseIds = []
 let from = 0
 const pageSize = 1000
-let exercisesTest = []
+let exercisesTableArr = []
 
 
 
 try {
-
+while (true){
 
 const {data: exerciseData, error: exerciseTableError} = await supabase
 .from("exercise")
 .select("*")
+.range(from, pageSize-1)
+
+const newData = exerciseData
 
 
 
-exercisesTest = exerciseData
+exercisesTableArr.push(newData)
 
-console.log("ex ", exercisesTest.length)
-
-
+//FIXME: Error about about this not being iterable  
 
 if (exerciseTableError) throw new Error("Cannot retrieve exercise table")
-
-
-while (true){
 
 
  const {data, error} = await supabase.from("exercise")
@@ -61,6 +59,8 @@ while (true){
 
  const exerciseExternalIds  = data.map(exercise => exercise.external_id)
 
+ console.log("EL: ", exerciseExternalIds)
+
 for (let i=0; i<exerciseExternalIds.length; i++) {
   const imageUrl =  `https://exercisedb.p.rapidapi.com/image?exerciseId=${exerciseExternalIds[i]}&resolution=180`;
   const options = {
@@ -71,29 +71,30 @@ for (let i=0; i<exerciseExternalIds.length; i++) {
     }
   }
 
-  const imageResponse = await fetch(imageUrl,options)
+  // const imageResponse = await fetch(imageUrl,options)
 
-  if (!imageResponse.ok) throw new Error("Image fetch failed")
+  // if (!imageResponse.ok) throw new Error("Image fetch failed")
 
-    const gifImage = await imageResponse.blob()
+  //   const gifImage = await imageResponse.blob()
 
-    const fileName = `${exerciseExternalIds[i]}.gif`
+  //   const fileName = `${exerciseExternalIds[i]}.gif`
 
 
-
-    const {error: uploadError} = await supabase.storage
-    .from("exercise-images")
-    .upload(fileName, gifImage, {
-      contentType: "image/gif",
-      upsert: false
-    })
+  //   const {error: uploadError} = await supabase.storage
+  //   .from("exercise-images")
+  //   .upload(fileName, gifImage, {
+  //     contentType: "image/gif",
+  //     upsert: false
+  //   })
 
  
-    const {data} = supabase.storage.from("exercise-images"
-      .getPublicUrl(fileName)
-    )
+  //   const {data} = supabase.storage.from("exercise-images"
+  //   .getPublicUrl(fileName)
+  //   )
 
-    const publicUrl = data.publicUrl
+  //   const publicUrl = data.publicUrl
+
+// console.log("PURL: ", publicUrl)
 
 //TODO: we now need to retrieve the data from our exercie table, map over it and add the new media url to it and then push this back into our exercise table via supabase
 //need MAP
@@ -115,7 +116,7 @@ for (let i=0; i<exerciseExternalIds.length; i++) {
  } catch (error) {
  console.error("failed to fetch external_ids", error)
 
- return new Response(JSON>stringify("unknown error"))
+ return new Response(JSON.stringify("unknown error"))
 
 }
 
