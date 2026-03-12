@@ -21,17 +21,30 @@ const supabase = createClient(
 
 
 
-
-
-
-
 Deno.serve(async (req) => {
 const exerciseIds = []
 let from = 0
 const pageSize = 1000
+let exercisesTest = []
+
 
 
 try {
+
+
+const {data: exerciseData, error: exerciseTableError} = await supabase
+.from("exercise")
+.select("*")
+
+
+
+exercisesTest = exerciseData
+
+console.log("ex ", exercisesTest.length)
+
+
+
+if (exerciseTableError) throw new Error("Cannot retrieve exercise table")
 
 
 while (true){
@@ -67,7 +80,7 @@ for (let i=0; i<exerciseExternalIds.length; i++) {
     const fileName = `${exerciseExternalIds[i]}.gif`
 
 
-    //TODO: learn below
+
     const {error: uploadError} = await supabase.storage
     .from("exercise-images")
     .upload(fileName, gifImage, {
@@ -75,7 +88,7 @@ for (let i=0; i<exerciseExternalIds.length; i++) {
       upsert: false
     })
 
-    //TODO: learn below
+ 
     const {data} = supabase.storage.from("exercise-images"
       .getPublicUrl(fileName)
     )
@@ -85,8 +98,10 @@ for (let i=0; i<exerciseExternalIds.length; i++) {
 //TODO: we now need to retrieve the data from our exercie table, map over it and add the new media url to it and then push this back into our exercise table via supabase
 //need MAP
 
+
+
     //end of loop
-}
+  }
 
 
 //TODO: need to come back to this below
@@ -94,7 +109,7 @@ for (let i=0; i<exerciseExternalIds.length; i++) {
 
  continue;
 
-}
+} // end of while loop
 
 
  } catch (error) {
@@ -134,6 +149,7 @@ return new Response(
 
 
 */
+
 
 
 
