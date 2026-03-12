@@ -2,17 +2,25 @@
 // https://deno.land/manual/getting_started/setup_your_environment
 // This enables autocomplete, go to definition, etc.
 
+
 // Setup type definitions for built-in Supabase Runtime APIs
 import {createClient} from  "jsr:@supabase/supabase-js@2"
 import "@supabase/functions-js/edge-runtime.d.ts"
 
+
 console.log("Hello from Functions!")
 
 
+
+
 const supabase = createClient(
-  Deno.env.get("REMOTE_SUPABASE_URL")!,
-  Deno.env.get("REMOTE_SUPABASE_SERVICE_ROLE_KEY")!,
+ Deno.env.get("REMOTE_SUPABASE_URL")!,
+ Deno.env.get("REMOTE_SUPABASE_SERVICE_ROLE_KEY")!,
 )
+
+
+
+
 
 
 
@@ -20,43 +28,90 @@ const supabase = createClient(
 Deno.serve(async (req) => {
 const exerciseIds = []
 let from = 0
-const pageSize = 1000 
+const pageSize = 1000
+
+
+try {
+
 
 while (true){
 
-  const {data, error} = await supabase.from("exercise")
-  .select("external_id")
-  .range(from, from + pageSize - 1)
 
-  const exerciseExternalIds  = data.map(exercise => exercise.external_id)
-
-  if (!exerciseExternalIds || exerciseExternalIds.length === 0) break;
+ const {data, error} = await supabase.from("exercise")
+ .select("external_id")
+ .range(from, from + pageSize - 1)
 
 
- try {
+ if(error) throw error
 
+ if (!data|| data.length === 0) break;
 
-  for (let i = 0; i<exerciseExternalIds.length; i++) {
-    exerciseIds.push(exerciseExternalIds[i])
+ const exerciseExternalIds  = data.map(exercise => exercise.external_id)
+
+for (let i=0; i<exerciseExternalIds.length; i++) {
+  const imageUrl =  `https://exercisedb.p.rapidapi.com/image?exerciseId=${exerciseExternalIds[i]}&resolution=180`;
+  const options = {
+    method: "GET",
+    headers: {
+      "x-rapidapi-key": Deno.env.get("RAPID_API_KEY"),
+      "x-rapidapi-host": Deno.env.get("RAPID_API_KEY"),
+    }
   }
 
-  from += pageSize
-  continue;
+  const imageResponse = await fetch(imageUrl,options)
+
+  if (!imageResponse.ok) throw new Error("Image fetch failed")
+
+    const gifImage = await imageResponse.blob()
+
+    const fileName = `${exerciseExternalIds[i]}.gif`
 
 
-  
- } catch (error) {
-  console.log(error)
-  
- }
+    //TODO: learn below
+    const {error: uploadError} = await supabase.storage
+    .from("exercise-images")
+    .upload(fileName, gifImage, {
+      contentType: "image/gif",
+      upsert: false
+    })
+
+    //TODO: learn below
+    const {data} = supabase.storage.from("exercise-images"
+      .getPublicUrl(fileName)
+    )
+
+    const publicUrl = data.publicUrl
+
+//TODO: we now need to retrieve the data from our exercie table, map over it and add the new media url to it and then push this back into our exercise table via supabase
+//need MAP
+
+    //end of loop
 }
 
- return new Response(
-  JSON.stringify(exerciseIds.length),
+
+//TODO: need to come back to this below
+ from += pageSize
+
+ continue;
+
+}
+
+
+ } catch (error) {
+ console.error("failed to fetch external_ids", error)
+
+ return new Response(JSON>stringify("unknown error"))
+
+}
+
+
+return new Response(
+ JSON.stringify(exerciseIds.length),
 {headers: {"Content-Type": "application/json"}}
 )
 
-//TODO: currently this only returns 1000 rows this is because of the maximum that supabase allows - we need to build in some pagination logic to allow us to navigate through the different pages
+
+
 
 //   return new Response(
 //     JSON.stringify(data),
@@ -64,14 +119,21 @@ while (true){
 //   )
 })
 
+
 /* To invoke locally:
 
-  1. Run `supabase start` (see: https://supabase.com/docs/reference/cli/supabase-start)
-  2. Make an HTTP request:
 
-  curl -i --location --request POST 'http://127.0.0.1:54321/functions/v1/backfill-exercise-image' \
-    --header 'Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6ImFub24iLCJleHAiOjE5ODM4MTI5OTZ9.CRXP1A7WOeoJeXxjNni43kdQwgnWNReilDMblYTn_I0' \
-    --header 'Content-Type: application/json' \
-    --data '{"name":"Functions"}'
+ 1. Run `supabase start` (see: https://supabase.com/docs/reference/cli/supabase-start)
+ 2. Make an HTTP request:
+
+
+ curl -i --location --request POST 'http://127.0.0.1:54321/functions/v1/backfill-exercise-image' \
+   --header 'Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6ImFub24iLCJleHAiOjE5ODM4MTI5OTZ9.CRXP1A7WOeoJeXxjNni43kdQwgnWNReilDMblYTn_I0' \
+   --header 'Content-Type: application/json' \
+   --data '{"name":"Functions"}'
+
 
 */
+
+
+
