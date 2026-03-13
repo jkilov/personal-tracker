@@ -24,8 +24,11 @@ const supabase = createClient(
 Deno.serve(async (req) => {
 const exerciseIds = []
 let from = 0
-const pageSize = 1000
+const pageSize = 10
 let exercisesTableArr = []
+
+
+//TODO: i need to create batching where it uploads a batch of 50 at a time?
 
 
 
@@ -37,13 +40,13 @@ const {data: exerciseData, error: exerciseTableError} = await supabase
 .select("*")
 .range(from, pageSize-1)
 
-const newData = exerciseData
 
 
 
-exercisesTableArr.push(newData)
+exercisesTableArr.push(exerciseData)
 
-//FIXME: Error about about this not being iterable  
+//TODO: need to add in mapping with the exercise table to add the media_url_ref into exercise table
+//TODO: is there a better way for this to run in a background and not be interrupted like it currently is when i click awy or into another table. How do i have this run without someone clicking a link to run it
 
 if (exerciseTableError) throw new Error("Cannot retrieve exercise table")
 
@@ -53,62 +56,68 @@ if (exerciseTableError) throw new Error("Cannot retrieve exercise table")
  .range(from, from + pageSize - 1)
 
 
+console.log("dd: ", data)
+
+
+
+ exerciseData.map(exercise => exercise.external_id === data.external_id ? exercise.media_url_ref = data.external_id : null )
+
+
+
  if(error) throw error
 
  if (!data|| data.length === 0) break;
 
  const exerciseExternalIds  = data.map(exercise => exercise.external_id)
 
- console.log("EL: ", exerciseExternalIds)
+
+
 
 for (let i=0; i<exerciseExternalIds.length; i++) {
+
   const imageUrl =  `https://exercisedb.p.rapidapi.com/image?exerciseId=${exerciseExternalIds[i]}&resolution=180`;
   const options = {
     method: "GET",
     headers: {
       "x-rapidapi-key": Deno.env.get("RAPID_API_KEY"),
-      "x-rapidapi-host": Deno.env.get("RAPID_API_KEY"),
+      "x-rapidapi-host": Deno.env.get("RAPID_API_HOST"),
     }
   }
 
-  // const imageResponse = await fetch(imageUrl,options)
-
-  // if (!imageResponse.ok) throw new Error("Image fetch failed")
-
-  //   const gifImage = await imageResponse.blob()
-
-  //   const fileName = `${exerciseExternalIds[i]}.gif`
+  const imageResponse = await fetch(imageUrl,options)
 
 
-  //   const {error: uploadError} = await supabase.storage
-  //   .from("exercise-images")
-  //   .upload(fileName, gifImage, {
-  //     contentType: "image/gif",
-  //     upsert: false
-  //   })
+  if (!imageResponse.ok) throw new Error("Image fetch failed")
+
+    const gifImage = await imageResponse.blob()
+
+    const fileName = `${exerciseExternalIds[i]}.gif`
+
+
+    const {error: uploadError} = await supabase.storage
+    .from("exercise-images")
+    .upload(fileName, gifImage, {
+      contentType: "image/gif",
+      upsert: false
+    })
+
 
  
-  //   const {data} = supabase.storage.from("exercise-images"
-  //   .getPublicUrl(fileName)
-  //   )
+//     const {data} = supabase.storage.from("exercise-images")
+//     .getPublicUrl(fileName)
+    
 
-  //   const publicUrl = data.publicUrl
+//     const publicUrl = data.publicUrl
 
-// console.log("PURL: ", publicUrl)
+//     console.log(publicUrl)
 
-//TODO: we now need to retrieve the data from our exercie table, map over it and add the new media url to it and then push this back into our exercise table via supabase
-//need MAP
-
-
-
-    //end of loop
   }
 
 
-//TODO: need to come back to this below
- from += pageSize
 
- continue;
+//  from += pageSize
+
+//  continue;
 
 } // end of while loop
 
@@ -119,6 +128,14 @@ for (let i=0; i<exerciseExternalIds.length; i++) {
  return new Response(JSON.stringify("unknown error"))
 
 }
+
+const {error} = await supabase
+.from("exercise")
+.insert(exerciseExternalIds)
+
+console.log("err", error)
+
+//TODO: check the above would work - if supabase will accept Arr of objects
 
 
 return new Response(
