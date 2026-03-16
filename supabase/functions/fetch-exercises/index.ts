@@ -10,8 +10,8 @@ console.log("Hello from Functions!")
 
 
 const supabase = createClient(
-  Deno.env.get("SUPABASE_URL")!,
-  Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!,
+  Deno.env.get("REMOTE_SUPABASE_URL")!,
+  Deno.env.get("REMOTE_SUPABASE_SERVICE_ROLE_KEY")!,
 )
 
 
@@ -74,12 +74,13 @@ const rows = exerciseData.map(exercise => ({
   exercise_name: rowCleanUp(exercise.name),
   body_part: rowCleanUp(exercise.bodyPart),
   equipment: rowCleanUp(exercise.equipment),
-  source: "exercisedb"
+  source: "exercisedb",
+
 }))
 
     const {data, error, count} = await supabase
     .from("exercise")
-    .insert(rows, {ignoreDuplicates: true, count: "exact"})
+    .upsert(rows, { count: "exact"})
 
     if (error) {
       throw error

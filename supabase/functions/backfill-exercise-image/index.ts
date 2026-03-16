@@ -19,61 +19,55 @@ const supabase = createClient(
 )
 
 
+let totalProcessed = 0
+let from = 0
+let totalRowCount = 0
+const remaining = totalRowCount - totalProcessed
+const processedId = new Set()
+
+
 
 
 Deno.serve(async (req) => {
-const exerciseIds = []
-let from = 0
 const pageSize = 10
-let exercisesTableArr = []
+let processed = 0
+let skipped = 0
 
 
-//TODO: i need to create batching where it uploads a batch of 50 at a time?
 
+
+
+
+
+//TODO: need to add a check to see if the media_url_ref is null or not - if not, skip
 
 
 try {
-while (true){
 
-const {data: exerciseData, error: exerciseTableError} = await supabase
+  
+
+const {data: exerciseData, error: exerciseTableError, count} = await supabase
 .from("exercise")
-.select("*")
+.select("*", {count: "exact"})
 .range(from, pageSize-1)
 
-
-
-
-exercisesTableArr.push(exerciseData)
-
-//TODO: need to add in mapping with the exercise table to add the media_url_ref into exercise table
-//TODO: is there a better way for this to run in a background and not be interrupted like it currently is when i click awy or into another table. How do i have this run without someone clicking a link to run it
+totalRowCount = count //total count of rows in table = 1324
 
 if (exerciseTableError) throw new Error("Cannot retrieve exercise table")
 
-
- const {data, error} = await supabase.from("exercise")
- .select("external_id")
- .range(from, from + pageSize - 1)
+  if (!exerciseData || exerciseData.length === 0) throw new Error("no exercises could be found")
 
 
-console.log("dd: ", data)
+ const exerciseExternalIds  = exerciseData.map(exercise => exercise.external_id)
 
+// const exerciseExternalIds = exerciseData.map(exercise => exercise.includes(!exercise.media_url_ref) ? exercise.external_id : null)
 
+for (let i=0; i<exerciseExternalIds.length; i++) { //loop start
 
- exerciseData.map(exercise => exercise.external_id === data.external_id ? exercise.media_url_ref = data.external_id : null )
-
-
-
- if(error) throw error
-
- if (!data|| data.length === 0) break;
-
- const exerciseExternalIds  = data.map(exercise => exercise.external_id)
-
-
-
-
-for (let i=0; i<exerciseExternalIds.length; i++) {
+  if(exerciseExternalIds[i].media_url_ref) {
+    ++skipped
+    continue;
+  }
 
   const imageUrl =  `https://exercisedb.p.rapidapi.com/image?exerciseId=${exerciseExternalIds[i]}&resolution=180`;
   const options = {
@@ -94,32 +88,39 @@ for (let i=0; i<exerciseExternalIds.length; i++) {
     const fileName = `${exerciseExternalIds[i]}.gif`
 
 
-    const {error: uploadError} = await supabase.storage
+    const {data: fileUpload, error: uploadError} = await supabase.storage
     .from("exercise-images")
     .upload(fileName, gifImage, {
       contentType: "image/gif",
       upsert: false
     })
 
+    if(uploadError) throw new Error("Upload failure")
 
- 
-//     const {data} = supabase.storage.from("exercise-images")
-//     .getPublicUrl(fileName)
+      if (fileUpload.path) {
+
+      processedId.add(exerciseExternalIds[i])
+
+  
+
+    const remainingGifs = totalRowCount - processed
+
+    ++processed
+
+    totalProcessed = processed
     
+    if (processed === totalRowCount) break
 
-//     const publicUrl = data.publicUrl
-
-//     console.log(publicUrl)
-
+      }
   }
+  from += pageSize
+  const upsertExerciseDataTable = exerciseData.map(exercise => processedId.has(exercise.external_id) ? {...exercise, media_url_ref: `${exercise.external_id}.gif`} : exercise)
 
 
+  const {error} = await supabase.from('exercise')
+  .upsert(upsertExerciseDataTable)
 
-//  from += pageSize
-
-//  continue;
-
-} // end of while loop
+  if (error) throw error
 
 
  } catch (error) {
@@ -129,27 +130,14 @@ for (let i=0; i<exerciseExternalIds.length; i++) {
 
 }
 
-const {error} = await supabase
-.from("exercise")
-.insert(exerciseExternalIds)
 
-console.log("err", error)
-
-//TODO: check the above would work - if supabase will accept Arr of objects
 
 
 return new Response(
- JSON.stringify(exerciseIds.length),
+ JSON.stringify("completed, total processed: ", totalProcessed + "remaining" + remaining + "skipped: " + skipped),
 {headers: {"Content-Type": "application/json"}}
 )
 
-
-
-
-//   return new Response(
-//     JSON.stringify(data),
-//     { headers: { "Content-Type": "application/json" } },
-//   )
 })
 
 
