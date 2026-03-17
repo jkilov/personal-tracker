@@ -19,57 +19,41 @@ const supabase = createClient(
 )
 
 
-let totalProcessed = 0
-let from = 0
-let totalRowCount = 0
-const remaining = totalRowCount - totalProcessed
-const processedId = new Set()
-
-
-
 
 Deno.serve(async (req) => {
-const pageSize = 10
 let processed = 0
-let skipped = 0
-
-
-
-
-
-
-
-//TODO: need to add a check to see if the media_url_ref is null or not - if not, skip
+let totalRows = 0
 
 
 try {
 
-  
 
 const {data: exerciseData, error: exerciseTableError, count} = await supabase
 .from("exercise")
 .select("*", {count: "exact"})
-.range(from, pageSize-1)
+.is("media_url_ref", null)
+.limit(10)
 
-totalRowCount = count //total count of rows in table = 1324
-
-if (exerciseTableError) throw new Error("Cannot retrieve exercise table")
-
-  if (!exerciseData || exerciseData.length === 0) throw new Error("no exercises could be found")
+totalRows = count
 
 
- const exerciseExternalIds  = exerciseData.map(exercise => exercise.external_id)
+if (exerciseTableError) throw new Error( "Cannot retrieve exercise table")
 
-// const exerciseExternalIds = exerciseData.map(exercise => exercise.includes(!exercise.media_url_ref) ? exercise.external_id : null)
+  if (!exerciseData || exerciseData.length === 0) return new Response(
+    JSON.stringify({message: "Batch completed, no more exercises to process"}),
+   {headers: {"Content-Type": "application/json"}}
+   )
 
-for (let i=0; i<exerciseExternalIds.length; i++) { //loop start
 
-  if(exerciseExternalIds[i].media_url_ref) {
-    ++skipped
-    continue;
-  }
+for (let i = 0; i< exerciseData.length; i++) {
 
-  const imageUrl =  `https://exercisedb.p.rapidapi.com/image?exerciseId=${exerciseExternalIds[i]}&resolution=180`;
+
+
+
+
+
+
+  const imageUrl =  `https://exercisedb.p.rapidapi.com/image?exerciseId=${exerciseData[i].external_id}&resolution=180`;
   const options = {
     method: "GET",
     headers: {
@@ -85,7 +69,7 @@ for (let i=0; i<exerciseExternalIds.length; i++) { //loop start
 
     const gifImage = await imageResponse.blob()
 
-    const fileName = `${exerciseExternalIds[i]}.gif`
+    const fileName = `${exerciseData[i].external_id}.gif`
 
 
     const {data: fileUpload, error: uploadError} = await supabase.storage
@@ -99,34 +83,31 @@ for (let i=0; i<exerciseExternalIds.length; i++) { //loop start
 
       if (fileUpload.path) {
 
-      processedId.add(exerciseExternalIds[i])
 
+
+      const {error: updateExerciseTableError} = await supabase.from('exercise')
+      .update({media_url_ref: `${fileName}`})
+      .eq('exercise_id', exerciseData[i].exercise_id)
+    
   
-
-    const remainingGifs = totalRowCount - processed
+if (updateExerciseTableError){ throw new Error("error uploading media_url_ref to exercise table")
+}
 
     ++processed
 
-    totalProcessed = processed
-    
-    if (processed === totalRowCount) break
 
+    
       }
   }
-  from += pageSize
-  const upsertExerciseDataTable = exerciseData.map(exercise => processedId.has(exercise.external_id) ? {...exercise, media_url_ref: `${exercise.external_id}.gif`} : exercise)
 
 
-  const {error} = await supabase.from('exercise')
-  .upsert(upsertExerciseDataTable)
 
-  if (error) throw error
 
 
  } catch (error) {
  console.error("failed to fetch external_ids", error)
 
- return new Response(JSON.stringify("unknown error"))
+ return new Response(JSON.stringify({message: "error received: " + error.message }))
 
 }
 
@@ -134,7 +115,7 @@ for (let i=0; i<exerciseExternalIds.length; i++) { //loop start
 
 
 return new Response(
- JSON.stringify("completed, total processed: ", totalProcessed + "remaining" + remaining + "skipped: " + skipped),
+ JSON.stringify({Processed: processed, Remaining: totalRows - processed}),
 {headers: {"Content-Type": "application/json"}}
 )
 
