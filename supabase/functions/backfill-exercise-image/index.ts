@@ -14,8 +14,8 @@ console.log("Hello from Functions!")
 
 
 const supabase = createClient(
- Deno.env.get("REMOTE_SUPABASE_URL")!,
- Deno.env.get("REMOTE_SUPABASE_SERVICE_ROLE_KEY")!,
+ Deno.env.get("SUPABASE_URL")!,
+ Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!,
 )
 
 
@@ -40,18 +40,12 @@ totalRows = count
 if (exerciseTableError) throw new Error( "Cannot retrieve exercise table")
 
   if (!exerciseData || exerciseData.length === 0) return new Response(
-    JSON.stringify({message: "Batch completed, no more exercises to process"}),
+    JSON.stringify({message: "Batch completed, no more exercises to process", processed, remaining: totalRows - processed}),
    {headers: {"Content-Type": "application/json"}}
    )
 
 
 for (let i = 0; i< exerciseData.length; i++) {
-
-
-
-
-
-
 
   const imageUrl =  `https://exercisedb.p.rapidapi.com/image?exerciseId=${exerciseData[i].external_id}&resolution=180`;
   const options = {
@@ -103,11 +97,10 @@ if (updateExerciseTableError){ throw new Error("error uploading media_url_ref to
 
 
 
-
  } catch (error) {
  console.error("failed to fetch external_ids", error)
 
- return new Response(JSON.stringify({message: "error received: " + error.message }))
+ return new Response(JSON.stringify({message: "error received: " + error.message, processed, remaining: totalRows - processed}))
 
 }
 
@@ -115,7 +108,7 @@ if (updateExerciseTableError){ throw new Error("error uploading media_url_ref to
 
 
 return new Response(
- JSON.stringify({Processed: processed, Remaining: totalRows - processed}),
+ JSON.stringify({processed: processed, remaining: totalRows - processed}),
 {headers: {"Content-Type": "application/json"}}
 )
 
