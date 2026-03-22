@@ -1,3 +1,5 @@
+//NOTE incase needed for later: removed a contrain on supabase sets table - where set number had to be unique (i have removed this)
+
 import { useState, useContext } from "react";
 import { useNavigate, useParams } from "react-router";
 import { createNewSet } from "../utils/supabase/set";
@@ -8,8 +10,8 @@ type MergeSet = {
   user_id: string | undefined;
   session_id: string | undefined;
   exercise_id: string;
-  set_number: number;
-  set_id: string | undefined;
+  set_number: string;
+
   reps: number;
   weight: number;
 };
@@ -111,9 +113,9 @@ const AddSet = ({ exerciseId }: Props) => {
       const mergeSet: MergeSet = {
         user_id: session?.user.id,
         session_id: sessionId,
-        set_number: el.setNo,
+        set_number: el.setNo + "_" + exerciseId,
         exercise_id: exerciseId,
-        set_id: el.id,
+
         reps: setVals[el.title].Reps,
         weight: setVals[el.title].Weight,
       };
@@ -125,6 +127,7 @@ const AddSet = ({ exerciseId }: Props) => {
     const { error } = await createNewSet(newArr);
 
     console.log(error);
+    setCreateSet(newSetConfig);
   };
 
   const handleChange = (title: string, field: FieldKey, value: number) => {

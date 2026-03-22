@@ -31,9 +31,7 @@ const rowCleanUp = (str: string) => {
 
 Deno.serve(async (req) => {
 
-//TODO: update rapiddb subscription to get full list of exercises
-//download all images and store these witihn supabase
-//link exercise table to storage to get exercises
+
 
 
   const url ="https://exercisedb.p.rapidapi.com/exercises?limit=0"
@@ -48,6 +46,10 @@ Deno.serve(async (req) => {
 
   try {
 
+    const request = await fetch(url, options)
+    const exerciseData = await request.json()
+    const totalFromApi = exerciseData.length
+
     const {count: existingCount, error: countError} = await supabase
     .from("exercise")
     .select("*", {count: "exact", head: true})
@@ -56,19 +58,17 @@ Deno.serve(async (req) => {
       throw countError
     }
 
-    if((existingCount ?? 0) > 0) {
+
+    if (existingCount >= totalFromApi) {
       return new Response(JSON.stringify({message: " Exercise already seeded. Import skipped", inserted: 0, existingCount}),
-    {headers: {"Content-Type": "application/json"}}
-    )
+      {headers: {"Content-Type": "application/json"}}
+      )
     }
 
-    const request = await fetch(url, options)
-    const exerciseData = await request.json()
+   
 
     
     
-const apiKey = Deno.env.get("RAPID_API_KEY")
-
 const rows = exerciseData.map(exercise => ({
   external_id: exercise.id,
   exercise_name: rowCleanUp(exercise.name),
@@ -96,7 +96,8 @@ const rows = exerciseData.map(exercise => ({
   } catch (error) {
     return new Response (
       JSON.stringify({message: error.message}), 
-      { headers: { "Content-Type": "application/json" } },
+      {status: 500,
+      headers: { "Content-Type": "application/json" } },
     )
   }
 })

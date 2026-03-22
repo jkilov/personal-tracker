@@ -1,3 +1,6 @@
+import dotenv from 'dotenv'
+
+dotenv.config()
 
 
 const sleep = (time) => {
@@ -8,57 +11,93 @@ const sleep = (time) => {
 
 
   let count = 0
+  let batchUploadCount = 0
+  const maxIteration = 500
 
 
 const runBackFill = async() => {
 
 
-    if (count >= 3) {
-        console.log("retries exhausted. terminating function")
-        return
-    }
 
+   
 console.log("starting backfill")
+
 
     const url = "https://sudaxmkqsdilkjylccqu.supabase.co/functions/v1/backfill-exercise-image"
     const options = {
         method : "POST",
         headers: {
-        Authorization: "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InN1ZGF4bWtxc2RpbGtqeWxjY3F1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzEzMDM1MjcsImV4cCI6MjA4Njg3OTUyN30.pQbyTYDZXvQABPU7373JUayQKvceYN90NsXWHP4e3Rw",
+        Authorization: `Bearer ${process.env.SUPABASE_ANON_KEY}`,
+
+        //TODO: update with hardcoded key when running to fill images
            "Content-Type": "application/json"
         }, 
         body: JSON.stringify({name: "Functions"})
     }
 
-    const response = await fetch(url, options)
+
+    
+    while (true) {
+    try {
+     
+        if (count >= 3) {
+            console.error("retries exhausted. terminating function")
+            throw new Error("retries exhausted, terminating function")
+        }
+    
+
+        const response = await fetch(url, options)
 
     if (!response.ok){
-        console.log("Error with fetch")
-        ++count
-        await sleep(2000)
-        return runBackFill()
-    
+        console.error("Fetch response error")
+        throw new Error("Fetch response error")
+
     }
 
     const result = await response.json()
+    count = 0
 
     console.log(result)
 
     if (result.message === "Batch completed, no more exercises to process") {
-        console.log("backfill completed")
-        return
+        console.log("backfill completed: ", result)
+        break;
     }
 
     if (result.remaining > 0 ) {
+        if (batchUploadCount >= maxIteration) throw new Error("max iterations hit.Aborting")
+        ++batchUploadCount 
         console.log(`batch run completed. processed: ${result.processed}, remaining: ${result.remaining}`)
-        count = 0
         await sleep(2000)
-       return  runBackFill()
      }
+    
+    
+    } catch (error) {
+        if (error.message === "max iterations hit.Aborting") break;
+
+        if (error.message === "retries exhausted. terminating function") {
+            console.error(`total retries: ${count}. Aborting script run`)
+            count = 0
+            break;
+        }
+
+        else if (error.message === "Fetch response error") {
+            ++count
+            await sleep(2000)
+        
+        } else {
+            console.error(error.message)
+            ++count
+            await sleep(2000)
+        }
+    }
+}
+
      
     }
 
 
 runBackFill()
 
-    //TODO: need to add try/catch for detailed logging and handling
+
+

@@ -32,7 +32,7 @@ const {data: exerciseData, error: exerciseTableError, count} = await supabase
 .from("exercise")
 .select("*", {count: "exact"})
 .is("media_url_ref", null)
-.limit(10)
+.limit(10) // 10 selected to avoid timeouts
 
 totalRows = count
 
@@ -70,8 +70,10 @@ for (let i = 0; i< exerciseData.length; i++) {
     .from("exercise-images")
     .upload(fileName, gifImage, {
       contentType: "image/gif",
-      upsert: false
+      upsert: true
     })
+
+    //TODO: handle if file exists to skip and then set above upsert to false
 
     if(uploadError) throw new Error("Upload failure")
 
@@ -100,12 +102,13 @@ if (updateExerciseTableError){ throw new Error("error uploading media_url_ref to
  } catch (error) {
  console.error("failed to fetch external_ids", error)
 
- return new Response(JSON.stringify({message: "error received: " + error.message, processed, remaining: totalRows - processed}))
+ return new Response(JSON.stringify({message: "error received: " + error.message, processed, remaining: totalRows - processed},
+  
+ ), {status: 500,
+  headers: {"Content-Type": "application/json"}
+})
 
 }
-
-
-
 
 return new Response(
  JSON.stringify({processed: processed, remaining: totalRows - processed}),
