@@ -1,3 +1,4 @@
+import type { Params } from "react-router";
 import { supabase } from "./client-supabase";
 
 
@@ -11,10 +12,10 @@ export const createNewSet = async(setArr: any) => {
 }
 
 
-export const readSet = async()=> {
+export const readSet = async(sessionId: string | undefined)=> {
     const {data,error} = await supabase.from("sets")
     .select()
-    .eq('session_id', '23cecd52-ca4a-4947-9078-1f36d35f8029')
+    .eq('session_id', sessionId)
     return {data,error} 
 
 }

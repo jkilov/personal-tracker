@@ -21,9 +21,11 @@ const SessionModal = () => {
 
   const sessionIdParam = useParams();
 
+  console.log("SD", sessionIdParam);
+
   useEffect(() => {
     const getSessionData = async () => {
-      const data = await readSet();
+      const { data, error } = await readSet(sessionIdParam.sessionId);
       console.log("t", data);
     };
 
