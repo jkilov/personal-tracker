@@ -1,6 +1,8 @@
 import { useState, useEffect } from "react";
 import { readExerciseData } from "../utils/supabase/exercise";
 import AddSet from "./AddSet";
+import { useParams } from "react-router";
+import { readSet } from "../utils/supabase/set";
 
 type ExerciseData = {
   exercise_id: string;
@@ -16,6 +18,17 @@ const SessionModal = () => {
   const [selectedExercise, setSelectedExercise] = useState<ExerciseData | null>(
     null
   );
+
+  const sessionIdParam = useParams();
+
+  useEffect(() => {
+    const getSessionData = async () => {
+      const data = await readSet();
+      console.log("t", data);
+    };
+
+    getSessionData();
+  }, [sessionIdParam]);
 
   useEffect(() => {
     let isMounted = true;

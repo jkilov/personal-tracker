@@ -4,6 +4,7 @@ import { useState, useContext } from "react";
 import { useNavigate, useParams } from "react-router";
 import { createNewSet } from "../utils/supabase/set";
 import { AuthContext } from "../App";
+
 import "../App.css";
 
 type MergeSet = {
@@ -56,7 +57,7 @@ const AddSet = ({ exerciseId }: Props) => {
   const { sessionId } = useParams();
   const navigate = useNavigate();
   const [count, setCount] = useState(1);
-
+  const [isLoading, setIsLoading] = useState(false);
   const [createSet, setCreateSet] = useState(newSetConfig);
   const session = useContext(AuthContext);
 
@@ -127,7 +128,6 @@ const AddSet = ({ exerciseId }: Props) => {
     const { error } = await createNewSet(newArr);
 
     console.log(error);
-    setCreateSet(newSetConfig);
   };
 
   const handleChange = (title: string, field: FieldKey, value: number) => {
