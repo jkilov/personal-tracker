@@ -11,7 +11,7 @@ type MergeSet = {
   user_id: string | undefined;
   session_id: string | undefined;
   exercise_id: string;
-  set_number: string;
+  set_number: number;
 
   reps: number;
   weight: number;
@@ -57,7 +57,6 @@ const AddSet = ({ exerciseId }: Props) => {
   const { sessionId } = useParams();
   const navigate = useNavigate();
   const [count, setCount] = useState(1);
-  const [isLoading, setIsLoading] = useState(false);
   const [createSet, setCreateSet] = useState(newSetConfig);
   const session = useContext(AuthContext);
 
@@ -114,7 +113,7 @@ const AddSet = ({ exerciseId }: Props) => {
       const mergeSet: MergeSet = {
         user_id: session?.user.id,
         session_id: sessionId,
-        set_number: el.setNo + "_" + exerciseId,
+        set_number: el.setNo,
         exercise_id: exerciseId,
 
         reps: setVals[el.title].Reps,

@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { readExerciseData } from "../utils/supabase/exercise";
 import AddSet from "./AddSet";
 import { useParams } from "react-router";
-import { readSet } from "../utils/supabase/set";
+import { readSetWithExerciseData } from "../utils/supabase/set";
 
 type ExerciseData = {
   exercise_id: string;
@@ -11,6 +11,8 @@ type ExerciseData = {
   media_url: string;
   equipment: string;
 };
+
+//TODO: need to create a type for what session data returns from readSet
 
 const SessionModal = () => {
   const [isLoading, setIsLoading] = useState(true);
@@ -25,8 +27,13 @@ const SessionModal = () => {
 
   useEffect(() => {
     const getSessionData = async () => {
-      const { data, error } = await readSet(sessionIdParam.sessionId);
-      console.log("t", data);
+      const { data, error } = await readSetWithExerciseData(
+        sessionIdParam.sessionId!
+      );
+
+      console.log("dataFromFetch", data);
+
+      //TODO: handle data and errror here - data goes into state and gets mapped over
     };
 
     getSessionData();
@@ -78,7 +85,7 @@ const SessionModal = () => {
               id={exercise.exercise_id}
               value={exercise.exercise_name}
               key={exercise.exercise_id}
-              data-user-exercise="test"
+              data-user-exercise="test" //need to fix
             >
               {exercise.exercise_name}
             </option>

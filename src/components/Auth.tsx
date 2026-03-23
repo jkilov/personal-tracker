@@ -67,8 +67,9 @@ const Auth = ({
       <form onSubmit={handleSubmit}>
         {updatedArr.map((input) => (
           <div key={input.key}>
-            <span>{input.label}</span>
+            <label htmlFor={input.form}>{input.label}</label>
             <input
+              id={input.label}
               type={input.type}
               value={values[input.key] as keyof AuthValues}
               onChange={(e) => onChange(input.key, e.target.value)}
