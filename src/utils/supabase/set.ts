@@ -1,4 +1,5 @@
-import type { Params } from "react-router";
+
+import type { PostgrestError } from "@supabase/supabase-js";
 import { supabase } from "./client-supabase";
 
 
@@ -20,11 +21,32 @@ export const readSet = async(sessionId: string | undefined)=> {
 
 }
 
+export type Exercise = {
+    body_part: string;
+    exercise_name: string;
+  };
+  
+  export type SessionInfo = {
+    created_at: string;
+    exercise: Exercise;
+    exercise_id: string;
+    reps: number;
+    session_id: string;
+    set_id: string;
+    set_number: number;
+    weight: number;
+  };
 
 
-export const readSetWithExerciseData = async(sessionId: string) => {
+  type readSetWithExerciseDataResponse = {
+    data: SessionInfo [] | null;
+    error: PostgrestError| null
+  }
 
-    const {data,error} = await supabase.from("sets")
+
+export const readSetWithExerciseData = async(sessionId: string):Promise<readSetWithExerciseDataResponse>  => {
+
+    const {data, error} = await supabase.from("sets")
     .select(`
        set_id,
        reps,
@@ -36,5 +58,5 @@ export const readSetWithExerciseData = async(sessionId: string) => {
         exercise!inner(exercise_name, body_part)
         `)
     .eq('session_id', sessionId)
-    return {data, error}
+    return {data: data as SessionInfo[] | null, error}
 }
