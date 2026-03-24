@@ -6,6 +6,7 @@ import {
   readSetWithExerciseData,
   type SessionInfo,
 } from "../utils/supabase/set";
+import { IoIosArrowDown } from "react-icons/io";
 
 type ExerciseData = {
   exercise_id: string;
@@ -23,6 +24,8 @@ type SetData = {
 
 type FormattedSetData = {
   exerciseName: string;
+  createdAt: string;
+  isOpen: boolean;
   sets: SetData[];
 };
 
@@ -50,7 +53,6 @@ const SessionModal = () => {
         sessionIdParam.sessionId!
       );
 
-      console.log("SD", sessionInformation);
       setRawSessionData(sessionInformation);
 
       //TODO: handle data and errror here - data goes into state and gets mapped over
@@ -62,12 +64,14 @@ const SessionModal = () => {
   useEffect(() => {
     if (!rawSessionData) return;
 
-    const reshapedExerciseData = rawSessionData?.reduce((acc, el) => {
+    const reshapedExerciseData = rawSessionData.reduce((acc, el) => {
       const exerciseName = el.exercise.exercise_name;
 
       if (!acc[exerciseName]) {
         acc[exerciseName] = {
           exerciseName,
+          createdAt: el.created_at,
+          isOpen: false,
           sets: [],
         };
       }
@@ -78,11 +82,10 @@ const SessionModal = () => {
         weight: el.weight,
       });
 
-      console.log("ac", acc);
       return acc;
-    }, {} as Record<string, { exerciseName: string; sets: { setNumber: number; reps: number; weight: number }[] }>);
+    }, {} as Record<string, { exerciseName: string; createdAt: string; isOpen: boolean; sets: { setNumber: number; reps: number; weight: number }[] }>);
     const exerciseSetArr = Object.values(reshapedExerciseData);
-    console.log("E", exerciseSetArr);
+    console.log("here", exerciseSetArr);
     setFormattedSetData(exerciseSetArr);
   }, [rawSessionData]);
 
@@ -111,13 +114,50 @@ const SessionModal = () => {
     setSelectedExercise(selectedExerciseData!);
   };
 
+  const toggleAdditionalSetInfo = (exerciseName: string) => {
+    const updatedIsOpen = formattedSetData?.map((exercise) =>
+      exercise.exerciseName === exerciseName
+        ? { ...exercise, isOpen: !exercise.isOpen }
+        : exercise
+    );
+
+    setFormattedSetData(updatedIsOpen);
+  };
+
   if (isLoading) return <div>Loading.</div>;
 
+  //FIXME: session date is being printed for every exercise despite being part of the same session
   return (
     <div>
       <div>
         {formattedSetData &&
-          formattedSetData.map((set) => <span>{set.exerciseName}</span>)}
+          formattedSetData.map((exercise) => (
+            <div>
+              <div>
+                <span>{exercise.exerciseName}</span>
+                <IoIosArrowDown
+                  onClick={() => toggleAdditionalSetInfo(exercise.exerciseName)}
+                />
+              </div>
+              {exercise.isOpen && (
+                <table>
+                  <tr>
+                    <th>Sets</th>
+                    <th>Reps</th>
+                    <th>Weight</th>
+                  </tr>
+
+                  {exercise.sets.map((set) => (
+                    <tr>
+                      <td>{set.setNumber}</td>
+                      <td>{set.reps}</td>
+                      <td>{set.weight}</td>
+                    </tr>
+                  ))}
+                </table>
+              )}
+            </div>
+          ))}
       </div>
       <div>
         <h3>Add Workout</h3>
