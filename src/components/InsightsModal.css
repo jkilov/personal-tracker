@@ -1,0 +1,14 @@
+.insights-card {
+    border: 1px solid white;
+    border-radius: 15px;
+}
+
+.insights-icon {
+    cursor: pointer;
+    padding: 0px
+}
+
+td .weight-label {
+    font-size: 0.7rem;
+    margin: 0;
+  }

@@ -1,0 +1,19 @@
+.session-card {
+transition: transform 1s;
+    padding: 15px;
+    border: 1px solid white;
+    border-radius: 20px;
+    display:flex;
+    flex-direction: column;
+    align-items: start;
+}
+
+.set-info {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.35s ease;
+  }
+  
+  .set-info-visible {
+    max-height: 300px;
+  }

@@ -1,0 +1,23 @@
+.card-layout {
+    border: 1px solid white;
+    border-radius: 10px;
+    
+}
+
+.card-exercise-layout {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px;
+}
+
+.card-text-graph-layout {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0px
+}
+
+.card-text-graph-layout span{
+    margin: 0px 20px;
+}

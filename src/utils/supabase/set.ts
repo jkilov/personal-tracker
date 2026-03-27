@@ -35,6 +35,7 @@ export type Exercise = {
     set_id: string;
     set_number: number;
     weight: number;
+    total_volume: number
   };
 
 
@@ -51,6 +52,7 @@ export const readSetWithExerciseData = async(sessionId: string):Promise<readSetW
        set_id,
        reps,
        weight,
+       total_volume,
        session_id,
        exercise_id,
         set_number,

@@ -1,12 +1,9 @@
 import { useState, useEffect } from "react";
 import { readExerciseData } from "../utils/supabase/exercise";
 import AddSet from "./AddSet";
-import { useParams } from "react-router";
-import {
-  readSetWithExerciseData,
-  type SessionInfo,
-} from "../utils/supabase/set";
-import { IoIosArrowDown } from "react-icons/io";
+
+import "./SessionModal.css";
+import SessionCard from "./SessionCard";
 
 type ExerciseData = {
   exercise_id: string;
@@ -14,19 +11,6 @@ type ExerciseData = {
   body_part: string;
   media_url: string;
   equipment: string;
-};
-
-type SetData = {
-  setNumber: number;
-  reps: number;
-  weight: number;
-};
-
-type FormattedSetData = {
-  exerciseName: string;
-  createdAt: string;
-  isOpen: boolean;
-  sets: SetData[];
 };
 
 //TODO: need to create a type for what session data returns from readSet
@@ -37,57 +21,6 @@ const SessionModal = () => {
   const [selectedExercise, setSelectedExercise] = useState<ExerciseData | null>(
     null
   );
-  const [rawSessionData, setRawSessionData] = useState<SessionInfo[] | null>(
-    null
-  );
-
-  const [formattedSetData, setFormattedSetData] = useState<
-    FormattedSetData[] | null
-  >(null);
-
-  const sessionIdParam = useParams();
-
-  useEffect(() => {
-    const getSessionData = async () => {
-      const { data: sessionInformation, error } = await readSetWithExerciseData(
-        sessionIdParam.sessionId!
-      );
-
-      setRawSessionData(sessionInformation);
-
-      //TODO: handle data and errror here - data goes into state and gets mapped over
-    };
-
-    getSessionData();
-  }, [sessionIdParam]);
-
-  useEffect(() => {
-    if (!rawSessionData) return;
-
-    const reshapedExerciseData = rawSessionData.reduce((acc, el) => {
-      const exerciseName = el.exercise.exercise_name;
-
-      if (!acc[exerciseName]) {
-        acc[exerciseName] = {
-          exerciseName,
-          createdAt: el.created_at,
-          isOpen: false,
-          sets: [],
-        };
-      }
-
-      acc[exerciseName].sets.push({
-        setNumber: el.set_number,
-        reps: el.reps,
-        weight: el.weight,
-      });
-
-      return acc;
-    }, {} as Record<string, { exerciseName: string; createdAt: string; isOpen: boolean; sets: { setNumber: number; reps: number; weight: number }[] }>);
-    const exerciseSetArr = Object.values(reshapedExerciseData);
-    console.log("here", exerciseSetArr);
-    setFormattedSetData(exerciseSetArr);
-  }, [rawSessionData]);
 
   useEffect(() => {
     let isMounted = true;
@@ -114,51 +47,12 @@ const SessionModal = () => {
     setSelectedExercise(selectedExerciseData!);
   };
 
-  const toggleAdditionalSetInfo = (exerciseName: string) => {
-    const updatedIsOpen = formattedSetData?.map((exercise) =>
-      exercise.exerciseName === exerciseName
-        ? { ...exercise, isOpen: !exercise.isOpen }
-        : exercise
-    );
-
-    setFormattedSetData(updatedIsOpen);
-  };
-
   if (isLoading) return <div>Loading.</div>;
 
   //FIXME: session date is being printed for every exercise despite being part of the same session
   return (
     <div>
-      <div>
-        {formattedSetData &&
-          formattedSetData.map((exercise) => (
-            <div>
-              <div>
-                <span>{exercise.exerciseName}</span>
-                <IoIosArrowDown
-                  onClick={() => toggleAdditionalSetInfo(exercise.exerciseName)}
-                />
-              </div>
-              {exercise.isOpen && (
-                <table>
-                  <tr>
-                    <th>Sets</th>
-                    <th>Reps</th>
-                    <th>Weight</th>
-                  </tr>
-
-                  {exercise.sets.map((set) => (
-                    <tr>
-                      <td>{set.setNumber}</td>
-                      <td>{set.reps}</td>
-                      <td>{set.weight}</td>
-                    </tr>
-                  ))}
-                </table>
-              )}
-            </div>
-          ))}
-      </div>
+      <SessionCard />
       <div>
         <h3>Add Workout</h3>
         <form>
