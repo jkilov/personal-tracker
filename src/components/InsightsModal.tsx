@@ -17,18 +17,6 @@ const InsightsModal = ({ sessionId, formattedSetData }: Props) => {
     number
   > | null>(null);
 
-  // useEffect(() => {
-  //   const fetchSessiondata = async () => {
-  //     //TODO:need to create a loading state
-  //     const { data, error } = await readSetWithExerciseData(sessionId);
-  //     //TODO: handle error
-
-  //     setSetData(data);
-  //   };
-
-  //   fetchSessiondata();
-  // }, []);
-
   const openModal = () => {
     if (dialogRef.current) dialogRef.current.showModal();
   };
@@ -46,7 +34,28 @@ const InsightsModal = ({ sessionId, formattedSetData }: Props) => {
     return acc;
   }, {} as Record<string, number>);
 
-  console.log("J", totalVolumeCombined);
+  const getRepMultiplier = (reps: number): number => {
+    switch (true) {
+      case reps >= 1 && reps <= 5:
+        return 0.9;
+      case reps >= 6 && reps <= 8:
+        return 1;
+      case reps >= 9 && reps <= 12:
+        return 1.1;
+      case reps >= 13 && reps <= 15:
+        return 1;
+      case reps >= 16 && reps <= 20:
+        return 0.9;
+      case reps >= 21:
+        return 0.8;
+      default:
+        return 1;
+    }
+  };
+
+  const adjustedVolume = (reps: number, weight: number) => {
+    return reps * weight * getRepMultiplier(reps);
+  };
 
   return (
     <div>
@@ -78,7 +87,7 @@ const InsightsModal = ({ sessionId, formattedSetData }: Props) => {
                       {set.total_volume}
                       <span className="weight-label">KG</span>
                     </td>
-                    <td>sdsds</td>
+                    <td>{Math.ceil(adjustedVolume(set.reps, set.weight))}</td>
                   </tr>
                 ))}
               </tbody>
