@@ -4,9 +4,10 @@
   --error: #EF6461;
   --success:  #A9E5BB;
   --neutral: #E0DFD5;
-  --ther: #E8E9EB;
   --warning: #E4B363;
-}
+  --pill1: #223843;
+  --pill2: #D77A61;
+  --pill3: #7F7CAF;
 
 
 #root {

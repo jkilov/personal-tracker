@@ -18,3 +18,17 @@ td .weight-label {
     justify-content: space-between;
     align-items: center;
   }
+
+  .tooltip {
+    z-index: 999;
+    position: absolute;
+  }
+
+  .body-part-pill {
+    border-radius: 100px;
+ 
+    color: white;
+    background-color: var(--pill3);
+    font-size: 0.7rem;
+    padding: 5px 10px;
+  }

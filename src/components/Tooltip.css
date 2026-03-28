@@ -1,3 +1,28 @@
 .tooltip-container {
     background-color: var(--neutral);
+    position: relative;
+    right: 0px;
+    border-radius: 15px;
+    color: black;
+    text-align: start;
+}
+
+.tooltip-container * {
+    margin: 10px 0px
+}
+
+
+.tooltip-container span {
+    font-size: 0.7rem;
+}
+
+.hide-tooltip-symbol {
+    display: none
+}
+
+.tooltip {
+    position: absolute;
+    z-index: 999;
+
+
 }

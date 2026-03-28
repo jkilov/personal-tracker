@@ -1,7 +1,6 @@
 import "./InsightsModal.css";
-import { useRef, useEffect, useState } from "react";
+import { useRef, useState } from "react";
 import { GoGraph } from "react-icons/go";
-import { readSetWithExerciseData } from "../utils/supabase/set";
 
 import { type SetData, type FormattedSetData } from "./SessionCard";
 import Tooltip from "./Tooltip";
@@ -14,10 +13,6 @@ interface Props {
 const InsightsModal = ({ sessionId, formattedSetData }: Props) => {
   const dialogRef = useRef<HTMLDialogElement | null>(null);
   const [setData, setSetData] = useState<SetData[] | null>(null);
-  const [exerciseVolume, setExerciseVolume] = useState<Record<
-    string,
-    number
-  > | null>(null);
 
   const openModal = () => {
     if (dialogRef.current) dialogRef.current.showModal();
@@ -59,6 +54,7 @@ const InsightsModal = ({ sessionId, formattedSetData }: Props) => {
     return reps * weight * getRepMultiplier(reps);
   };
 
+  console.log("TL", formattedSetData);
   return (
     <div>
       <GoGraph className="insights-icon" onClick={openModal} />
@@ -66,8 +62,26 @@ const InsightsModal = ({ sessionId, formattedSetData }: Props) => {
       <dialog ref={dialogRef} className="insights-card">
         <div>
           <div className="session-header">
-            <h2>Session Overview</h2>
-            <Tooltip />
+            <div>
+              <h2>Session Overview</h2>
+              <Tooltip
+                children={
+                  <div>
+                    <h6>Total Volume</h6>
+                    <span>
+                      Raw workload. Adds up reps × weight for every set.
+                    </span>
+                    <h6>Adjusted Volume</h6>
+                    <span>
+                      Rep-range weighted volume. Sets in more effective
+                      hypertrophy ranges count slightly more than very low or
+                      very high reps.
+                    </span>
+                  </div>
+                }
+              />
+            </div>
+            <button onClick={closeModal}>X</button>
           </div>
 
           <span>chatGPT Input</span>
@@ -76,6 +90,7 @@ const InsightsModal = ({ sessionId, formattedSetData }: Props) => {
 
         {formattedSetData.map((exercise) => (
           <div key={exercise.exerciseName}>
+            <span className="body-part-pill">{exercise.body_part}</span>
             <h3>{exercise.exerciseName}</h3>
             <table>
               <thead>
@@ -107,7 +122,6 @@ const InsightsModal = ({ sessionId, formattedSetData }: Props) => {
         <span></span>
         <h3>Recommendations</h3>
         <span></span>
-        <button onClick={closeModal}>Close</button>
       </dialog>
     </div>
   );

@@ -17,6 +17,7 @@ export type SetData = {
 
 export type FormattedSetData = {
   exerciseName: string;
+  body_part: string;
   createdAt: string;
   isOpen?: boolean;
   sets: SetData[];
@@ -39,6 +40,7 @@ const SessionCard = () => {
         sessionIdParam.sessionId!
       );
 
+      console.log("S", sessionInformation);
       setRawSessionData(sessionInformation);
 
       //TODO: handle data and errror here - data goes into state and gets mapped over
@@ -56,6 +58,7 @@ const SessionCard = () => {
       if (!acc[exerciseName]) {
         acc[exerciseName] = {
           exerciseName,
+          body_part: el.exercise.body_part,
           createdAt: el.created_at,
           isOpen: false,
           sets: [],
@@ -70,7 +73,7 @@ const SessionCard = () => {
       });
 
       return acc;
-    }, {} as Record<string, { exerciseName: string; createdAt: string; isOpen: boolean; sets: { setNumber: number; reps: number; weight: number; total_volume: number }[] }>);
+    }, {} as Record<string, { exerciseName: string; body_part: string; createdAt: string; isOpen: boolean; sets: { setNumber: number; reps: number; weight: number; total_volume: number }[] }>);
     const exerciseSetArr = Object.values(reshapedExerciseData);
     setFormattedSetData(exerciseSetArr);
   }, [rawSessionData]);
