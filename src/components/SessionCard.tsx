@@ -90,19 +90,21 @@ const SessionCard = () => {
       {formattedSetData &&
         formattedSetData.map((exercise) => (
           <div key={exercise.exerciseName}>
-            <div className="card-exercise-layout ">
-              <div className="card-text-graph-layout">
-                <InsightsModal
-                  sessionId={sessionIdParam.sessionId!}
-                  formattedSetData={formattedSetData}
+            <InsightsModal
+              sessionId={sessionIdParam.sessionId!}
+              formattedSetData={formattedSetData}
+            />
+            <div>
+              <div className="card-exercise-layout ">
+                <div className="card-text-graph-layout">
+                  <span>{exercise.exerciseName}</span>
+                  <span>Sets: {exercise.sets.length}</span>
+                </div>
+                <IoIosArrowDown
+                  className="clickable-icon"
+                  onClick={() => toggleAdditionalSetInfo(exercise.exerciseName)}
                 />
-                <span>{exercise.exerciseName}</span>
-                <span>Sets: {exercise.sets.length}</span>
               </div>
-              <IoIosArrowDown
-                className="clickable-icon"
-                onClick={() => toggleAdditionalSetInfo(exercise.exerciseName)}
-              />
             </div>
             {exercise.isOpen && (
               <table

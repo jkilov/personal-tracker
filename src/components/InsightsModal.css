@@ -12,3 +12,9 @@ td .weight-label {
     font-size: 0.7rem;
     margin: 0;
   }
+
+  .session-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }

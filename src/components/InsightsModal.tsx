@@ -2,7 +2,9 @@ import "./InsightsModal.css";
 import { useRef, useEffect, useState } from "react";
 import { GoGraph } from "react-icons/go";
 import { readSetWithExerciseData } from "../utils/supabase/set";
+
 import { type SetData, type FormattedSetData } from "./SessionCard";
+import Tooltip from "./Tooltip";
 
 interface Props {
   sessionId: string;
@@ -63,13 +65,17 @@ const InsightsModal = ({ sessionId, formattedSetData }: Props) => {
 
       <dialog ref={dialogRef} className="insights-card">
         <div>
-          <h2>Session Overview</h2>
+          <div className="session-header">
+            <h2>Session Overview</h2>
+            <Tooltip />
+          </div>
+
           <span>chatGPT Input</span>
         </div>
         <h3>Insights</h3>
 
         {formattedSetData.map((exercise) => (
-          <div>
+          <div key={exercise.exerciseName}>
             <h3>{exercise.exerciseName}</h3>
             <table>
               <thead>
@@ -85,9 +91,12 @@ const InsightsModal = ({ sessionId, formattedSetData }: Props) => {
                     <td>{set.setNumber}</td>
                     <td>
                       {set.total_volume}
-                      <span className="weight-label">KG</span>
+                      <span className="weight-label"> KG</span>
                     </td>
-                    <td>{Math.ceil(adjustedVolume(set.reps, set.weight))}</td>
+                    <td>
+                      {Math.ceil(adjustedVolume(set.reps, set.weight))}
+                      <span className="weight-label"> KG</span>
+                    </td>
                   </tr>
                 ))}
               </tbody>
