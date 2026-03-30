@@ -91,6 +91,10 @@ const InsightsModal = ({ sessionId, formattedSetData }: Props) => {
         {formattedSetData.map((exercise) => (
           <div key={exercise.exerciseName}>
             <span className="body-part-pill">{exercise.body_part}</span>
+          </div>
+        ))}
+        {formattedSetData.map((exercise) => (
+          <div>
             <h3>{exercise.exerciseName}</h3>
             <table>
               <thead>
@@ -116,6 +120,7 @@ const InsightsModal = ({ sessionId, formattedSetData }: Props) => {
                 ))}
               </tbody>
             </table>
+            <h3>Volume Progression</h3>
           </div>
         ))}
         <span></span>
