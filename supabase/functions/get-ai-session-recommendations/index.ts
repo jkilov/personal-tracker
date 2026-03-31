@@ -59,9 +59,22 @@ ${JSON.stringify(data, null, 2)}
   headers: {
     "Content-Type": "application/json"
   },
-  body: JSON.stringify(prompt)
+  body: JSON.stringify({
+    contents: [
+      {
+        parts: [{text: prompt}]
+      }
+    ]
+  })
 }
       )
+
+      const response = await geminiRequest.json()
+      const geminiResponse = response.candidates[0].content.parts[0].text
+
+    
+
+
 
   } catch (error) {
     console.log(error)
