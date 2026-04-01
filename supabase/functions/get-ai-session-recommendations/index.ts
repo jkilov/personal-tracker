@@ -9,16 +9,16 @@ import {createClient} from "jsr:@supabase/supabase-js@2"
 console.log("Hello from Functions!")
 
 const supabase = createClient(
-  Deno.env.get("REMOTE_SUPABASE_URL"),
-Deno.env.get("REMOTE_SUPABASE_SERVICE_ROLE_KEY")
+  Deno.env.get("SUPABASE_URL"),
+Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")
 );
 
 Deno.serve(async (req) => {
  
 
-  // const {sessionId} = req.json()
 
-  const sessionId = "75dac6f6-d3b5-40ef-b788-09e1deee4cb2"
+
+
 
   try {
     
@@ -42,7 +42,7 @@ Deno.serve(async (req) => {
 Requirements:
 
 Stay within 100 words
-Focus on the most meaningful patterns or performance indicators in the data
+Focus on the most meaningful patterns or performance indicators in the data. Be sure to use actual data in your response that hs been shared with you.
 Recommendations should be specific and directly tied to what the data shows
 
 Workout session data:
@@ -52,11 +52,12 @@ ${JSON.stringify(data, null, 2)}
 
       const geminiKey = Deno.env.get("GEMINI_API_KEY")
 
-      console.log("Gemini Has Key?", !!geminiKey)
+      if (!geminiKey) throw new Error("Auth issue accessing data")
 
-      const geminiRequest = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${geminiKey}`,
+      const geminiRequest = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent`,
 {method: "POST",
   headers: {
+    "x-goog-api-key": geminiKey,
     "Content-Type": "application/json"
   },
   body: JSON.stringify({
@@ -69,27 +70,35 @@ ${JSON.stringify(data, null, 2)}
 }
       )
 
-      const response = await geminiRequest.json()
-      const geminiResponse = response.candidates[0].content.parts[0].text
+      //TODO:add defensive programming
 
     
 
+      const response = await geminiRequest.json()
+
+      if (!response.ok) throw new Error("error receiving response", response.status)
+
+      const geminiResponse = response.candidates[0].content.parts[0].text
+
+
+      return new Response(
+        {message: JSON.stringify(geminiResponse)},
+        { 
+          status: 200,
+          headers: { "Content-Type": "application/json" }},
+      )
 
 
   } catch (error) {
     console.log(error)
     return new Response(JSON.stringify("Error. try again"),
-    {headers: {"Content-Type": "application/json"}},
+    {
+      status: 500,
+      headers: {"Content-Type": "application/json"}},
   )}
 
   
     
-
-
-  return new Response(
-    JSON.stringify("end"),
-    { headers: { "Content-Type": "application/json" }},
-  )
 })
 
 /* To invoke locally:
