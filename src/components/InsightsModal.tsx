@@ -1,5 +1,5 @@
 import "./InsightsModal.css";
-import { useRef, useState } from "react";
+import { useRef, useState, useEffect } from "react";
 import { GoGraph } from "react-icons/go";
 
 import { type SetData, type FormattedSetData } from "./SessionCard";
@@ -13,6 +13,7 @@ interface Props {
 const InsightsModal = ({ sessionId, formattedSetData }: Props) => {
   const dialogRef = useRef<HTMLDialogElement | null>(null);
   const [setData, setSetData] = useState<SetData[] | null>(null);
+  const [aiInsight, setAiInsight] = useState<string | null>(null);
 
   const openModal = () => {
     if (dialogRef.current) dialogRef.current.showModal();
@@ -52,6 +53,24 @@ const InsightsModal = ({ sessionId, formattedSetData }: Props) => {
 
   const adjustedVolume = (reps: number, weight: number) => {
     return reps * weight * getRepMultiplier(reps);
+  };
+
+  const getInsights = async () => {
+    const data = await fetch(
+      `https://sudaxmkqsdilkjylccqu.supabase.co/functions/v1/get-ai-session-recommendations/${sessionId}`,
+      {
+        method: "GET",
+        headers: {
+          Authorization:
+            "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6ImFub24iLCJleHAiOjE5ODM4MTI5OTZ9.CRXP1A7WOeoJeXxjNni43kdQwgnWNReilDMblYTn_I0",
+          "Content-Type": "application/json",
+        },
+      }
+    );
+
+    const response = await data.json();
+
+    console.log("R", response);
   };
 
   console.log("TL", formattedSetData);
@@ -126,7 +145,8 @@ const InsightsModal = ({ sessionId, formattedSetData }: Props) => {
         <span></span>
         <span></span>
         <h3>Recommendations</h3>
-        <span></span>
+        <button onClick={getInsights}>Click</button>
+        <span>{aiInsight}</span>
       </dialog>
     </div>
   );
