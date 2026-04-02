@@ -13,15 +13,31 @@ const supabase = createClient(
 Deno.env.get("REMOTE_SUPABASE_SERVICE_ROLE_KEY")
 );
 
+
+const corseHeaders = {
+  "Access-Control-Allow-Origin": "*",
+  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type"
+}
+
 Deno.serve(async (req) => {
  
 
-
-
+  if (req.method === "OPTIONS") {
+    return new Response("ok", {headers: corsHeaders})
+  }
 
 
   try {
-    
+
+const url = new URL(req.url)
+
+const pathname = url.pathname
+const splitPathname = pathname.split("/")
+const sessionId = splitPathname[splitPathname.length-1]
+
+
+
+
 
     const {data, error} = await supabase.from("sets")
     .select(`
@@ -32,16 +48,18 @@ Deno.serve(async (req) => {
       total_volume,
       exercise!inner(exercise_name, body_part, equipment)
       `)
-    .eq("session_id", "75dac6f6-d3b5-40ef-b788-09e1deee4cb2")
+    .eq("session_id", sessionId)
 
-    if (error) throw new Error("Unable to fetch session Info: ", error)
+      if (error) throw new Error("Unable to fetch session Info: ", error)
 
  const prompt = ` 
  You are a fitness and exercise expert. Analyze the workout session data below and deliver a concise summary of key insights and actionable recommendations.
 
 Requirements:
 
-Stay within 100 words
+- Stay within 50 words.
+- Reps refer to the amount of repetitions an exercise as done. All weights are in KG.
+- remove special characters from your response
 Focus on the most meaningful patterns or performance indicators in the data. Be sure to use actual data in your response that hs been shared with you.
 Recommendations should be specific and directly tied to what the data shows
 
@@ -76,25 +94,32 @@ ${JSON.stringify(data, null, 2)}
 
       const response = await geminiRequest.json()
 
-      if (!response.ok) throw new Error("error receiving response", response.status)
+      // if (!response.ok) throw new Error("error receiving response", response.status)
 
       const geminiResponse = response.candidates[0].content.parts[0].text
 
+      
 
       return new Response(
-        {message: JSON.stringify(geminiResponse)},
-        { 
+        JSON.stringify({ message: geminiResponse }),
+        {
           status: 200,
-          headers: { "Content-Type": "application/json" }},
-      )
-
+          headers: {
+            ...corseHeaders,
+            "Content-Type": "application/json",
+          },
+        }
+      );
 
   } catch (error) {
     console.log(error)
-    return new Response(JSON.stringify("Error. try again"),
+    console.log("finished")
+    return new Response(JSON.stringify(error.message),
     {
       status: 500,
-      headers: {"Content-Type": "application/json"}},
+      headers: {
+        ...corseHeaders,
+        "Content-Type": "application/json"}},
   )}
 
   

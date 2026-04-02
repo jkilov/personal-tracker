@@ -2,7 +2,9 @@ import "./InsightsModal.css";
 import { useRef, useState, useEffect } from "react";
 import { GoGraph } from "react-icons/go";
 
-import { type SetData, type FormattedSetData } from "./SessionCard";
+import { retrieveSession } from "../utils/supabase/auth-supabase";
+
+import { type FormattedSetData } from "./SessionCard";
 import Tooltip from "./Tooltip";
 
 interface Props {
@@ -12,8 +14,8 @@ interface Props {
 
 const InsightsModal = ({ sessionId, formattedSetData }: Props) => {
   const dialogRef = useRef<HTMLDialogElement | null>(null);
-  const [setData, setSetData] = useState<SetData[] | null>(null);
   const [aiInsight, setAiInsight] = useState<string | null>(null);
+  const [accessToken, setAccessToken] = useState<string | undefined>(undefined);
 
   const openModal = () => {
     if (dialogRef.current) dialogRef.current.showModal();
@@ -57,23 +59,33 @@ const InsightsModal = ({ sessionId, formattedSetData }: Props) => {
 
   const getInsights = async () => {
     const data = await fetch(
-      `https://sudaxmkqsdilkjylccqu.supabase.co/functions/v1/get-ai-session-recommendations/${sessionId}`,
+      `http://127.0.0.1:54321/functions/v1/get-ai-session-recommendations/${sessionId}`,
       {
         method: "GET",
         headers: {
-          Authorization:
-            "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6ImFub24iLCJleHAiOjE5ODM4MTI5OTZ9.CRXP1A7WOeoJeXxjNni43kdQwgnWNReilDMblYTn_I0",
-          "Content-Type": "application/json",
+          Authorization: `Bearer ${accessToken}`,
         },
       }
     );
 
+    //TODO: need to get the user access token and pass in to Authorization headers
+    //TODO: add loading indicators
     const response = await data.json();
-
-    console.log("R", response);
+    setAiInsight(response.message);
   };
 
-  console.log("TL", formattedSetData);
+  useEffect(() => {
+    const retrieveAccessToken = async () => {
+      const { data, error } = await retrieveSession();
+
+      if (error) return;
+
+      setAccessToken(data.session?.access_token);
+    };
+
+    retrieveAccessToken();
+  }, []);
+
   return (
     <div>
       <GoGraph className="insights-icon" onClick={openModal} />
@@ -146,7 +158,7 @@ const InsightsModal = ({ sessionId, formattedSetData }: Props) => {
         <span></span>
         <h3>Recommendations</h3>
         <button onClick={getInsights}>Click</button>
-        <span>{aiInsight}</span>
+        <span style={{ fontSize: "0.8rem" }}>{aiInsight}</span>
       </dialog>
     </div>
   );

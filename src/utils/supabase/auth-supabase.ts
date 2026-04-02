@@ -46,4 +46,13 @@ export const authenticationCheck = (callback: (session: Session | null) => void 
   return subscription
 }
 
+//retrieve session
+
+export const retrieveSession = async() => {
+  const {data, error} = await supabase.auth.getSession()
+
+  return {data, error}
+
+}
+
 
