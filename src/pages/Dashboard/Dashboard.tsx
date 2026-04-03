@@ -1,10 +1,11 @@
 import { useState } from "react";
 import { Toaster, toast } from "sonner";
-import { readUserData } from "../utils/supabase/user";
-import { createSession } from "../utils/supabase/session";
+import { readUserData } from "../../utils/supabase/user";
+import { createSession } from "../../utils/supabase/session";
 import { useNavigate } from "react-router";
 import { PulseLoader } from "react-spinners";
-import "../App.css";
+import "../../App.css";
+import "./Dashboard.css";
 
 const Dashboard = () => {
   const navigate = useNavigate();
@@ -40,8 +41,11 @@ const Dashboard = () => {
   };
 
   return (
-    <div>
-      <h1>Dashboard</h1>
+    <div className="dashboard-layout">
+      <h1>Home</h1>
+      <h2>Past Sessions</h2>
+
+      <h2>What would you like to do?</h2>
 
       <button onClick={handleCreateSession}>
         {isLoading ? (

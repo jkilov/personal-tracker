@@ -5,7 +5,7 @@ import { Route, Routes } from "react-router";
 import ProtectedRoutes from "./components/ProtectedRoutes";
 import { authenticationCheck } from "./utils/supabase/auth-supabase";
 import SignUp from "./pages/SignUp";
-import Dashboard from "./pages/Dashboard";
+import Dashboard from "./pages/Dashboard/Dashboard";
 import SessionModal from "./components/SessionModal";
 import type { Session } from "@supabase/supabase-js";
 export const AuthContext = createContext<Session | null>(null);
@@ -26,7 +26,7 @@ function App() {
     console.log("auth: ", isAuthenticated);
 
     return () => subscription.unsubscribe();
-  }, []);
+  }, [isAuthenticated]);
 
   if (isLoading) return <div>Loading...</div>;
 

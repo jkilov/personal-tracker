@@ -51,7 +51,6 @@ const InsightsModal = ({ sessionId, formattedSetData }: Props) => {
   };
 
   const getInsights = async () => {
-    console.log("A", accessToken);
     setIsLoading(true);
     const data = await fetch(
       `http://127.0.0.1:54321/functions/v1/get-ai-session-recommendations/${sessionId}`,

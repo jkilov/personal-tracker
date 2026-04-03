@@ -123,10 +123,9 @@ const AddSet = ({ exerciseId }: Props) => {
       return acc;
     }, []);
 
-    console.log("t", newArr);
     const { error } = await createNewSet(newArr);
 
-    console.log(error);
+    console.log("Error creating set: ", error);
   };
 
   const handleChange = (title: string, field: FieldKey, value: number) => {
@@ -166,7 +165,6 @@ const AddSet = ({ exerciseId }: Props) => {
         set.RepsTouched === false ||
         set.WeightTouched === false
     );
-    console.log("V", valuesArr);
     return hasInvalidSet;
   };
 

@@ -20,3 +20,17 @@ export const fetchSessionData = async(columnName: string) => {
 }
 
 
+// export const fetchSessionAndSetData = async() => {
+
+//     const {data, error} = await supabase
+//     .from("session")
+//     .select(`
+//         session_id,
+//         session_date,
+//         sets!inner(set_id, reps, weight,
+        
+//         exercise!inner(exercise_name)
+
+//         )
+//         `)
+// }

@@ -1,0 +1,7 @@
+.dashboard-layout {
+    display: flex;
+    flex-direction: column;
+    align-items:start;
+    justify-content: flex-start;
+    width: 100vw;
+}
