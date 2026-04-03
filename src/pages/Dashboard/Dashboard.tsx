@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Toaster, toast } from "sonner";
 import { readUserData } from "../../utils/supabase/user";
 import { createSession } from "../../utils/supabase/session";
@@ -6,11 +6,15 @@ import { useNavigate } from "react-router";
 import { PulseLoader } from "react-spinners";
 import "../../App.css";
 import "./Dashboard.css";
+import SessionCard from "../../components/SessionCard";
+import { fetchSessionData, type Session } from "../../utils/supabase/session";
+import { UTCtoLocalDateConversion } from "../../utils/helper/localDateConversion";
 
 const Dashboard = () => {
   const navigate = useNavigate();
 
   const [isLoading, setIsLoading] = useState(false);
+  const [allSessions, setAllSessions] = useState<Session[] | null>(null);
 
   const handleCreateSession = async () => {
     setIsLoading(true);
@@ -40,10 +44,29 @@ const Dashboard = () => {
     });
   };
 
+  useEffect(() => {
+    const getAllSessions = async () => {
+      const { data: sessionArr, error } = await fetchSessionData();
+      setAllSessions(sessionArr);
+      //TODO: Handle Error
+    };
+
+    getAllSessions();
+  }, []);
+
   return (
     <div className="dashboard-layout">
       <h1>Home</h1>
+
       <h2>Past Sessions</h2>
+      <div className="sessions-list">
+        {allSessions?.map((session) => (
+          <div className="session-details" key={session.session_id}>
+            <h3>{UTCtoLocalDateConversion(session.created_at)}</h3>
+            <SessionCard sessionId={session.session_id} />
+          </div>
+        ))}
+      </div>
 
       <h2>What would you like to do?</h2>
 

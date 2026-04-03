@@ -8,29 +8,20 @@ return {data, error, status, statusText}
 
 }
 
+export type Session = {
+    session_id: string;
+   session_date: string; 
+   created_at: string;
+}
 
-export const fetchSessionData = async(columnName: string) => {
+
+export const fetchSessionData = async() => {
 
     const {data, error, status} = await supabase
     .from("session")
-    .select(columnName)
+    .select("*")
 
 
     return {data, error, status}
 }
 
-
-// export const fetchSessionAndSetData = async() => {
-
-//     const {data, error} = await supabase
-//     .from("session")
-//     .select(`
-//         session_id,
-//         session_date,
-//         sets!inner(set_id, reps, weight,
-        
-//         exercise!inner(exercise_name)
-
-//         )
-//         `)
-// }

@@ -5,3 +5,15 @@
     justify-content: flex-start;
     width: 100vw;
 }
+
+.sessions-list {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-evenly;
+    width: 100%;
+}
+
+.session-details {
+    display: flex;
+    flex-direction: column;
+}

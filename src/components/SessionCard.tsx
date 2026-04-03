@@ -23,7 +23,11 @@ export type FormattedSetData = {
   sets: SetData[];
 };
 
-const SessionCard = () => {
+interface Props {
+  sessionId: string;
+}
+
+const SessionCard = ({ sessionId }: Props) => {
   const [formattedSetData, setFormattedSetData] = useState<
     FormattedSetData[] | null
   >(null);
@@ -37,7 +41,7 @@ const SessionCard = () => {
   useEffect(() => {
     const getSessionData = async () => {
       const { data: sessionInformation, error } = await readSetWithExerciseData(
-        sessionIdParam.sessionId!
+        sessionId
       );
 
       console.log("S", sessionInformation);
@@ -89,10 +93,10 @@ const SessionCard = () => {
   };
 
   return (
-    <div className="card-layout">
+    <div>
       {formattedSetData &&
         formattedSetData.map((exercise) => (
-          <div key={exercise.exerciseName}>
+          <div key={exercise.exerciseName} className="card-layout">
             <InsightsModal
               sessionId={sessionIdParam.sessionId!}
               formattedSetData={formattedSetData}
