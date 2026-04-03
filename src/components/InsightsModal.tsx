@@ -3,9 +3,10 @@ import { useRef, useState, useEffect } from "react";
 import { GoGraph } from "react-icons/go";
 
 import { retrieveSession } from "../utils/supabase/auth-supabase";
-
 import { type FormattedSetData } from "./SessionCard";
 import Tooltip from "./Tooltip";
+import { TrophySpin } from "react-loading-indicators";
+import { PiCursorClick } from "react-icons/pi";
 
 interface Props {
   sessionId: string;
@@ -16,6 +17,7 @@ const InsightsModal = ({ sessionId, formattedSetData }: Props) => {
   const dialogRef = useRef<HTMLDialogElement | null>(null);
   const [aiInsight, setAiInsight] = useState<string | null>(null);
   const [accessToken, setAccessToken] = useState<string | undefined>(undefined);
+  const [isLoading, setIsLoading] = useState(false);
 
   const openModal = () => {
     if (dialogRef.current) dialogRef.current.showModal();
@@ -24,15 +26,6 @@ const InsightsModal = ({ sessionId, formattedSetData }: Props) => {
   const closeModal = () => {
     if (dialogRef.current) dialogRef.current.close();
   };
-
-  const totalVolumeCombined = formattedSetData.reduce((acc, el) => {
-    let aggTotalVol = 0;
-    for (let i = 0; i < el.sets.length; i++) {
-      aggTotalVol += el.sets[i].total_volume!;
-    }
-    acc[el.exerciseName] = { name: el.exerciseName, total_volume: aggTotalVol };
-    return acc;
-  }, {} as Record<string, number>);
 
   const getRepMultiplier = (reps: number): number => {
     switch (true) {
@@ -58,6 +51,8 @@ const InsightsModal = ({ sessionId, formattedSetData }: Props) => {
   };
 
   const getInsights = async () => {
+    console.log("A", accessToken);
+    setIsLoading(true);
     const data = await fetch(
       `http://127.0.0.1:54321/functions/v1/get-ai-session-recommendations/${sessionId}`,
       {
@@ -68,10 +63,9 @@ const InsightsModal = ({ sessionId, formattedSetData }: Props) => {
       }
     );
 
-    //TODO: need to get the user access token and pass in to Authorization headers
-    //TODO: add loading indicators
     const response = await data.json();
     setAiInsight(response.message);
+    setIsLoading(false);
   };
 
   useEffect(() => {
@@ -125,7 +119,7 @@ const InsightsModal = ({ sessionId, formattedSetData }: Props) => {
           </div>
         ))}
         {formattedSetData.map((exercise) => (
-          <div>
+          <div key={exercise.exerciseName}>
             <h3>{exercise.exerciseName}</h3>
             <table>
               <thead>
@@ -157,8 +151,28 @@ const InsightsModal = ({ sessionId, formattedSetData }: Props) => {
         <span></span>
         <span></span>
         <h3>Recommendations</h3>
-        <button onClick={getInsights}>Click</button>
-        <span style={{ fontSize: "0.8rem" }}>{aiInsight}</span>
+        <div>
+          <span onClick={getInsights} className="ai-recommendation-btn">
+            {!aiInsight ? (
+              <>
+                View your AI Coach Recommendations <PiCursorClick />{" "}
+              </>
+            ) : null}
+          </span>
+        </div>
+
+        <span className="ai-recommendation-response">
+          {isLoading ? (
+            <TrophySpin
+              color="#7F7CAF"
+              size="small"
+              text="analyzing"
+              textColor=""
+            />
+          ) : (
+            aiInsight
+          )}
+        </span>
       </dialog>
     </div>
   );

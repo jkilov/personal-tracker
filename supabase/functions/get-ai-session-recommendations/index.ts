@@ -57,7 +57,7 @@ const sessionId = splitPathname[splitPathname.length-1]
 
 Requirements:
 
-- Stay within 50 words.
+- Stay within 100 words.
 - Reps refer to the amount of repetitions an exercise as done. All weights are in KG.
 - remove special characters from your response
 Focus on the most meaningful patterns or performance indicators in the data. Be sure to use actual data in your response that hs been shared with you.

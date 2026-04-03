@@ -32,3 +32,13 @@ td .weight-label {
     font-size: 0.7rem;
     padding: 5px 10px;
   }
+
+  .ai-recommendation-response {
+    font-size: 0.8rem;
+    width: 300px;
+  }
+
+  .ai-recommendation-btn {
+    color: var(--pill3);
+    cursor: pointer;
+  }
