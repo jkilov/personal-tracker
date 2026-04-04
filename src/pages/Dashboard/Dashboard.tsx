@@ -47,8 +47,12 @@ const Dashboard = () => {
   useEffect(() => {
     const getAllSessions = async () => {
       const { data: sessionArr, error } = await fetchSessionData();
+
+      if (error) {
+        console.error(error.message, error.cause);
+      }
+
       setAllSessions(sessionArr);
-      //TODO: Handle Error
     };
 
     getAllSessions();

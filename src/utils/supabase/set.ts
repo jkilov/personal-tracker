@@ -1,10 +1,11 @@
 
 import type { PostgrestError } from "@supabase/supabase-js";
 import { supabase } from "./client-supabase";
+import type { MergeSet } from "../../components/AddSet";
 
 
 
-export const createNewSet = async(setArr: any) => {
+export const createNewSet = async(setArr: MergeSet[]) => {
 
     const {data, error} = await supabase
     .from("sets")

@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useParams } from "react-router";
+// import { useParams } from "react-router";
 import {
   readSetWithExerciseData,
   type SessionInfo,
@@ -29,14 +29,14 @@ interface Props {
 
 const SessionCard = ({ sessionId }: Props) => {
   const [formattedSetData, setFormattedSetData] = useState<
-    FormattedSetData[] | null
-  >(null);
+    FormattedSetData[] | undefined
+  >(undefined);
 
   const [rawSessionData, setRawSessionData] = useState<SessionInfo[] | null>(
     null
   );
 
-  const sessionIdParam = useParams();
+  // const sessionIdParam = useParams();
 
   useEffect(() => {
     const getSessionData = async () => {
@@ -44,14 +44,15 @@ const SessionCard = ({ sessionId }: Props) => {
         sessionId
       );
 
-      console.log("S", sessionInformation);
+      if (error) {
+        console.error(error.message);
+        return;
+      }
       setRawSessionData(sessionInformation);
-
-      //TODO: handle data and errror here - data goes into state and gets mapped over
     };
 
     getSessionData();
-  }, [sessionIdParam]);
+  }, [sessionId]);
 
   useEffect(() => {
     if (!rawSessionData) return;
@@ -92,15 +93,21 @@ const SessionCard = ({ sessionId }: Props) => {
     setFormattedSetData(updatedIsOpen);
   };
 
+  console.log("formatted", formattedSetData);
+
+  //FIXME: below there are two conditional checks on formattedSetData - this needs to be refactored
   return (
-    <div>
+    <div className="card-layout">
+      {formattedSetData ? (
+        // Two conditionals on the same data -refactor
+        <InsightsModal
+          sessionId={sessionId} //changed this from sessionIDParams
+          formattedSetData={formattedSetData}
+        />
+      ) : null}
       {formattedSetData &&
         formattedSetData.map((exercise) => (
-          <div key={exercise.exerciseName} className="card-layout">
-            <InsightsModal
-              sessionId={sessionIdParam.sessionId!}
-              formattedSetData={formattedSetData}
-            />
+          <div key={exercise.exerciseName}>
             <div>
               <div className="card-exercise-layout ">
                 <div className="card-text-graph-layout">
@@ -126,13 +133,11 @@ const SessionCard = ({ sessionId }: Props) => {
                 </tr>
 
                 {exercise.sets.map((set) => (
-                  <div key={exercise.exerciseName}>
-                    <tr>
-                      <td>{set.setNumber}</td>
-                      <td>{set.reps}</td>
-                      <td>{set.weight}</td>
-                    </tr>
-                  </div>
+                  <tr key={exercise.exerciseName}>
+                    <td>{set.setNumber}</td>
+                    <td>{set.reps}</td>
+                    <td>{set.weight}</td>
+                  </tr>
                 ))}
               </table>
             )}

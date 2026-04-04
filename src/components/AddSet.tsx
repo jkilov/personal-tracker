@@ -7,7 +7,7 @@ import { AuthContext } from "../App";
 
 import "../App.css";
 
-type MergeSet = {
+export type MergeSet = {
   user_id: string | undefined;
   session_id: string | undefined;
   exercise_id: string;
