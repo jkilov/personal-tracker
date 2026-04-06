@@ -126,18 +126,22 @@ const SessionCard = ({ sessionId }: Props) => {
                   exercise.isOpen ? "set-info-visible" : ""
                 }`}
               >
-                <tr>
-                  <th>Sets</th>
-                  <th>Reps</th>
-                  <th>Weight</th>
-                </tr>
+                <thead>
+                  <tr>
+                    <th>Sets</th>
+                    <th>Reps</th>
+                    <th>Weight</th>
+                  </tr>
+                </thead>
 
                 {exercise.sets.map((set) => (
-                  <tr key={exercise.exerciseName}>
-                    <td>{set.setNumber}</td>
-                    <td>{set.reps}</td>
-                    <td>{set.weight}</td>
-                  </tr>
+                  <tbody key={`${exercise.exerciseName}-${set.setNumber}`}>
+                    <tr>
+                      <td>{set.setNumber}</td>
+                      <td>{set.reps}</td>
+                      <td>{set.weight}</td>
+                    </tr>
+                  </tbody>
                 ))}
               </table>
             )}

@@ -51,9 +51,10 @@ const InsightsModal = ({ sessionId, formattedSetData }: Props) => {
   };
 
   const getInsights = async () => {
+    if (!accessToken) return;
     setIsLoading(true);
     const data = await fetch(
-      `http://127.0.0.1:54321/functions/v1/get-ai-session-recommendations/${sessionId}`,
+      `https://sudaxmkqsdilkjylccqu.supabase.co/functions/v1/get-ai-session-recommendations/${sessionId}`,
       {
         method: "GET",
         headers: {
@@ -74,7 +75,7 @@ const InsightsModal = ({ sessionId, formattedSetData }: Props) => {
       const { data, error } = await retrieveSession();
 
       if (error) return;
-
+      console.log("token: ", data.session?.access_token);
       setAccessToken(data.session?.access_token);
     };
 

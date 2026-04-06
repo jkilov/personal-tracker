@@ -9,12 +9,12 @@ import {createClient} from "jsr:@supabase/supabase-js@2"
 console.log("Hello from Functions!")
 
 const supabase = createClient(
-  Deno.env.get("REMOTE_SUPABASE_URL"),
-Deno.env.get("REMOTE_SUPABASE_SERVICE_ROLE_KEY")
+  Deno.env.get("SUPABASE_URL"),
+Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")
 );
 
 
-const corseHeaders = {
+const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type"
 }
@@ -50,7 +50,7 @@ const sessionId = splitPathname[splitPathname.length-1]
       `)
     .eq("session_id", sessionId)
 
-      if (error) throw new Error("Unable to fetch session Info: ", error)
+      if (error) throw new Error("Unable to fetch session Info: " + error)
 
  const prompt = ` 
  You are a fitness and exercise expert. Analyze the workout session data below and deliver a concise summary of key insights and actionable recommendations.
@@ -88,24 +88,22 @@ ${JSON.stringify(data, null, 2)}
 }
       )
 
-      //TODO:add defensive programming
 
     
-
-      const response = await geminiRequest.json()
-
-      // if (!response.ok) throw new Error("error receiving response", response.status)
-
-      const geminiResponse = response.candidates[0].content.parts[0].text
-
+      if (!geminiRequest.ok) {
+        throw new Error(`Gemini request failed with status ${geminiRequest.status}`);
+      }
       
+      const response = await geminiRequest.json();
+      
+      const geminiResponse = response.candidates[0].content.parts[0].text;
 
       return new Response(
         JSON.stringify({ message: geminiResponse }),
         {
           status: 200,
           headers: {
-            ...corseHeaders,
+            ...corsHeaders,
             "Content-Type": "application/json",
           },
         }
@@ -118,7 +116,7 @@ ${JSON.stringify(data, null, 2)}
     {
       status: 500,
       headers: {
-        ...corseHeaders,
+        ...corsHeaders,
         "Content-Type": "application/json"}},
   )}
 
