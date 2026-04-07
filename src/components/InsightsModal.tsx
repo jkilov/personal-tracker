@@ -50,6 +50,8 @@ const InsightsModal = ({ sessionId, formattedSetData }: Props) => {
     return reps * weight * getRepMultiplier(reps);
   };
 
+  const newId = "dbb44a0e-fb20-4f4a-a30c-f61d5ab1989b";
+
   const getInsights = async () => {
     if (!accessToken) return;
     setIsLoading(true);
@@ -136,7 +138,7 @@ const InsightsModal = ({ sessionId, formattedSetData }: Props) => {
                   <tr key={exercise.exerciseName + "-" + index}>
                     <td>{set.setNumber}</td>
                     <td>
-                      {set.total_volume}
+                      {set.set_volume}
                       <span className="weight-label"> KG</span>
                     </td>
                     <td>

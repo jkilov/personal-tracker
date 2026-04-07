@@ -12,7 +12,7 @@ export type SetData = {
   setNumber: number;
   reps: number;
   weight: number;
-  total_volume?: number;
+  set_volume?: number;
 };
 
 export type FormattedSetData = {
@@ -74,11 +74,11 @@ const SessionCard = ({ sessionId }: Props) => {
         setNumber: el.set_number,
         reps: el.reps,
         weight: el.weight,
-        total_volume: el.total_volume,
+        set_volume: el.set_volume,
       });
 
       return acc;
-    }, {} as Record<string, { exerciseName: string; body_part: string; createdAt: string; isOpen: boolean; sets: { setNumber: number; reps: number; weight: number; total_volume: number }[] }>);
+    }, {} as Record<string, { exerciseName: string; body_part: string; createdAt: string; isOpen: boolean; sets: { setNumber: number; reps: number; weight: number; set_volume: number }[] }>);
     const exerciseSetArr = Object.values(reshapedExerciseData);
     setFormattedSetData(exerciseSetArr);
   }, [rawSessionData]);

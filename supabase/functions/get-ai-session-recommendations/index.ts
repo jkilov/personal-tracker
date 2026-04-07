@@ -45,12 +45,12 @@ const sessionId = splitPathname[splitPathname.length-1]
       reps,
       weight,
       exercise_id, set_number,
-      total_volume,
+      set_volume,
       exercise!inner(exercise_name, body_part, equipment)
       `)
     .eq("session_id", sessionId)
 
-      if (error) throw new Error("Unable to fetch session Info: " + error)
+      if (error) throw new Error("Unable to fetch session Info: " + JSON.stringify(error))
 
  const prompt = ` 
  You are a fitness and exercise expert. Analyze the workout session data below and deliver a concise summary of key insights and actionable recommendations.
@@ -95,8 +95,12 @@ ${JSON.stringify(data, null, 2)}
       }
       
       const response = await geminiRequest.json();
+
+      const geminiResponse = response?.candidates?.[0]?.content?.parts?.[0]?.text;
       
-      const geminiResponse = response.candidates[0].content.parts[0].text;
+      if (!geminiResponse) {
+        throw new Error("Gemini returned no usable text response");
+      }
 
       return new Response(
         JSON.stringify({ message: geminiResponse }),
