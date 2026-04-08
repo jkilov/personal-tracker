@@ -52,7 +52,6 @@ const SessionModal = () => {
   //FIXME: session date is being printed for every exercise despite being part of the same session
   return (
     <div>
-      <SessionCard />
       <div>
         <h3>Add Workout</h3>
         <form>

@@ -44,6 +44,8 @@ const SessionCard = ({ sessionId }: Props) => {
         sessionId
       );
 
+      console.group("S", sessionInformation);
+
       if (error) {
         console.error(error.message);
         return;

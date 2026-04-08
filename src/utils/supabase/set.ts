@@ -26,11 +26,12 @@ export type SessionInfo = {
   set_number: number;
   weight: number;
   set_volume: number
+  user_id: string
 };
 
 
 type readSetWithExerciseDataResponse = {
-  data: SessionInfo [] | null;
+  data: SessionInfo [] | null;    
   error: PostgrestError| null
 }
 
@@ -43,16 +44,14 @@ export const createNewSet = async(setArr: MergeSet[]) => {
     .insert(setArr)
     .select()
 
+
 if (setError) throw new Error("error occurred when writing set information")
 
-    if (!setError && setData?.length) {
+  if (setData) await supabase.rpc("refresh_fitness_scores", {passed_id: setData[0].session_id })
 
-      const {data: scoreData, error: scoreError} = await supabase.rpc("refresh_fitness_scores", {passed_id: setData[0].session_id })
 
-      if (scoreError) throw new Error ("error occurred calculating fitness scores")
-
-      return {setData, scoreData}
-    }
+      return {setData}
+    
     
   } catch (error) {
     console.error(error)
