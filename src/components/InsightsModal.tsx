@@ -46,6 +46,8 @@ const InsightsModal = ({ sessionId, formattedSetData }: Props) => {
     }
   };
 
+  //TODO: delete above as it now sits in RPC function - will also need to clean the component
+
   const adjustedVolume = (reps: number, weight: number) => {
     return reps * weight * getRepMultiplier(reps);
   };

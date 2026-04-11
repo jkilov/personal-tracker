@@ -44,17 +44,32 @@ export const createNewSet = async(setArr: MergeSet[]) => {
     .insert(setArr)
     .select()
 
-
-if (setError) throw new Error("error occurred when writing set information")
-
-  if (setData) await supabase.rpc("refresh_fitness_scores", {passed_id: setData[0].session_id })
+    console.log("SD", setData)
 
 
-      return {setData}
+if (setError) throw new Error("error occurred when writing set information: ", setError)
+  if (!setData) throw new Error("No data returned for calculation")
+
+  if (setData)  {
+    
+    const passedSessionId = setData[0].session_id
+    
+    console.log("id", passedSessionId)
+
+    await supabase.rpc("refresh_fitness_scores", {passed_id: passedSessionId })
+    await supabase.rpc("load_total_adjusted_volume", {passed_session_id: passedSessionId})
+// TODO: promise.all
+  
+  }
+
+
+//TODO: add more defensive programming
+      return {data: setData, error: null}
     
     
   } catch (error) {
     console.error(error)
+    return {data: null, error}
     
   }
   

@@ -3,7 +3,6 @@ import { readExerciseData } from "../utils/supabase/exercise";
 import AddSet from "./AddSet";
 
 import "./SessionModal.css";
-import SessionCard from "./SessionCard";
 
 type ExerciseData = {
   exercise_id: string;

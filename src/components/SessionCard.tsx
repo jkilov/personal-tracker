@@ -7,6 +7,10 @@ import {
 import { IoIosArrowDown } from "react-icons/io";
 import "./SessionCard.css";
 import InsightsModal from "./InsightsModal";
+import {
+  type FitnessScores,
+  getFitnessScoresBySession,
+} from "../utils/supabase/fitness-score";
 
 export type SetData = {
   setNumber: number;
@@ -36,7 +40,9 @@ const SessionCard = ({ sessionId }: Props) => {
     null
   );
 
-  // const sessionIdParam = useParams();
+  const [fitnessScores, setFitnessScores] = useState<FitnessScores[] | null>(
+    null
+  );
 
   useEffect(() => {
     const getSessionData = async () => {
@@ -85,6 +91,18 @@ const SessionCard = ({ sessionId }: Props) => {
     setFormattedSetData(exerciseSetArr);
   }, [rawSessionData]);
 
+  useEffect(() => {
+    const getFitnessScores = async () => {
+      const { data, error } = await getFitnessScoresBySession(sessionId);
+      setFitnessScores(data);
+      console.log(data);
+    };
+
+    getFitnessScores();
+  }, [sessionId]);
+
+  //TODO: ADD FITNIESS SCORE HERE
+
   const toggleAdditionalSetInfo = (exerciseName: string) => {
     const updatedIsOpen = formattedSetData?.map((exercise) =>
       exercise.exerciseName === exerciseName
@@ -95,19 +113,24 @@ const SessionCard = ({ sessionId }: Props) => {
     setFormattedSetData(updatedIsOpen);
   };
 
-  console.log("formatted", formattedSetData);
-
   //FIXME: below there are two conditional checks on formattedSetData - this needs to be refactored
   return (
     <div className="card-layout">
+      {fitnessScores?.map((score) => (
+        <div key={score.session_Id}>
+          <span>Adjusted Volume{score.adjusted_daily_volume}kg</span>
+          <span>Total Volume: {score.total_daily_volume}kg</span>
+        </div>
+      ))}
       {formattedSetData ? (
         // Two conditionals on the same data -refactor
         <InsightsModal
-          sessionId={sessionId} //changed this from sessionIDParams
+          sessionId={sessionId}
           formattedSetData={formattedSetData}
         />
       ) : null}
       {formattedSetData &&
+        //TODO: check if using formattedSetData twice together is correct
         formattedSetData.map((exercise) => (
           <div key={exercise.exerciseName}>
             <div>

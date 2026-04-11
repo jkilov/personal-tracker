@@ -9,6 +9,7 @@ import "./Dashboard.css";
 import SessionCard from "../../components/SessionCard";
 import { fetchSessionData, type Session } from "../../utils/supabase/session";
 import { UTCtoLocalDateConversion } from "../../utils/helper/localDateConversion";
+import FtinessScoresGraph from "../../components/FtinessScoresGraph";
 
 const Dashboard = () => {
   const navigate = useNavigate();
@@ -61,7 +62,7 @@ const Dashboard = () => {
   return (
     <div className="dashboard-layout">
       <h1>Home</h1>
-
+      <FtinessScoresGraph />
       <h2>Past Sessions</h2>
       <div className="sessions-list">
         {allSessions?.map((session) => (
