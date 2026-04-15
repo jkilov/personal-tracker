@@ -12,7 +12,6 @@ export type MergeSet = {
   session_id: string | undefined;
   exercise_id: string;
   set_number: number;
-
   reps: number;
   weight: number;
 };
@@ -132,7 +131,7 @@ const AddSet = ({ exerciseId }: Props) => {
   const handleChange = (title: string, field: FieldKey, value: number) => {
     setSetVals((prev) => ({
       ...prev,
-      [title]: { ...prev[title], [field]: value },
+      [title]: { ...prev[title], [field]: Number.isNaN(value) ? "" : value },
     }));
   };
 

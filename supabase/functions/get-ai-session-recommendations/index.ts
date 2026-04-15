@@ -63,9 +63,9 @@ Requirements:
 Focus on the most meaningful patterns or performance indicators in the data. Be sure to use actual data in your response that hs been shared with you.
 Recommendations should be specific and directly tied to what the data shows
 
-Workout session data:
+Use the workout session data that is delimited by quotation marks:
 
-${JSON.stringify(data, null, 2)}
+"${JSON.stringify(data, null, 2)}"
  `
 
       const geminiKey = Deno.env.get("GEMINI_API_KEY")

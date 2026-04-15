@@ -56,6 +56,7 @@ const SessionModal = () => {
         <form>
           <label htmlFor="exerciseList">Select Exercise</label>
           <select
+            value=""
             name="exerciseList"
             id="exerciseList"
             onChange={(e) => handleExerciseSelection(e.target.value)}

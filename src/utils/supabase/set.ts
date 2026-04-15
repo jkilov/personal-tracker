@@ -25,7 +25,6 @@ export type SessionInfo = {
   set_id: string;
   set_number: number;
   weight: number;
-  set_volume: number
   user_id: string
 };
 
@@ -55,10 +54,6 @@ if (setError) throw new Error("error occurred when writing set information: ", s
     const passedSessionId = setData[0].session_id
     
     console.log("id", passedSessionId)
-
-    await supabase.rpc("refresh_fitness_scores", {passed_id: passedSessionId })
-    await supabase.rpc("load_total_adjusted_volume", {passed_session_id: passedSessionId})
-// TODO: promise.all
   
   }
 
@@ -85,7 +80,6 @@ export const readSetWithExerciseData = async(sessionId: string):Promise<readSetW
        set_id,
        reps,
        weight,
-       set_volume,
        session_id,
        exercise_id,
         set_number,

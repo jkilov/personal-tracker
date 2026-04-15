@@ -14,16 +14,24 @@ console.log("Hello from Functions!")
 
 
 const supabase = createClient(
- Deno.env.get("SUPABASE_URL")!,
- Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!,
+ Deno.env.get("REMOTE_SUPABASE_URL")!,
+ Deno.env.get("REMOTE_SUPABASE_SERVICE_ROLE_KEY")!,
 )
 
 
+const runSleeper = async() =>  new Promise((resolve) => {
+  setTimeout(()=>{
+    console.log("waiting new batch")
+    resolve()}, 
+    3000)
+})
 
 Deno.serve(async (req) => {
 let processed = 0
 let totalRows = 0
 
+while (true) {
+  //TODO: add sleeper function for batching
 
 try {
 
@@ -90,6 +98,8 @@ if (updateExerciseTableError){ throw new Error("error uploading media_url_ref to
 }
 
     ++processed
+    console.log( `processed: ${processed}, remaining: ${totalRows - processed})`,
+  )
 
 
     
@@ -97,7 +107,7 @@ if (updateExerciseTableError){ throw new Error("error uploading media_url_ref to
   }
 
 
-
+await runSleeper()
 
  } catch (error) {
  console.error("failed to fetch external_ids", error)
@@ -109,11 +119,14 @@ if (updateExerciseTableError){ throw new Error("error uploading media_url_ref to
 })
 
 }
+}
+
 
 return new Response(
  JSON.stringify({processed: processed, remaining: totalRows - processed}),
 {headers: {"Content-Type": "application/json"}}
 )
+
 
 })
 
