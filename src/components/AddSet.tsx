@@ -114,7 +114,6 @@ const AddSet = ({ exerciseId }: Props) => {
         session_id: sessionId,
         set_number: el.setNo,
         exercise_id: exerciseId,
-
         reps: setVals[el.title].Reps,
         weight: setVals[el.title].Weight,
       };

@@ -38,15 +38,23 @@ type readSetWithExerciseDataResponse = {
 export const createNewSet = async(setArr: MergeSet[]) => {
 
   try {
-    const {data: setData, error: setError}: {data: SessionInfo[] | null; error: any} = await supabase
+    const {data: setData, error: setError}: {data: SessionInfo[] | null; error: PostgrestError | null} = await supabase
     .from("sets")
     .insert(setArr)
-    .select()
+    .select('*')
 
     console.log("SD", setData)
 
 
-if (setError) throw new Error("error occurred when writing set information: ", setError)
+if (setError) {
+  console.error("Supabase insert error:", {
+    message: setError.message,
+    code: setError.code,
+    details: setError.details,
+    hint: setError.hint,
+  })
+  throw new Error(`error occurred when writing set information: ${setError.message}`, { cause: setError })
+}
   if (!setData) throw new Error("No data returned for calculation")
 
   if (setData)  {

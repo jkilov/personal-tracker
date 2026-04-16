@@ -38,13 +38,13 @@ function App() {
             element={<ProtectedRoutes isAuthenticated={isAuthenticated} />}
           >
             <Route path="/dashboard" element={<Dashboard />} />
+            <Route path="/modal/:sessionId" element={<SessionModal />} />
           </Route>
           <Route
             path="/"
             element={<SignIn isAuthenticated={isAuthenticated} />}
           />
           <Route path="/sign-up" element={<SignUp />} />
-          <Route path="/modal/:sessionId" element={<SessionModal />} />
         </Routes>
       </AuthContext.Provider>
     </>

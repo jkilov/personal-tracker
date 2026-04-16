@@ -105,7 +105,6 @@ const InsightsModal = ({ sessionId, formattedSetData }: Props) => {
             <table>
               <thead>
                 <tr>
-                  <th>Sets</th>
                   <th>Total Volume</th>
                   <th>Adjusted Volume</th>
                 </tr>

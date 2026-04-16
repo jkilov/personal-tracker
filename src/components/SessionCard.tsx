@@ -116,12 +116,6 @@ const SessionCard = ({ sessionId }: Props) => {
   //FIXME: below there are two conditional checks on formattedSetData - this needs to be refactored
   return (
     <div className="card-layout">
-      {fitnessScores?.map((score) => (
-        <div key={score.session_Id}>
-          <span>Adjusted Volume{score.adjusted_daily_volume}kg</span>
-          <span>Total Volume: {score.total_daily_volume}kg</span>
-        </div>
-      ))}
       {formattedSetData ? (
         // Two conditionals on the same data -refactor
         <InsightsModal
@@ -158,16 +152,15 @@ const SessionCard = ({ sessionId }: Props) => {
                     <th>Weight</th>
                   </tr>
                 </thead>
-
-                {exercise.sets.map((set) => (
-                  <tbody key={`${exercise.exerciseName}-${set.setNumber}`}>
-                    <tr>
+                <tbody>
+                  {exercise.sets.map((set) => (
+                    <tr key={`${exercise.exerciseName}-${set.setNumber}`}>
                       <td>{set.setNumber}</td>
                       <td>{set.reps}</td>
                       <td>{set.weight}</td>
                     </tr>
-                  </tbody>
-                ))}
+                  ))}
+                </tbody>
               </table>
             )}
           </div>

@@ -31,4 +31,11 @@ export default [
       "react-refresh/only-export-components": ["warn", { allowConstantExport: true }],
     },
   },
+
+  {
+    files: ["src/scripts/**/*.{js,ts}"],
+    languageOptions: {
+      globals: globals.node,
+    },
+  },
 ];

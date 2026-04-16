@@ -1,8 +1,12 @@
 import { createClient } from "@supabase/supabase-js"
-import "dotenv/config"
+import dotenv from "dotenv"
 
-const supabaseUrl = "https://sudaxmkqsdilkjylccqu.supabase.co"
-const supabaseServiceKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InN1ZGF4bWtxc2RpbGtqeWxjY3F1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzEzMDM1MjcsImV4cCI6MjA4Njg3OTUyN30.pQbyTYDZXvQABPU7373JUayQKvceYN90NsXWHP4e3Rw"
+
+
+dotenv.config()
+
+const supabaseUrl = process.env.VITE_API_URL
+const supabaseServiceKey = process.env.SUPABASE_SERVICE_KEY
 //removed service role key for testing
 
 
@@ -34,31 +38,41 @@ const testDeterminism = async() => {
  await supabase.from("sets")
 .insert(testData1)
 .select()
-await supabase.from("sets")
-.insert(testData2)
-.select()
+
 
 
 
 await sleeper
 
-const {data: scoresOne, error: errorOne} = await supabase.from("fitness_scores")
+const {data: scoresOne} = await supabase.from("fitness_scores")
 .select("total_daily_volume, adjusted_daily_volume")
 .eq("session_id", testData1.session_id)
 
-const {data:scoresTwo, error: errorTwo} = await supabase.from("fitness_scores")
+const storedDataFirstRun = scoresOne
+
+await supabase.from('fitness_scores')
+    .delete()
+    .eq('session_id', testData1.session_id)
+
+
+await supabase.from("sets")
+.insert(testData1)
+.select()
+
+
+await sleeper
+
+const {data: scoresTwo} = await supabase.from("fitness_scores")
 .select("total_daily_volume, adjusted_daily_volume")
-.eq("session_id",testData2.session_id)
+.eq("session_id", testData1.session_id)
 
+const storedDataSecondRun = scoresTwo
 
-console.log("data 1: ", scoresOne, "error: ", errorOne)
-console.log("data 2: ", scoresTwo, "error: ", errorTwo)
+const isTotalDailyVolumeDeterministic = storedDataFirstRun[0].total_daily_volume === storedDataSecondRun[0].total_daily_volume
+const isAdjustedDeterministic = storedDataFirstRun[0].adjusted_daily_volume === storedDataSecondRun[0].adjusted_daily_volume
 
-console.log("Adjusted daily volume deterministic:", scoresOne[0].adjusted_daily_volume === scoresTwo[0].adjusted_daily_volume)
-console.log("Adjusted daily volume deterministic:", scoresOne[0].total_daily_volume === scoresTwo[0].total_daily_volume)
+console.log(isTotalDailyVolumeDeterministic && isAdjustedDeterministic ? "Passed Deterministic Test" : "Fails Deterministic Test" )
 
-
-    //end
 }
 
 testDeterminism()
