@@ -27,8 +27,6 @@ const InsightsModal = ({ sessionId, formattedSetData }: Props) => {
     if (dialogRef.current) dialogRef.current.close();
   };
 
-  const newId = "dbb44a0e-fb20-4f4a-a30c-f61d5ab1989b";
-
   const getInsights = async () => {
     if (!accessToken) return;
     setIsLoading(true);
@@ -89,8 +87,6 @@ const InsightsModal = ({ sessionId, formattedSetData }: Props) => {
             </div>
             <button onClick={closeModal}>X</button>
           </div>
-
-          <span>chatGPT Input</span>
         </div>
         <h3>Insights</h3>
 

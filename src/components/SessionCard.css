@@ -1,6 +1,8 @@
 .card-layout {
-    border: 1px solid white;
+
     border-radius: 10px;
+    box-shadow: -10px -10px 20px 0 #3C3C3C, 10px 10px 20px 0 #1E1E1E, -4px -4px 8px 0 rgba(77, 77, 77, 0.25) inset, 4px 4px 8px 0 #1E1E1E inset;
+
     
 }
 

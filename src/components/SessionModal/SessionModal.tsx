@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
-import { readExerciseData } from "../utils/supabase/exercise";
-import AddSet from "./AddSet";
+import { readExerciseData } from "../../utils/supabase/exercise";
+import AddSet from "../AddSet/AddSet";
 
 import "./SessionModal.css";
 
@@ -53,17 +53,17 @@ const SessionModal = () => {
     <div>
       <div>
         <h3>Add Workout</h3>
-        <form>
+
+        <div className="exercise-select-container">
           <label htmlFor="exerciseList">Select Exercise</label>
           <select
+            className="exercise-selector"
             value=""
             name="exerciseList"
             id="exerciseList"
             onChange={(e) => handleExerciseSelection(e.target.value)}
           >
-            <option value="" disabled selected>
-              Select an exercise
-            </option>
+            <option value="" disabled selected></option>
             {exerciseData?.map((exercise) => (
               <option
                 id={exercise.exercise_id}
@@ -75,7 +75,8 @@ const SessionModal = () => {
               </option>
             ))}
           </select>
-        </form>
+        </div>
+
         {selectedExercise && (
           <div>
             <AddSet exerciseId={selectedExercise.exercise_id} />

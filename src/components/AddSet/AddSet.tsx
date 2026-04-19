@@ -1,11 +1,10 @@
-//NOTE incase needed for later: removed a contrain on supabase sets table - where set number had to be unique (i have removed this)
-
 import { useState, useContext } from "react";
 import { useNavigate, useParams } from "react-router";
-import { createNewSet } from "../utils/supabase/set";
-import { AuthContext } from "../App";
+import { createNewSet } from "../../utils/supabase/set";
+import { AuthContext } from "../../App";
 
-import "../App.css";
+import "../../App.css";
+import "./AddSet.css";
 
 export type MergeSet = {
   user_id: string | undefined;
@@ -168,45 +167,65 @@ const AddSet = ({ exerciseId }: Props) => {
   };
 
   return (
-    <div>
+    <div className="set-container">
       {createSet.map((set) => (
-        <div key={set.id}>
-          <h4>{set.title}</h4>
-          <label htmlFor={set.repLabel}>{set.repLabel}</label>
-          <input
-            min={1}
-            id={set.repLabel}
-            type={set.repInputType}
-            required
-            value={setVals[set.title].Reps}
-            onChange={(e) =>
-              handleChange(set.title, set.repLabel, parseInt(e.target.value))
-            }
-            onBlur={() => handleBlur(set.title, "Reps")}
-          />
-          {handleValidation(set.title, set.repLabel) && (
-            <span className="error-text">Value must be greater than 1</span>
-          )}
-
-          {/* //BUG: the above is not correct validation */}
-          <label htmlFor={set.weightLabel}>{set.weightLabel}</label>
-          <input
-            min={1}
-            id={set.weightLabel}
-            required
-            type={set.weightInputType}
-            value={setVals[set.title].Weight}
-            onChange={(e) =>
-              handleChange(set.title, set.weightLabel, parseInt(e.target.value))
-            }
-            onBlur={() => handleBlur(set.title, "Weight")}
-          />
-          {handleValidation(set.title, set.weightLabel) && (
-            <span className="error-text">Value must be greater than 1</span>
-          )}
+        <div key={set.id} className="set-row">
+          <h4 className="set-title">{set.title}</h4>
+          <div className="reps-and-sets-container">
+            <div className="inner-container">
+              <label htmlFor={`${set.id}-${set.repLabel}`}>
+                {set.repLabel}
+              </label>
+              <input
+                className="text-input"
+                min={1}
+                id={`${set.id}-${set.repLabel}`}
+                type={set.repInputType}
+                required
+                value={setVals[set.title].Reps}
+                onChange={(e) =>
+                  handleChange(
+                    set.title,
+                    set.repLabel,
+                    parseInt(e.target.value)
+                  )
+                }
+                onBlur={() => handleBlur(set.title, "Reps")}
+              />
+              {handleValidation(set.title, set.repLabel) && (
+                <span className="error-text">Value must be greater than 1</span>
+              )}
+            </div>
+            <div className="inner-container">
+              <label htmlFor={`${set.id}-${set.weightLabel}`}>
+                {set.weightLabel}
+              </label>
+              <div className="input-with-suffix">
+                <input
+                  className="text-input"
+                  min={1}
+                  id={`${set.id}-${set.weightLabel}`}
+                  required
+                  type={set.weightInputType}
+                  value={setVals[set.title].Weight}
+                  onChange={(e) =>
+                    handleChange(
+                      set.title,
+                      set.weightLabel,
+                      parseInt(e.target.value)
+                    )
+                  }
+                  onBlur={() => handleBlur(set.title, "Weight")}
+                />
+                <span className="input-suffix">kg</span>
+              </div>
+              {handleValidation(set.title, set.weightLabel) && (
+                <span className="error-text">Value must be greater than 1</span>
+              )}
+            </div>
+          </div>
         </div>
       ))}
-      <span>kg</span>
       <button onClick={addSet}>+</button>
       <button
         onClick={() => {

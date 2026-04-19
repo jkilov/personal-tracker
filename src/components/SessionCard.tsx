@@ -40,7 +40,7 @@ const SessionCard = ({ sessionId }: Props) => {
     null
   );
 
-  const [fitnessScores, setFitnessScores] = useState<FitnessScores[] | null>(
+  const [fitnessScores, setFitnessScores] = useState<FitnessScores | null>(
     null
   );
 
@@ -123,6 +123,12 @@ const SessionCard = ({ sessionId }: Props) => {
           formattedSetData={formattedSetData}
         />
       ) : null}
+      {fitnessScores && (
+        <span>
+          Total Daily: {fitnessScores.total_daily_volume}KG and Adjusted Daily:{" "}
+          {fitnessScores.adjusted_daily_volume}KG
+        </span>
+      )}
       {formattedSetData &&
         //TODO: check if using formattedSetData twice together is correct
         formattedSetData.map((exercise) => (

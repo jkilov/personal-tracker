@@ -17,3 +17,18 @@ transition: transform 1s;
   .set-info-visible {
     max-height: 300px;
   }
+
+  .exercise-selector {
+    height: 40px;
+    border-radius: 13px;
+background: #333;
+border: none;
+box-shadow: -12px -12px 24px 0 #3E3E3E inset, 12px 12px 24px 0 #1E1E1E inset;
+  }
+
+.exercise-select-container {
+  display: flex;
+  flex-direction: column;
+  align-items: start;
+  gap: 10px;
+}

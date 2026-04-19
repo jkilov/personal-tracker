@@ -1,7 +1,7 @@
 
 import type { PostgrestError } from "@supabase/supabase-js";
 import { supabase } from "./client-supabase";
-import type { MergeSet } from "../../components/AddSet";
+import type { MergeSet } from "../../components/AddSet/AddSet";
 
 export const readSet = async(sessionId: string | undefined)=> {
   const {data,error} = await supabase.from("sets")
@@ -26,6 +26,7 @@ export type SessionInfo = {
   set_number: number;
   weight: number;
   user_id: string
+  set_volume: number;
 };
 
 
