@@ -1,6 +1,7 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { readExerciseData } from "../../utils/supabase/exercise";
 import AddSet from "../AddSet/AddSet";
+import { RiCloseFill } from "react-icons/ri";
 
 import "./SessionModal.css";
 
@@ -20,6 +21,8 @@ const SessionModal = () => {
   const [selectedExercise, setSelectedExercise] = useState<ExerciseData | null>(
     null
   );
+
+  const modalRef = useRef<HTMLDialogElement | null>(null);
 
   useEffect(() => {
     let isMounted = true;
@@ -46,43 +49,56 @@ const SessionModal = () => {
     setSelectedExercise(selectedExerciseData!);
   };
 
+  const handleOpen = () => {
+    if (modalRef) modalRef.current?.showModal();
+  };
+
+  const handleClose = () => {
+    if (modalRef) modalRef.current?.close();
+  };
+
   if (isLoading) return <div>Loading.</div>;
 
   //FIXME: session date is being printed for every exercise despite being part of the same session
   return (
     <div>
-      <div>
-        <h3>Add Workout</h3>
+      <button type="button" onClick={handleOpen}>
+        Add Exercise
+      </button>
+      <dialog ref={modalRef} className="session-card">
+        <div>
+          <RiCloseFill onClick={handleClose} />
 
-        <div className="exercise-select-container">
-          <label htmlFor="exerciseList">Select Exercise</label>
-          <select
-            className="exercise-selector"
-            value=""
-            name="exerciseList"
-            id="exerciseList"
-            onChange={(e) => handleExerciseSelection(e.target.value)}
-          >
-            <option value="" disabled selected></option>
-            {exerciseData?.map((exercise) => (
-              <option
-                id={exercise.exercise_id}
-                value={exercise.exercise_name}
-                key={exercise.exercise_id}
-                data-user-exercise="test" //need to fix
-              >
-                {exercise.exercise_name}
-              </option>
-            ))}
-          </select>
-        </div>
-
-        {selectedExercise && (
-          <div>
-            <AddSet exerciseId={selectedExercise.exercise_id} />
+          <h3>Add Workout</h3>
+          <div className="exercise-select-container">
+            <label htmlFor="exerciseList">Select Exercise</label>
+            <select
+              className="exercise-selector"
+              value=""
+              name="exerciseList"
+              id="exerciseList"
+              onChange={(e) => handleExerciseSelection(e.target.value)}
+            >
+              <option value="" disabled selected></option>
+              {exerciseData?.map((exercise) => (
+                <option
+                  id={exercise.exercise_id}
+                  value={exercise.exercise_name}
+                  key={exercise.exercise_id}
+                  data-user-exercise="test" //need to fix
+                >
+                  {exercise.exercise_name}
+                </option>
+              ))}
+            </select>
           </div>
-        )}
-      </div>
+          {selectedExercise && (
+            <div>
+              <AddSet exerciseId={selectedExercise.exercise_id} />
+            </div>
+          )}
+        </div>
+      </dialog>
     </div>
   );
 };
