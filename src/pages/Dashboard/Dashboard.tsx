@@ -40,7 +40,8 @@ const Dashboard = () => {
       style: { background: "var(--success)" },
       onAutoClose: () => {
         setIsLoading(false);
-        navigate(`/modal/${sessionId}`);
+        //TODO:come back to
+        navigate(`/session/${sessionId}`);
       },
     });
   };

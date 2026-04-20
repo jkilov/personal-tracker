@@ -8,6 +8,7 @@ import SignUp from "./pages/SignUp";
 import Dashboard from "./pages/Dashboard/Dashboard";
 import SessionModal from "./components/SessionModal/SessionModal";
 import type { Session } from "@supabase/supabase-js";
+import CurrentSession from "./pages/CurrentSession/CurrentSession";
 export const AuthContext = createContext<Session | null>(null);
 
 function App() {
@@ -38,7 +39,8 @@ function App() {
             element={<ProtectedRoutes isAuthenticated={isAuthenticated} />}
           >
             <Route path="/dashboard" element={<Dashboard />} />
-            <Route path="/modal/:sessionId" element={<SessionModal />} />
+            <Route path="/session/:sessionId" element={<CurrentSession />} />
+            {/* <Route path="/modal/:sessionId" element={<SessionModal />} /> */}
           </Route>
           <Route
             path="/"
