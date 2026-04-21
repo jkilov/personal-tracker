@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Toaster, toast } from "sonner";
+import { toast } from "sonner";
 import { readUserData } from "../../utils/supabase/user";
 import { createSession } from "../../utils/supabase/session";
 import { useNavigate } from "react-router";
@@ -10,6 +10,7 @@ import SessionCard from "../../components/SessionCard";
 import { fetchSessionData, type Session } from "../../utils/supabase/session";
 import { UTCtoLocalDateConversion } from "../../utils/helper/localDateConversion";
 import FtinessScoresGraph from "../../components/FtinessScoresGraph";
+import InsightsModal from "../../components/InsightsModal/InsightsModal";
 
 const Dashboard = () => {
   const navigate = useNavigate();
@@ -64,12 +65,13 @@ const Dashboard = () => {
     <div className="dashboard-layout">
       <h1>Home</h1>
       <FtinessScoresGraph />
-      <h2>Past Sessions</h2>
+      <h2>Your Past 7 Sessions</h2>
       <div className="sessions-list">
-        {allSessions?.map((session) => (
+        {allSessions?.slice(0, 7).map((session) => (
           <div className="session-details" key={session.session_id}>
             <h3>{UTCtoLocalDateConversion(session.created_at)}</h3>
-            <SessionCard sessionId={session.session_id} />
+            <InsightsModal sessionId={session.session_id} />
+            {/* //TODO: add sorting to show most recent first */}
           </div>
         ))}
       </div>
@@ -80,10 +82,9 @@ const Dashboard = () => {
         {isLoading ? (
           <PulseLoader color={"var(--neutral)"} size={5} />
         ) : (
-          "Add Session"
+          "Start New Session"
         )}
       </button>
-      <Toaster />
     </div>
   );
 };

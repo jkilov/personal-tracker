@@ -10,6 +10,7 @@ import SessionModal from "./components/SessionModal/SessionModal";
 import type { Session } from "@supabase/supabase-js";
 import CurrentSession from "./pages/CurrentSession/CurrentSession";
 export const AuthContext = createContext<Session | null>(null);
+import { Toaster } from "sonner";
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -34,6 +35,7 @@ function App() {
   return (
     <>
       <AuthContext.Provider value={sessionDetails ?? null}>
+        <Toaster richColors />
         <Routes>
           <Route
             element={<ProtectedRoutes isAuthenticated={isAuthenticated} />}

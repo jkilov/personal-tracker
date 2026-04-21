@@ -2,6 +2,7 @@ import { useState, useContext } from "react";
 import { useNavigate, useParams } from "react-router";
 import { createNewSet } from "../../utils/supabase/set";
 import { AuthContext } from "../../App";
+import { toast } from "sonner";
 
 import "../../App.css";
 import "./AddSet.css";
@@ -49,11 +50,11 @@ const addSetTemplate = {
 
 interface Props {
   exerciseId: string;
+  handleClose: () => void;
 }
 
-const AddSet = ({ exerciseId }: Props) => {
+const AddSet = ({ exerciseId, handleClose }: Props) => {
   const { sessionId } = useParams();
-  const navigate = useNavigate();
   const [count, setCount] = useState(1);
   const [createSet, setCreateSet] = useState(newSetConfig);
   const session = useContext(AuthContext);
@@ -117,6 +118,8 @@ const AddSet = ({ exerciseId }: Props) => {
         weight: setVals[el.title].Weight,
       };
       acc.push(mergeSet);
+      handleClose();
+      toast.success("Exercise Saved");
       return acc;
     }, []);
 
@@ -164,6 +167,10 @@ const AddSet = ({ exerciseId }: Props) => {
         set.WeightTouched === false
     );
     return hasInvalidSet;
+  };
+
+  const onCancel = () => {
+    handleClose();
   };
 
   return (
@@ -227,13 +234,7 @@ const AddSet = ({ exerciseId }: Props) => {
         </div>
       ))}
       <button onClick={addSet}>+</button>
-      <button
-        onClick={() => {
-          navigate(-1);
-        }}
-      >
-        cancel
-      </button>
+      <button onClick={onCancel}>cancel</button>
       <button disabled={isSaveDisabled()} onClick={saveSets}>
         Save
       </button>

@@ -2,7 +2,7 @@ import Auth from "../components/Auth";
 import { signUpUser } from "../utils/supabase/auth-supabase";
 import { createUserData } from "../utils/supabase/user.ts";
 import { useState } from "react";
-import { Toaster, toast } from "sonner";
+import { toast } from "sonner";
 
 import { useNavigate } from "react-router";
 
@@ -78,7 +78,6 @@ const SignUp = () => {
         buttonCTA="Create Account"
       />
       <button onClick={handleSignInAccount}>Sign in</button>
-      <Toaster />
     </div>
   );
 };

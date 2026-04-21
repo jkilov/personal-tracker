@@ -42,3 +42,13 @@ td .weight-label {
     color: var(--pill3);
     cursor: pointer;
   }
+
+  .insights-button {
+    background: #333;
+box-shadow: -10px -10px 20px 0 #3C3C3C, 10px 10px 20px 0 #1E1E1E, -4px -4px 8px 0 rgba(77, 77, 77, 0.25) inset, 4px 4px 8px 0 #1E1E1E inset;
+display: flex;
+flex-direction: column;
+padding: 20px;
+gap: 20px;
+align-items: center;
+  }

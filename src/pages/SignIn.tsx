@@ -4,7 +4,7 @@ import { signInUser } from "../utils/supabase/auth-supabase";
 import { useNavigate } from "react-router";
 import type { AuthValues } from "./SignUp";
 import { Spinner } from "react-bootstrap";
-import { Toaster, toast } from "sonner";
+import { toast } from "sonner";
 import "../App.css";
 
 interface Props {
@@ -76,7 +76,6 @@ const SignIn = ({ isAuthenticated }: Props) => {
         formKey="signIn"
         buttonCTA={"Sign In"}
       />
-      <Toaster />
       <button onClick={handleCreateAccount}>Create Account</button>
     </div>
   );

@@ -2,18 +2,17 @@ import "./InsightsModal.css";
 import { useRef, useState, useEffect } from "react";
 import { GoGraph } from "react-icons/go";
 
-import { retrieveSession } from "../utils/supabase/auth-supabase";
-import { type FormattedSetData } from "./SessionCard";
-import Tooltip from "./Tooltip";
+import { retrieveSession } from "../../utils/supabase/auth-supabase";
+import { type FormattedSetData } from "../SessionCard";
+import Tooltip from "../Tooltip";
 import { TrophySpin } from "react-loading-indicators";
 import { PiCursorClick } from "react-icons/pi";
 
 interface Props {
   sessionId: string;
-  formattedSetData: FormattedSetData[];
 }
 
-const InsightsModal = ({ sessionId, formattedSetData }: Props) => {
+const InsightsModal = ({ sessionId }: Props) => {
   const dialogRef = useRef<HTMLDialogElement | null>(null);
   const [aiInsight, setAiInsight] = useState<string | null>(null);
   const [accessToken, setAccessToken] = useState<string | undefined>(undefined);
@@ -59,9 +58,14 @@ const InsightsModal = ({ sessionId, formattedSetData }: Props) => {
     retrieveAccessToken();
   }, []);
 
+  useEffect(() => {}, []);
+
   return (
     <div>
-      <GoGraph className="insights-icon" onClick={openModal} />
+      <div className="insights-button ">
+        <span>See Workout Insights</span>
+        <GoGraph className="insights-icon" onClick={openModal} />
+      </div>
 
       <dialog ref={dialogRef} className="insights-card">
         <div>
@@ -89,7 +93,7 @@ const InsightsModal = ({ sessionId, formattedSetData }: Props) => {
           </div>
         </div>
         <h3>Insights</h3>
-
+        {/* 
         {formattedSetData.map((exercise) => (
           <div key={exercise.exerciseName}>
             <span className="body-part-pill">{exercise.body_part}</span>
@@ -119,7 +123,7 @@ const InsightsModal = ({ sessionId, formattedSetData }: Props) => {
             </table>
             <h3>Volume Progression</h3>
           </div>
-        ))}
+        ))} */}
         <span></span>
         <span></span>
         <h3>Recommendations</h3>

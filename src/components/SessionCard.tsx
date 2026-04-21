@@ -6,7 +6,6 @@ import {
 } from "../utils/supabase/set";
 import { IoIosArrowDown } from "react-icons/io";
 import "./SessionCard.css";
-import InsightsModal from "./InsightsModal";
 import {
   type FitnessScores,
   getFitnessScoresBySession,
@@ -116,35 +115,31 @@ const SessionCard = ({ sessionId }: Props) => {
   //FIXME: below there are two conditional checks on formattedSetData - this needs to be refactored
   return (
     <div className="card-layout">
-      {formattedSetData ? (
-        // Two conditionals on the same data -refactor
-        <InsightsModal
-          sessionId={sessionId}
-          formattedSetData={formattedSetData}
-        />
-      ) : null}
-      {fitnessScores && (
-        <span>
-          Total Daily: {fitnessScores.total_daily_volume}KG and Adjusted Daily:{" "}
-          {fitnessScores.adjusted_daily_volume}KG
-        </span>
-      )}
       {formattedSetData &&
         //TODO: check if using formattedSetData twice together is correct
         formattedSetData.map((exercise) => (
           <div key={exercise.exerciseName}>
             <div>
-              <div className="card-exercise-layout ">
-                <div className="card-text-graph-layout">
-                  <span>{exercise.exerciseName}</span>
-                  <span>Sets: {exercise.sets.length}</span>
-                </div>
-                <IoIosArrowDown
-                  className="clickable-icon"
-                  onClick={() => toggleAdditionalSetInfo(exercise.exerciseName)}
-                />
-              </div>
+              <table className="card-exercise-layout ">
+                <tr>
+                  <td>
+                    <span>{exercise.exerciseName}</span>
+                  </td>
+                  <td>
+                    <span>Total Sets: {exercise.sets.length}</span>
+                  </td>
+                  <td>
+                    <IoIosArrowDown
+                      className="clickable-icon"
+                      onClick={() =>
+                        toggleAdditionalSetInfo(exercise.exerciseName)
+                      }
+                    />
+                  </td>
+                </tr>
+              </table>
             </div>
+
             {exercise.isOpen && (
               <table
                 className={`set-info ${

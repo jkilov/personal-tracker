@@ -1,4 +1,14 @@
-.session-container {
+.page-container {
     display: flex;
     flex-direction: column;
+    justify-content: space-around;
+gap: 50px;
+}
+
+
+
+.add-exercise-container {
+    display: flex;
+    flex-direction: column;
+
 }
