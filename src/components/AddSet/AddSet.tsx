@@ -1,5 +1,5 @@
 import { useState, useContext } from "react";
-import { useNavigate, useParams } from "react-router";
+import { useParams } from "react-router";
 import { createNewSet } from "../../utils/supabase/set";
 import { AuthContext } from "../../App";
 import { toast } from "sonner";

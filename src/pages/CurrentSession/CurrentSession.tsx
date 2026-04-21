@@ -13,14 +13,9 @@ const CurrentSession = () => {
   const [currentSessionData, setCurrentSessionData] = useState<
     SessionInfo[] | null
   >(null);
-  const [addExerciseIsOpen, setAddExerciseIsOpen] = useState(false);
 
   const params = useParams();
   const sessionId = params.sessionId;
-
-  const handleOpenExerciseModal = (value: boolean) => {
-    setAddExerciseIsOpen(value);
-  };
 
   useEffect(() => {
     const getSessionInfo = async () => {
@@ -48,16 +43,16 @@ const CurrentSession = () => {
     };
 
     getSessionInfo();
-  }, [sessionId, addExerciseIsOpen, currentSessionData]);
+  }, [sessionId]);
 
   console.log("CS", currentSessionData);
 
   return (
-    <div className="page-container">
-      <SessionModal handleOpenExerciseModal={handleOpenExerciseModal} />
-
+    <div className="page-container" key="current-session">
       <div className="session-container">
         <h2>Your Current Session</h2>
+        <SessionModal />
+
         <SessionCard sessionId={sessionId!} />
       </div>
     </div>

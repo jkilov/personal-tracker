@@ -11,6 +11,7 @@ import { fetchSessionData, type Session } from "../../utils/supabase/session";
 import { UTCtoLocalDateConversion } from "../../utils/helper/localDateConversion";
 import FtinessScoresGraph from "../../components/FtinessScoresGraph";
 import InsightsModal from "../../components/InsightsModal/InsightsModal";
+import SessionCalendar from "../../components/SessionCalendar/SessionCalendar";
 
 const Dashboard = () => {
   const navigate = useNavigate();
@@ -64,7 +65,8 @@ const Dashboard = () => {
   return (
     <div className="dashboard-layout">
       <h1>Home</h1>
-      <FtinessScoresGraph />
+      <SessionCalendar />
+      {/* <FtinessScoresGraph /> */}
       <h2>Your Past 7 Sessions</h2>
       <div className="sessions-list">
         {allSessions?.slice(0, 7).map((session) => (

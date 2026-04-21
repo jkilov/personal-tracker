@@ -13,13 +13,9 @@ type ExerciseData = {
   equipment: string;
 };
 
-interface Props {
-  handleOpenExerciseModal: (value: boolean) => void;
-}
-
 //TODO: need to create a type for what session data returns from readSet
 
-const SessionModal = ({ handleOpenExerciseModal }: Props) => {
+const SessionModal = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [exerciseData, setExerciseData] = useState<ExerciseData[] | null>([]);
   const [selectedExercise, setSelectedExercise] = useState<ExerciseData | null>(
@@ -55,14 +51,11 @@ const SessionModal = ({ handleOpenExerciseModal }: Props) => {
 
   const handleOpen = () => {
     if (modalRef) modalRef.current?.showModal();
-    handleOpenExerciseModal(true);
-
     //TODO: we can refactor and derive state rather than creating a duplication
   };
 
   const handleClose = () => {
     if (modalRef) modalRef.current?.close();
-    handleOpenExerciseModal(false);
   };
 
   if (isLoading) return <div>Loading.</div>;
