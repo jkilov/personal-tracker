@@ -51,7 +51,7 @@ const InsightsModal = ({ sessionId }: Props) => {
       const { data, error } = await retrieveSession();
 
       if (error) return;
-      console.log("token: ", data.session?.access_token);
+
       setAccessToken(data.session?.access_token);
     };
 

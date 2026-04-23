@@ -6,10 +6,8 @@ import { useNavigate } from "react-router";
 import { PulseLoader } from "react-spinners";
 import "../../App.css";
 import "./Dashboard.css";
-import SessionCard from "../../components/SessionCard";
 import { fetchSessionData, type Session } from "../../utils/supabase/session";
 import { UTCtoLocalDateConversion } from "../../utils/helper/localDateConversion";
-import FtinessScoresGraph from "../../components/FtinessScoresGraph";
 import InsightsModal from "../../components/InsightsModal/InsightsModal";
 import SessionCalendar from "../../components/SessionCalendar/SessionCalendar";
 
@@ -65,6 +63,7 @@ const Dashboard = () => {
   return (
     <div className="dashboard-layout">
       <h1>Home</h1>
+      <h2>Training History</h2>
       <SessionCalendar />
       {/* <FtinessScoresGraph /> */}
       <h2>Your Past 7 Sessions</h2>

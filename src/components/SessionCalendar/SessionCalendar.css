@@ -1,7 +1,19 @@
+.calendar-container {
+  height: auto;
+  margin-bottom: 20px;;
+}
+
 .calendar {
     display: grid;
     grid-template-columns: repeat(10, 1fr); 
+    grid-template-rows: repeat(4, 60px);
     gap: 20px;
+}
+
+.select-month-navigation {
+  display: flex;
+  align-items: center;
+  gap: 10px;
 }
 
 .day-container {
@@ -35,3 +47,17 @@
     background: #3a3a3a;
     flex-shrink: 0;
   }
+
+  .day-trained {
+    width: 19px;
+    height: 19px;
+    border-radius: 50%;
+    background: radial-gradient(circle at 30% 30%, #8fecd9 0%, #55D6BE 55%, #2f9b85 100%);
+    flex-shrink: 0;
+    transform: translate(1px, 1px);
+    box-shadow:
+      inset 1px 1px 2px rgba(255, 255, 255, 0.4),
+      inset -1px -1px 2px rgba(0, 0, 0, 0.35),
+      0 0 6px rgba(85, 214, 190, 0.55);
+  }
+

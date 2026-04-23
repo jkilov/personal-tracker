@@ -123,7 +123,6 @@ const AddSet = ({ exerciseId, handleClose }: Props) => {
       return acc;
     }, []);
 
-    console.log("na", newArr);
     const { error } = await createNewSet(newArr);
 
     console.log("Error creating set: ", error);

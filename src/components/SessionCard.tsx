@@ -94,7 +94,6 @@ const SessionCard = ({ sessionId }: Props) => {
     const getFitnessScores = async () => {
       const { data, error } = await getFitnessScoresBySession(sessionId);
       setFitnessScores(data);
-      console.log(data);
     };
 
     getFitnessScores();
