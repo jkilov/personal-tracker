@@ -27,7 +27,6 @@ const SignUp = () => {
 
   const handleChange = (inputKey: string, value: string) => {
     setValues((prev) => ({ ...prev, [inputKey]: value }));
-    console.log("type: ", inputKey, value);
   };
 
   const handleAuthSignUp = async () => {

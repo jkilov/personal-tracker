@@ -9,10 +9,30 @@ export type FitnessScores = {
 
 export const getFitnessScoresBySession = async(sessionId: string) => {
 
-    const {data, error} = await supabase.from("fitness_scores")
-    .select()
-    .eq("session_id", `${sessionId}`)
-    .single()
 
-    return {data, error}
+    try {
+
+        const {data, error} = await supabase
+        .from("fitness_scores")
+        .select('*')
+        .eq("session_id", sessionId)
+        .single()
+
+        if (error) {
+            console.error(error.cause, error.message, error.details)
+            throw new Error(`error occurred when writing information: ${error.message}, ${error.cause}`)
+        }
+
+
+        return {data, error: null}
+        
+    } catch (error) {
+
+        console.error(error)
+        return {data: null, error}
+        
+    }
+
+
+
 }

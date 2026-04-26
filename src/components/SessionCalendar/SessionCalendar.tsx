@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import "./SessionCalendar.css";
+import clsx from "clsx";
 
 import { IoIosArrowBack } from "react-icons/io";
 import { IoIosArrowForward } from "react-icons/io";
@@ -9,6 +10,7 @@ import {
   type SessionByDate,
 } from "../../utils/supabase/session";
 import { toast } from "sonner";
+import SessionCard from "../SessionCard/SessionCard";
 
 const SessionCalendar = () => {
   const [selectedDate, setSelectedDate] = useState(() => new Date());
@@ -17,6 +19,7 @@ const SessionCalendar = () => {
   const [chosenSession, setChosenSession] = useState<SessionByDate | null>(
     null
   );
+  const [daySelected, setDaySelected] = useState<number | null>(null);
 
   const todayYear = new Date().getFullYear();
   const todayMonth = new Date().getMonth();
@@ -58,7 +61,7 @@ const SessionCalendar = () => {
   };
 
   const trainedDates = (day: number) => {
-    if (!rawSessionDates) return;
+    if (!rawSessionDates) return false;
     const dayOfMonth = day;
     const calendarDate = new Date(selectedYear, selectedMonth, dayOfMonth);
     const calendarDateToString = calendarDate.toDateString();
@@ -69,13 +72,14 @@ const SessionCalendar = () => {
         session.getDate()
       ).toDateString()
     );
+    //TODO: confirm if we need to do the above since will be stringified due to JSON passing over network to supabase
     return normalizeDate.includes(calendarDateToString);
   };
 
   const onSelectedSession = async (date: number) => {
+    setDaySelected(date);
     const selectedSession = new Date(selectedYear, selectedMonth, date);
     const selectedSessionToString = selectedSession.toDateString();
-    console.log("T", selectedSessionToString);
 
     const { data, error } = await fetchSessionByDate(selectedSessionToString);
     if (!data) {
@@ -118,29 +122,36 @@ const SessionCalendar = () => {
     getSessionDates();
   }, []);
 
-  console.log("C", chosenSession);
-
   return (
     <div className="calendar-container ">
-      <div className="select-month-navigation">
-        <IoIosArrowBack onClick={goBackMonths} />
-        <h3>{monthAsString}</h3>
-        {!isCurrentDate && <IoIosArrowForward onClick={goForwardMonths} />}
-      </div>
-      <div className="calendar">
-        {daysOfMonthArray.map((day) => (
-          <div key={day} className="day-container">
-            <span>{day}</span>
-            <div className="day-indicator">
-              <div
-                className={
-                  trainedDates(day) ? "day-trained" : "day-indicator-inner"
-                }
-                onClick={() => onSelectedSession(day)}
-              />
-            </div>
+      <div className="calendar-contents">
+        <div>
+          <div className="select-month-navigation">
+            <IoIosArrowBack onClick={goBackMonths} />
+            <h3>{monthAsString}</h3>
+            {!isCurrentDate && <IoIosArrowForward onClick={goForwardMonths} />}
           </div>
-        ))}
+          <div className="calendar">
+            {daysOfMonthArray.map((day) => (
+              <div key={day} className="day-container">
+                <span>{day}</span>
+                <div className="day-indicator">
+                  <div
+                    className={clsx(
+                      "day-indicator-inner",
+                      trainedDates(day) && "day-trained",
+                      daySelected === day && "selected"
+                    )}
+                    onClick={() => onSelectedSession(day)}
+                  />
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+      <div>
+        {chosenSession && <SessionCard sessionId={chosenSession?.session_id} />}
       </div>
     </div>
   );

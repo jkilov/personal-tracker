@@ -44,8 +44,6 @@ export const createNewSet = async(setArr: MergeSet[]) => {
     .insert(setArr)
     .select('*')
 
-    console.log("SD", setData)
-
 
 if (setError) {
   console.error("Supabase insert error:", {
@@ -60,9 +58,8 @@ if (setError) {
 
   if (setData)  {
     
-    const passedSessionId = setData[0].session_id
+      const passedSessionId = setData[0].session_id
     
-    console.log("id", passedSessionId)
   
   }
 

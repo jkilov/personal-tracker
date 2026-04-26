@@ -7,7 +7,7 @@ import {
 import "./CurrentSession.css";
 import SessionModal from "../../components/SessionModal/SessionModal";
 import { toast } from "sonner";
-import SessionCard from "../../components/SessionCard";
+import SessionCard from "../../components/SessionCard/SessionCard";
 
 const CurrentSession = () => {
   const [currentSessionData, setCurrentSessionData] = useState<
@@ -44,8 +44,6 @@ const CurrentSession = () => {
 
     getSessionInfo();
   }, [sessionId]);
-
-  console.log("CS", currentSessionData);
 
   return (
     <div className="page-container" key="current-session">

@@ -1,6 +1,17 @@
 .calendar-container {
   height: auto;
-  margin-bottom: 20px;;
+  margin-bottom: 20px;
+  display: flex;
+  flex-direction: row;
+  justify-content: start;
+  width: 100%;
+  gap: 10rem;
+  align-items: center;
+}
+
+.calendar-contents{
+  display: flex;
+  flex-direction: column;;
 }
 
 .calendar {
@@ -49,6 +60,7 @@
   }
 
   .day-trained {
+    cursor: pointer;
     width: 19px;
     height: 19px;
     border-radius: 50%;
@@ -59,5 +71,19 @@
       inset 1px 1px 2px rgba(255, 255, 255, 0.4),
       inset -1px -1px 2px rgba(0, 0, 0, 0.35),
       0 0 6px rgba(85, 214, 190, 0.55);
+  }
+
+  .day-trained.selected{
+    cursor: pointer;
+    width: 19px;
+    height: 19px;
+    border-radius: 50%;
+    background: radial-gradient(circle at 30% 30%, #ffe5a3 0%, #FFCB47 55%, #c79414 100%);
+    flex-shrink: 0;
+    transform: translate(1px, 1px);
+    box-shadow:
+      inset 1px 1px 2px rgba(255, 255, 255, 0.4),
+      inset -1px -1px 2px rgba(0, 0, 0, 0.35),
+      0 0 6px rgba(255, 203, 71, 0.55);
   }
 

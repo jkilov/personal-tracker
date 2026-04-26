@@ -1,30 +1,21 @@
 import "./InsightsModal.css";
-import { useRef, useState, useEffect } from "react";
-import { GoGraph } from "react-icons/go";
+import { useState, useEffect } from "react";
 
 import { retrieveSession } from "../../utils/supabase/auth-supabase";
-import { type FormattedSetData } from "../SessionCard";
 import Tooltip from "../Tooltip";
 import { TrophySpin } from "react-loading-indicators";
 import { PiCursorClick } from "react-icons/pi";
 
 interface Props {
   sessionId: string;
+  isInsightsViewable: boolean;
+  onClose: () => void;
 }
 
-const InsightsModal = ({ sessionId }: Props) => {
-  const dialogRef = useRef<HTMLDialogElement | null>(null);
+const InsightsModal = ({ sessionId, onClose, isOpen }: Props) => {
   const [aiInsight, setAiInsight] = useState<string | null>(null);
   const [accessToken, setAccessToken] = useState<string | undefined>(undefined);
   const [isLoading, setIsLoading] = useState(false);
-
-  const openModal = () => {
-    if (dialogRef.current) dialogRef.current.showModal();
-  };
-
-  const closeModal = () => {
-    if (dialogRef.current) dialogRef.current.close();
-  };
 
   const getInsights = async () => {
     if (!accessToken) return;
@@ -58,16 +49,9 @@ const InsightsModal = ({ sessionId }: Props) => {
     retrieveAccessToken();
   }, []);
 
-  useEffect(() => {}, []);
-
   return (
     <div>
-      <div className="insights-button ">
-        <span>See Workout Insights</span>
-        <GoGraph className="insights-icon" onClick={openModal} />
-      </div>
-
-      <dialog ref={dialogRef} className="insights-card">
+      <dialog className="insights-card" open={isOpen}>
         <div>
           <div className="session-header">
             <div>
@@ -89,7 +73,7 @@ const InsightsModal = ({ sessionId }: Props) => {
                 }
               />
             </div>
-            <button onClick={closeModal}>X</button>
+            <button onClick={onClose}>X</button>
           </div>
         </div>
         <h3>Insights</h3>
