@@ -8,8 +8,8 @@ import "../../App.css";
 import "./Dashboard.css";
 import { fetchSessionData, type Session } from "../../utils/supabase/session";
 import { UTCtoLocalDateConversion } from "../../utils/helper/localDateConversion";
-import InsightsModal from "../../components/InsightsModal/InsightsModal";
 import SessionCalendar from "../../components/SessionCalendar/SessionCalendar";
+import InsightsGraphs from "../../components/InsightsGraphs/InsightsGraphs";
 
 const Dashboard = () => {
   const navigate = useNavigate();
@@ -65,16 +65,10 @@ const Dashboard = () => {
       <h1>Home</h1>
       <h2>Training History</h2>
       <SessionCalendar />
-      {/* <FtinessScoresGraph /> */}
-      <h2>Your Past 7 Sessions</h2>
-      <div className="sessions-list">
-        {allSessions?.slice(0, 7).map((session) => (
-          <div className="session-details" key={session.session_id}>
-            <h3>{UTCtoLocalDateConversion(session.created_at)}</h3>
-            <InsightsModal sessionId={session.session_id} />
-            {/* //TODO: add sorting to show most recent first */}
-          </div>
-        ))}
+
+      <div>
+        <h2>Workout Analytics</h2>
+        <InsightsGraphs />
       </div>
 
       <h2>What would you like to do?</h2>

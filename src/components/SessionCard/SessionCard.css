@@ -5,6 +5,29 @@ align-items: center;
     border-radius: 10px;
     box-shadow: -10px -10px 20px 0 #3C3C3C, 10px 10px 20px 0 #1E1E1E, -4px -4px 8px 0 rgba(77, 77, 77, 0.25) inset, 4px 4px 8px 0 #1E1E1E inset;
 width: 600px;
+overflow: hidden;
+}
+
+.card-viewport {
+    width: 100%;
+    overflow: hidden;
+}
+
+.card-track {
+    display: flex;
+    width: 100%;
+    transform: translateX(0);
+    transition: transform 350ms ease;
+}
+
+.card-track.show-insights {
+    transform: translateX(-100%);
+}
+
+.card-panel {
+    flex: 0 0 100%;
+    width: 100%;
+    box-sizing: border-box;
 }
 
 .card-exercise-layout {
