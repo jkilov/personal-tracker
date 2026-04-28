@@ -28,6 +28,7 @@ export const useGraphMetrics = () => {
                     adjusted_daily_volume,
                     session!inner(session_date)
                     `);
+        
         if (cancelled) return;
         if (fitnessScoreError)
           throw new Error("Failed to fetch fitness scores", {
