@@ -26,7 +26,12 @@ export const useGraphMetrics = () => {
           await supabase.from("fitness_scores").select(`
                     total_daily_volume,
                     adjusted_daily_volume,
-                    session!inner(session_date)
+                    session!inner(session_date,
+                    sets!inner(exercise_id,
+                    exercise!inner(exercise_name, body_part
+                    )
+                    )
+                    )
                     `);
         
         if (cancelled) return;
