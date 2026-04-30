@@ -1,20 +1,31 @@
 import { useState, useEffect } from "react";
 import { supabase } from "../../utils/supabase/client-supabase";
 
-type SessionDate = {
-  session_date: string;
-};
+type Exercise = {
+  body_part: string;
+  exercise_name: string;
+}
 
-export type FetchedFitnessScores = {
+type Sets = {
+  exercise_id: string;
+  exercise: Exercise
+}
+
+type Session = {
+  session_date: string;
+  sets: Sets[]
+}
+
+export type FetchedTrainingData = {
   total_daily_volume: number;
   adjusted_daily_volume: number;
-  session: SessionDate[];
-};
+  session: Session
+}
 
 export const useGraphMetrics = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<Error | null>(null);
-  const [data, setData] = useState<FetchedFitnessScores[]>([]);
+  const [data, setData] = useState<FetchedTrainingData[]>([]);
 
   useEffect(() => {
     let cancelled = false;

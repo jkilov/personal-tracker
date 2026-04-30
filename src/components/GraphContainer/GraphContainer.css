@@ -1,0 +1,5 @@
+.graph-container {
+    display: flex;
+    gap: 20px;
+    width: fit-content;
+}

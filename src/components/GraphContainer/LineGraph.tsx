@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { type FetchedTrainingData } from "./useGraphMetrics";
 
 import {
   LineChart,
@@ -11,34 +12,29 @@ import {
 } from "recharts";
 
 interface Props {
-  rawTrainingData: any[];
+  rawTrainingData: FetchedTrainingData[];
 }
 
-type SessionDate = {
-  session_date: string;
-};
-
-type FormattedFitnessData = {
-  Date: string;
+type LineGraphDataShape = {
+  date: string;
   total_daily_volume: number;
   adjusted_daily_volume: number;
-  session: SessionDate[];
 };
 
 const LineGraph = ({ rawTrainingData }: Props) => {
   const [formattedFitnessData, setFormattedFitnessData] = useState<
-    FormattedFitnessData[]
+    LineGraphDataShape[]
   >([]);
 
   useEffect(() => {
     const formattedData = rawTrainingData.map((el) => ({
-      Date: el.session.session_date,
+      date: el.session.session_date,
       total_daily_volume: el.total_daily_volume,
       adjusted_daily_volume: el.adjusted_daily_volume,
     }));
 
     formattedData.sort(
-      (a, b) => new Date(a.Date).getTime() - new Date(b.Date).getTime()
+      (a, b) => new Date(a.date).getTime() - new Date(b.date).getTime()
     );
 
     setFormattedFitnessData(formattedData);

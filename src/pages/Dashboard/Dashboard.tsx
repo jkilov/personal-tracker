@@ -9,7 +9,7 @@ import "./Dashboard.css";
 import { fetchSessionData, type Session } from "../../utils/supabase/session";
 import { UTCtoLocalDateConversion } from "../../utils/helper/localDateConversion";
 import SessionCalendar from "../../components/SessionCalendar/SessionCalendar";
-import InsightsGraphs from "../../components/InsightsGraphs/InsightsGraphs";
+import InsightsGraphs from "../../components/GraphContainer/GraphContainer";
 
 const Dashboard = () => {
   const navigate = useNavigate();
