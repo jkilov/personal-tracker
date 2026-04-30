@@ -66,7 +66,7 @@ const Dashboard = () => {
       <h2>Training History</h2>
       <SessionCalendar />
 
-      <div>
+      <div className="analytics-section">
         <h2>Workout Analytics</h2>
         <InsightsGraphs />
       </div>

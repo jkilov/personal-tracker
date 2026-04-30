@@ -11,11 +11,9 @@ const InsightsGraphs = () => {
     return <OrbitProgress color="#7CEA9C" size="medium" text="" textColor="" />;
   }
 
-  if (error) {
-    return <span>An error occurred. Please Refresh the page</span>;
-  }
-
-  console.log("RawData", rawTrainingData);
+  // if (error) {
+  //   return <span>An error occurred. Please Refresh the page</span>;
+  // }
 
   return (
     <div className="graph-container">

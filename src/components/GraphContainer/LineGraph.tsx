@@ -69,7 +69,7 @@ const LineGraph = ({ rawTrainingData }: Props) => {
           stroke="#7CEA9C"
           dot={{ fill: "var(--background)" }}
         />
-        <XAxis dataKey="Date" />
+        <XAxis dataKey="date" />
         <YAxis
           width="auto"
           label={{ value: "KG", position: "insideLeft", angle: -90 }}

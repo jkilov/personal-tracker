@@ -19,12 +19,35 @@ type RadarGraphDataShope = {
 };
 
 export const RadarGraph = ({ rawTrainingData }: Props) => {
-  const [formattedFitnessData, setFormattedFitnessData] = useState<
-    RadarGraphDataShope[]
-  >([]);
+  // const [formattedFitnessData, setFormattedFitnessData] = useState<
+  //   RadarGraphDataShope[]
+  // >([]);
 
-  useEffect(() => {
-    const fitnessDataObj = rawTrainingData.reduce((acc, el) => {
+  // useEffect(() => {
+  //   const fitnessDataObj = rawTrainingData.reduce((acc, el) => {
+  //     const setLength = el.session.sets;
+
+  //     for (let i = 0; i < setLength.length; i++) {
+  //       const bodyPart = el.session.sets[i].exercise.body_part;
+
+  //       acc[bodyPart] = (acc[bodyPart] || 0) + 1;
+  //     }
+
+  //     return acc;
+  //   }, {});
+
+  //   const fitnessDataArr = Object.entries(fitnessDataObj).map(
+  //     ([body_part, count]) => ({
+  //       body_part,
+  //       count,
+  //     })
+  //   )<RadarGraphDataShope[]>;
+
+  //   setFormattedFitnessData(fitnessDataArr);
+  // }, [rawTrainingData]);
+
+  const fitnessDataObj = rawTrainingData.reduce<Record<string, number>>(
+    (acc, el) => {
       const setLength = el.session.sets;
 
       for (let i = 0; i < setLength.length; i++) {
@@ -34,17 +57,16 @@ export const RadarGraph = ({ rawTrainingData }: Props) => {
       }
 
       return acc;
-    }, {});
+    },
+    {}
+  );
 
-    const fitnessDataArr = Object.entries(fitnessDataObj).map(
-      ([body_part, count]) => ({
-        body_part,
-        count,
-      })
-    )<RadarGraphDataShope[]>;
-
-    setFormattedFitnessData(fitnessDataArr);
-  }, [rawTrainingData]);
+  const fitnessDataArr = Object.entries(fitnessDataObj).map(
+    ([body_part, count]) => ({
+      body_part,
+      count,
+    })
+  );
 
   return (
     <div>
@@ -52,7 +74,7 @@ export const RadarGraph = ({ rawTrainingData }: Props) => {
         style={{ width: "100%", aspectRatio: 1.618, maxWidth: "600px" }}
         outerRadius="80%"
         responsive
-        data={formattedFitnessData}
+        data={fitnessDataArr}
       >
         <PolarGrid />
         <PolarAngleAxis dataKey="body_part" />
