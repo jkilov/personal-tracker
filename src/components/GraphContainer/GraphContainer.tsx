@@ -3,6 +3,7 @@ import { useGraphMetrics } from "./useGraphMetrics";
 import LineGraph from "./LineGraph";
 import { RadarGraph } from "./RadarGraph";
 import "./GraphContainer.css";
+import BarGraph from "./BarGraph";
 
 const InsightsGraphs = () => {
   const { data: rawTrainingData, error, isLoading } = useGraphMetrics();
@@ -19,6 +20,7 @@ const InsightsGraphs = () => {
     <div className="graph-container">
       <LineGraph rawTrainingData={rawTrainingData} />
       <RadarGraph rawTrainingData={rawTrainingData} />
+      <BarGraph rawTrainingData={rawTrainingData} />
     </div>
   );
 };

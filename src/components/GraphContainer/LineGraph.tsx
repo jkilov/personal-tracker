@@ -26,6 +26,7 @@ const LineGraph = ({ rawTrainingData }: Props) => {
     LineGraphDataShape[]
   >([]);
 
+  //FIXME: we can change the below to compute and derive rather than storing in stte
   useEffect(() => {
     const formattedData = rawTrainingData.map((el) => ({
       date: el.session.session_date,
