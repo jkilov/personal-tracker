@@ -1,4 +1,5 @@
 import { OrbitProgress } from "react-loading-indicators";
+import Error from "../Error/Error";
 import { useGraphMetrics } from "./useGraphMetrics";
 import LineGraph from "./LineGraph";
 import { RadarGraph } from "./RadarGraph";
@@ -10,6 +11,10 @@ const InsightsGraphs = () => {
 
   if (isLoading) {
     return <OrbitProgress color="#7CEA9C" size="medium" text="" textColor="" />;
+  }
+
+  if (error) {
+    return <Error />;
   }
 
   // if (error) {
