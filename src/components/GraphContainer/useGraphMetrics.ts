@@ -22,7 +22,7 @@ export type FetchedTrainingData = {
   session: Session
 }
 
-export const useGraphMetrics = () => {
+export const useGraphMetrics = (name: string = "") => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<Error | null>(null);
   const [data, setData] = useState<FetchedTrainingData[]>([]);
@@ -38,12 +38,13 @@ export const useGraphMetrics = () => {
                     total_daily_volume,
                     adjusted_daily_volume,
                     session!inner(session_date,
-                    sets!inner(exercise_id,
+                    sets!inner(exercise_id, set_volume,
                     exercise!inner(exercise_name, body_part
                     )
                     )
                     )
-                    `);
+                    `)
+                    ;
         
         if (cancelled) return;
         if (fitnessScoreError)
