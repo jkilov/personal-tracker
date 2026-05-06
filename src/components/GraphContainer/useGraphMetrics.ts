@@ -9,6 +9,9 @@ type Exercise = {
 type Sets = {
   exercise_id: string;
   exercise: Exercise
+  set_volume: number;
+  reps: number;
+  weight: number;
 }
 
 type Session = {
@@ -38,7 +41,7 @@ export const useGraphMetrics = (name: string = "") => {
                     total_daily_volume,
                     adjusted_daily_volume,
                     session!inner(session_date,
-                    sets!inner(exercise_id, set_volume,
+                    sets!inner(exercise_id, set_volume, reps, weight,
                     exercise!inner(exercise_name, body_part
                     )
                     )
