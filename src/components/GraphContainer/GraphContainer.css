@@ -1,11 +1,22 @@
 .graph-container {
     display: flex;
-    gap: 20px;
     width: 100%;
+    justify-content: flex-start;
+    flex-wrap: wrap;
+    gap: 16px;
 }
 
-.graph-container > * {
-    flex: 1 1 0;
+.graph {
+    flex: 1 1 360px;
     min-width: 0;
-    max-width: 600px;
+    max-width: 560px;
+    box-sizing: border-box;
+    padding: 15px;
+    border-radius: 13px;
+    background: #333;
+    box-shadow: -10px -10px 20px 0 #3C3C3C, 10px 10px 20px 0 #1E1E1E, -4px -4px 8px 0 rgba(77, 77, 77, 0.25) inset, 4px 4px 8px 0 #1E1E1E inset;
+}
+
+.graph h4 {
+    text-align: center;
 }

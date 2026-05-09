@@ -1,34 +1,49 @@
 import { useState } from "react";
 import { type FetchedTrainingData } from "./useGraphMetrics";
+import {
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer,
+} from "recharts";
+import "./GraphContainer.css";
 
 interface Props {
   rawTrainingData: FetchedTrainingData[];
 }
 
 const BarGraph = ({ rawTrainingData }: Props) => {
-  const [selectedExercise, setSelectedExercise] = useState<string>("");
   const completedExercises = rawTrainingData.flatMap((exercise) =>
     exercise.session.sets.map((set) => set.exercise.exercise_name)
   );
 
   const exerciseName = [...new Set(completedExercises)];
 
-  const containsExercise = rawTrainingData.filter((el) =>
+  const [selectedExercise, setSelectedExercise] = useState<string>(
+    exerciseName[0]
+  );
+
+  const validatedExercise = exerciseName.includes(selectedExercise)
+    ? selectedExercise
+    : exerciseName[0];
+
+  const sessionsWithMatchingSets = rawTrainingData.filter((el) =>
     el.session.sets.some(
-      (element) => selectedExercise === element.exercise.exercise_name
+      (element) => validatedExercise === element.exercise.exercise_name
     )
   );
 
-  const barGraphShape = containsExercise.map((element) => ({
+  const barGraphShape = sessionsWithMatchingSets.map((element) => ({
     date: element.session.session_date,
     rm: Math.max(
       ...element.session.sets
-        .filter((set) => set.exercise.exercise_name === selectedExercise)
-        .map((workout) => Number(workout.weight * (1 + workout.reps / 30)))
+        .filter((set) => set.exercise.exercise_name === validatedExercise)
+        .map((workout) => Math.round(workout.weight * (1 + workout.reps / 30)))
     ),
   }));
-
-  console.log("BG", barGraphShape);
 
   const handleExerciseSelection = (
     event: React.ChangeEvent<HTMLSelectElement>
@@ -37,14 +52,42 @@ const BarGraph = ({ rawTrainingData }: Props) => {
   };
 
   return (
-    <div>
-      <select onChange={handleExerciseSelection} value={selectedExercise}>
+    <div className="graph">
+      <h4>1 Rep Max</h4>
+      <select onChange={handleExerciseSelection}>
         {exerciseName.map((exercise) => (
           <option key={exercise} value={exercise}>
             {exercise}
           </option>
         ))}
       </select>
+      <ResponsiveContainer width="100%" aspect={1.618}>
+        <BarChart
+          data={barGraphShape}
+          margin={{
+            top: 5,
+            right: 0,
+            left: 0,
+            bottom: 5,
+          }}
+        >
+          <CartesianGrid strokeDasharray="3 3" />
+          <XAxis dataKey="date" />
+          <YAxis dataKey="rm" />
+          <Tooltip
+            contentStyle={{
+              backgroundColor: "var(--background)",
+            }}
+          />
+          <Bar
+            dataKey="rm"
+            name="1 Rep Max"
+            fill="#7494EA"
+            activeBar={{ fill: "#7CEA9C" }}
+            radius={[10, 10, 0, 0]}
+          />
+        </BarChart>
+      </ResponsiveContainer>
     </div>
   );
 };

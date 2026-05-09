@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import "./SessionCalendar.css";
 import clsx from "clsx";
-
+import { OrbitProgress } from "react-loading-indicators";
 import { IoIosArrowBack } from "react-icons/io";
 import { IoIosArrowForward } from "react-icons/io";
 import {
@@ -13,6 +13,7 @@ import { toast } from "sonner";
 import SessionCard from "../SessionCard/SessionCard";
 
 const SessionCalendar = () => {
+  const [isLoading, setIsLoading] = useState(false);
   const [selectedDate, setSelectedDate] = useState(() => new Date());
   const [isCurrentDate, setIsCurrentDate] = useState(true);
   const [rawSessionDates, setRawSessionDates] = useState<Date[] | null>(null);
@@ -77,6 +78,7 @@ const SessionCalendar = () => {
   };
 
   const onSelectedSession = async (date: number) => {
+    setIsLoading(true);
     setDaySelected(date);
     const selectedSession = new Date(selectedYear, selectedMonth, date);
     const selectedSessionToString = selectedSession.toDateString();
@@ -91,6 +93,8 @@ const SessionCalendar = () => {
       });
       return;
     }
+    setIsLoading(false);
+
     setChosenSession(data);
   };
 
@@ -115,8 +119,6 @@ const SessionCalendar = () => {
           data?.map((session) => new Date(session.session_date))
         );
       }
-
-      // setRawSessionDates(data.map((date) => new Date(date.session_date))); this was working before (populating date)
     };
 
     getSessionDates();
@@ -151,6 +153,9 @@ const SessionCalendar = () => {
         </div>
       </div>
       <div>
+        {isLoading && (
+          <OrbitProgress color="#7CEA9C" size="medium" text="" textColor="" />
+        )}
         {chosenSession && <SessionCard sessionId={chosenSession?.session_id} />}
       </div>
     </div>

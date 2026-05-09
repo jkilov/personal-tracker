@@ -1,11 +1,21 @@
 .dashboard-layout {
     display: flex;
     flex-direction: column;
-    align-items:start;
+    align-items: start;
     justify-content: flex-start;
     width: 100vw;
 }
 
+
+
+.dashboard-layout div {
+    margin: 10px 0px;
+}
+
+
+.dashboard-layout button {
+    margin-left: 0px;
+}
 .sessions-list {
     display: flex;
     flex-direction: row;
@@ -18,6 +28,19 @@
     flex-direction: column;
 }
 
-.analytics-section {
+.graph-section {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
     width: 100%;
+    text-align: left;
 }
+
+.dashboard-layout button {
+    display: block;
+    margin: 0px;
+  }
+
+  .add-session > * {
+    margin: 25px 0px
+  }

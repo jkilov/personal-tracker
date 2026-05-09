@@ -63,23 +63,27 @@ const Dashboard = () => {
   return (
     <div className="dashboard-layout">
       <h1>Home</h1>
-      <h2>Training History</h2>
-      <SessionCalendar />
+      <div className="add-session">
+        <h2>Start a New Workout</h2>
 
-      <div className="analytics-section">
-        <h2>Workout Analytics</h2>
-        <InsightsGraphs />
+        <button onClick={handleCreateSession}>
+          {isLoading ? (
+            <PulseLoader color={"var(--neutral)"} size={5} />
+          ) : (
+            "Start New Session"
+          )}
+        </button>
       </div>
 
-      <h2>What would you like to do?</h2>
+      <div className="graph-section">
+        <h2>Workout Analytics</h2>
+        <div>
+          <InsightsGraphs />
+        </div>
+      </div>
 
-      <button onClick={handleCreateSession}>
-        {isLoading ? (
-          <PulseLoader color={"var(--neutral)"} size={5} />
-        ) : (
-          "Start New Session"
-        )}
-      </button>
+      <h2>Training History</h2>
+      <SessionCalendar />
     </div>
   );
 };

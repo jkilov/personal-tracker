@@ -97,17 +97,6 @@ const SessionCard = ({ sessionId }: Props) => {
     setFormattedSetData(exerciseSetArr);
   }, [rawSessionData]);
 
-  // useEffect(() => {
-  //   const getFitnessScores = async () => {
-  //     const { data, error } = await getFitnessScoresBySession(sessionId);
-  //     setFitnessScores(data);
-  //   };
-
-  //   getFitnessScores();
-  // }, [sessionId]);
-
-  //TODO: ADD FITNIESS SCORE HERE
-
   const toggleAdditionalSetInfo = (exerciseName: string) => {
     const updatedIsOpen = formattedSetData.map((exercise) =>
       exercise.exerciseName === exerciseName
@@ -140,8 +129,7 @@ const SessionCard = ({ sessionId }: Props) => {
     setAiInsights(result.data.message);
   };
 
-  console.log("Ai", aiInsights);
-  //TODO: why is this an object with a message property. Where is this .message coming from
+  if (formattedSetData.length === 0) return;
 
   return (
     <div className="card-layout">

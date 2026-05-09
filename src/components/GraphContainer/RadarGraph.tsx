@@ -1,4 +1,5 @@
 import { type FetchedTrainingData } from "./useGraphMetrics";
+import "./GraphContainer.css";
 
 import {
   Radar,
@@ -6,6 +7,7 @@ import {
   PolarGrid,
   PolarAngleAxis,
   PolarRadiusAxis,
+  ResponsiveContainer,
 } from "recharts";
 
 interface Props {
@@ -36,24 +38,22 @@ export const RadarGraph = ({ rawTrainingData }: Props) => {
   );
 
   return (
-    <div>
-      <RadarChart
-        style={{ width: "100%", aspectRatio: 1.618, maxWidth: "600px" }}
-        outerRadius="80%"
-        responsive
-        data={fitnessDataArr}
-      >
-        <PolarGrid />
-        <PolarAngleAxis dataKey="body_part" />
-        <PolarRadiusAxis />
-        <Radar
-          name="Most frequent body parts"
-          dataKey="count"
-          stroke="#7494EA"
-          fill="#7494EA"
-          fillOpacity={0.6}
-        />
-      </RadarChart>
+    <div className="graph">
+      <h4>Most Frequently trained Body Part</h4>
+      <ResponsiveContainer width="100%" aspect={1.618}>
+        <RadarChart outerRadius="80%" data={fitnessDataArr}>
+          <PolarGrid />
+          <PolarAngleAxis dataKey="body_part" />
+          <PolarRadiusAxis />
+          <Radar
+            name="Most frequent body parts"
+            dataKey="count"
+            stroke="#7494EA"
+            fill="#7494EA"
+            fillOpacity={0.6}
+          />
+        </RadarChart>
+      </ResponsiveContainer>
     </div>
   );
 };

@@ -17,6 +17,7 @@ const CurrentSession = () => {
   const params = useParams();
   const sessionId = params.sessionId;
 
+  //FIXME: fix useState here
   useEffect(() => {
     const getSessionInfo = async () => {
       const { data, error } = await readSetWithExerciseData(sessionId!);
