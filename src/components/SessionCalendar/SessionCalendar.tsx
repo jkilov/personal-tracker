@@ -7,10 +7,28 @@ import { IoIosArrowForward } from "react-icons/io";
 import {
   fetchSessionByDate,
   fetchSessionData,
-  type SessionByDate,
 } from "../../utils/supabase/session";
 import { toast } from "sonner";
 import SessionCard from "../SessionCard/SessionCard";
+
+type Exercise = {
+  exercise_name: string;
+  body_part: string;
+};
+
+type Sets = {
+  reps: number;
+  weight: number;
+  exercise_id: number;
+  set_number: number;
+  exercise: Exercise[];
+};
+
+type SessionByDate = {
+  session_date: string;
+  session_id: string;
+  sets: Sets[];
+};
 
 const SessionCalendar = () => {
   const [isLoading, setIsLoading] = useState(false);

@@ -50,10 +50,11 @@ const addSetTemplate = {
 
 interface Props {
   exerciseId: string;
-  handleClose: () => void;
+  onReset: () => void;
+  onSave: () => void;
 }
 
-const AddSet = ({ exerciseId, handleClose }: Props) => {
+const AddSet = ({ exerciseId, onReset, onSave }: Props) => {
   const { sessionId } = useParams();
   const [count, setCount] = useState(1);
   const [createSet, setCreateSet] = useState(newSetConfig);
@@ -118,13 +119,11 @@ const AddSet = ({ exerciseId, handleClose }: Props) => {
         weight: setVals[el.title].Weight,
       };
       acc.push(mergeSet);
-      handleClose();
-      toast.success("Exercise Saved");
       return acc;
     }, []);
 
     const { error } = await createNewSet(newArr);
-
+    onSave();
     console.log("Error creating set: ", error);
   };
 
@@ -166,10 +165,6 @@ const AddSet = ({ exerciseId, handleClose }: Props) => {
         set.WeightTouched === false
     );
     return hasInvalidSet;
-  };
-
-  const onCancel = () => {
-    handleClose();
   };
 
   return (
@@ -233,7 +228,7 @@ const AddSet = ({ exerciseId, handleClose }: Props) => {
         </div>
       ))}
       <button onClick={addSet}>+</button>
-      <button onClick={onCancel}>cancel</button>
+      <button onClick={onReset}>Clear</button>
       <button disabled={isSaveDisabled()} onClick={saveSets}>
         Save
       </button>

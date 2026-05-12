@@ -1,14 +1,8 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import { readExerciseData } from "../../utils/supabase/exercise";
 import AddSet from "../AddSet/AddSet";
-import { RiCloseFill } from "react-icons/ri";
 
 import "./SessionModal.css";
-
-interface Props {
-  isModalOpen: boolean;
-  onCloseModal: () => void;
-}
 
 type ExerciseData = {
   exercise_id: string;
@@ -20,14 +14,15 @@ type ExerciseData = {
 
 //TODO: need to create a type for what session data returns from readSet
 
-const SessionModal = ({ isModalOpen, onCloseModal }: Props) => {
+interface Props {
+  onSave: () => void;
+}
+const SessionModal = ({ onSave }: Props) => {
   const [isLoading, setIsLoading] = useState(true);
   const [exerciseData, setExerciseData] = useState<ExerciseData[] | null>([]);
   const [selectedExercise, setSelectedExercise] = useState<ExerciseData | null>(
     null
   );
-
-  const modalRef = useRef<HTMLDialogElement | null>(null);
 
   useEffect(() => {
     let isMounted = true;
@@ -55,56 +50,46 @@ const SessionModal = ({ isModalOpen, onCloseModal }: Props) => {
     return;
   };
 
-  useEffect(() => {
-    if (isModalOpen) modalRef.current?.showModal();
-    if (!isModalOpen) modalRef.current?.close();
-  }, [isModalOpen]);
-
   if (isLoading) return <div>Loading.</div>;
-
-  //FIXME: session date is being printed for every exercise despite being part of the same session
 
   //FIXME: change code here from getters and setters to commands and events
   //FIXME: remove booleans that arent actual and can be string unions (boo for booleans)
   return (
-    <div>
-      <dialog ref={modalRef} className="session-card">
-        <div>
-          <RiCloseFill onClick={onCloseModal} />
-
-          <h3>Add Workout</h3>
-          <div className="exercise-select-container">
-            <label htmlFor="exerciseList">Select Exercise</label>
-            <select
-              className="exercise-selector"
-              value={selectedExercise?.exercise_name ?? ""}
-              name="exerciseList"
-              id="exerciseList"
-              onChange={(e) => handleExerciseSelection(e.target.value)}
-            >
-              <option value="" disabled></option>
-              {exerciseData?.map((exercise) => (
-                <option
-                  id={exercise.exercise_id}
-                  value={exercise.exercise_name}
-                  key={exercise.exercise_id}
-                  data-user-exercise="test" //need to fix
-                >
-                  {exercise.exercise_name}
-                </option>
-              ))}
-            </select>
-          </div>
-          {selectedExercise && (
-            <div>
-              <AddSet
-                exerciseId={selectedExercise.exercise_id}
-                handleClose={onCloseModal}
-              />
-            </div>
-          )}
+    <div className="session-card">
+      <div>
+        <h2>Add Workout</h2>
+        <div className="exercise-select-container">
+          <label htmlFor="exerciseList">Select Exercise</label>
+          <select
+            className="exercise-selector"
+            value={selectedExercise?.exercise_name ?? ""}
+            name="exerciseList"
+            id="exerciseList"
+            onChange={(e) => handleExerciseSelection(e.target.value)}
+          >
+            <option value="" disabled></option>
+            {exerciseData?.map((exercise) => (
+              <option
+                id={exercise.exercise_id}
+                value={exercise.exercise_name}
+                key={exercise.exercise_id}
+                data-user-exercise="test" //need to fix
+              >
+                {exercise.exercise_name}
+              </option>
+            ))}
+          </select>
         </div>
-      </dialog>
+        {selectedExercise && (
+          <div>
+            <AddSet
+              onSave={onSave}
+              exerciseId={selectedExercise.exercise_id}
+              onReset={() => setSelectedExercise(null)}
+            />
+          </div>
+        )}
+      </div>
     </div>
   );
 };

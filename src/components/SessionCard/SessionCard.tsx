@@ -32,9 +32,13 @@ export type FormattedSetData = {
 
 interface Props {
   sessionId: string;
+  showInsights?: boolean;
+  resetKey?: number;
 }
 
-const SessionCard = ({ sessionId }: Props) => {
+//FIXME: refactor
+
+const SessionCard = ({ sessionId, showInsights = true, resetKey }: Props) => {
   const [formattedSetData, setFormattedSetData] = useState<FormattedSetData[]>(
     []
   );
@@ -50,13 +54,13 @@ const SessionCard = ({ sessionId }: Props) => {
   const [isLoading, setIsLoading] = useState(false);
   const [aiInsights, setAiInsights] = useState<string | null>(null);
 
+  //FIXME: refactor
+
   useEffect(() => {
     const getSessionData = async () => {
       const { data: sessionInformation, error } = await readSetWithExerciseData(
         sessionId
       );
-
-      console.group("S", sessionInformation);
 
       if (error) {
         console.error(error.message);
@@ -66,7 +70,9 @@ const SessionCard = ({ sessionId }: Props) => {
     };
 
     getSessionData();
-  }, [sessionId]);
+  }, [resetKey, sessionId]);
+
+  //FIXME: refactor
 
   useEffect(() => {
     if (!rawSessionData) return;
@@ -110,6 +116,9 @@ const SessionCard = ({ sessionId }: Props) => {
   const handleOpen = async () => {
     setIsInsightsViewable((prev) => !prev);
     const { data, error } = await getFitnessScoresBySession(sessionId);
+    if (error) {
+      console.error("error received: " + error);
+    }
     setFitnessScores(data);
   };
 
@@ -121,7 +130,7 @@ const SessionCard = ({ sessionId }: Props) => {
     setIsLoading(true);
     const result = await getInsights(sessionId);
     if (!result.ok) {
-      //show error on ui
+      setIsLoading(false);
       return;
     }
     setIsLoading(false);
@@ -129,19 +138,22 @@ const SessionCard = ({ sessionId }: Props) => {
     setAiInsights(result.data.message);
   };
 
-  if (formattedSetData.length === 0) return;
+  if (formattedSetData.length === 0) return <p>No Exercises logged yet</p>;
 
   return (
-    <div className="card-layout">
-      <h5 className="insights-btn" onClick={handleOpen}>
-        {isInsightsViewable ? "See Session Summary" : " See Insights "}
-      </h5>
+    <div className="card-layout" key={resetKey}>
+      {showInsights && (
+        <h5 className="insights-btn" onClick={handleOpen}>
+          {isInsightsViewable ? "See Session Summary" : " See Insights "}
+        </h5>
+      )}
       <div className="card-viewport">
         <div
           className={`card-track ${isInsightsViewable ? "show-insights" : ""}`}
         >
           <div className="card-panel">
             <InsightsModal
+              sessionId={sessionId}
               onClose={handleClose}
               isInsightsViewable={isInsightsViewable}
             />
@@ -194,69 +206,74 @@ const SessionCard = ({ sessionId }: Props) => {
               </div>
             ))}
           </div>
-          <div className="card-panel">
-            <h2>Session Overview</h2>
-            <Tooltip
-              children={
-                <div>
-                  <h6>Total Volume</h6>
-                  <span>
-                    Raw workload. Adds up reps × weight for every set.
-                  </span>
-                  <h6>Adjusted Volume</h6>
-                  <span>
-                    Rep-range weighted volume. Sets in more effective
-                    hypertrophy ranges count slightly more than very low or very
-                    high reps.
-                  </span>
+          {showInsights && (
+            <div className="card-panel">
+              <h2>Session Overview</h2>
+              <Tooltip
+                children={
+                  <div>
+                    <h6>Total Volume</h6>
+                    <span>
+                      Raw workload. Adds up reps × weight for every set.
+                    </span>
+                    <h6>Adjusted Volume</h6>
+                    <span>
+                      Rep-range weighted volume. Sets in more effective
+                      hypertrophy ranges count slightly more than very low or
+                      very high reps.
+                    </span>
+                  </div>
+                }
+              />
+              <button>X</button>
+              <h3>Body Parts Trained</h3>
+              {formattedSetData.map((exercise) => (
+                <div key={exercise.exerciseName}>
+                  <span className="body-part-pill">{exercise.body_part}</span>
                 </div>
-              }
-            />
-            <button>X</button>
-            <h3>Body Parts Trained</h3>
-            {formattedSetData.map((exercise) => (
-              <div key={exercise.exerciseName}>
-                <span className="body-part-pill">{exercise.body_part}</span>
+              ))}
+              <h3>Volume Insights</h3>
+              <table>
+                <thead>
+                  <tr>
+                    <td>Daily Volume</td>
+                    <td>Adjusted Volume</td>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>
+                      {fitnessScores?.total_daily_volume ?? "-"}
+                      <span className="weight">kg</span>
+                    </td>
+                    <td>
+                      {fitnessScores?.adjusted_daily_volume ?? "-"}
+                      <span className="weight">kg</span>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+              <div>
+                <h3>Summary & Recommendations</h3>
+                {isLoading ? (
+                  <TrophySpin
+                    color="#FFCB47"
+                    size="small"
+                    text="analyzing"
+                    textColor=""
+                  />
+                ) : (
+                  <h5
+                    className="insights-btn"
+                    onClick={handleAiRecommendations}
+                  >
+                    Generate with AI
+                  </h5>
+                )}
+                <span>{aiInsights}</span>
               </div>
-            ))}
-            <h3>Volume Insights</h3>
-            <table>
-              <thead>
-                <tr>
-                  <td>Daily Volume</td>
-                  <td>Adjusted Volume</td>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <td>
-                    {fitnessScores?.total_daily_volume ?? "-"}
-                    <span className="weight">kg</span>
-                  </td>
-                  <td>
-                    {fitnessScores?.adjusted_daily_volume ?? "-"}
-                    <span className="weight">kg</span>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-            <div>
-              <h3>Summary & Recommendations</h3>
-              {isLoading ? (
-                <TrophySpin
-                  color="#FFCB47"
-                  size="small"
-                  text="analyzing"
-                  textColor=""
-                />
-              ) : (
-                <h5 className="insights-btn" onClick={handleAiRecommendations}>
-                  Generate with AI
-                </h5>
-              )}
-              <span>{aiInsights}</span>
             </div>
-          </div>
+          )}
         </div>
       </div>
     </div>

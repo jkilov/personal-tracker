@@ -8,12 +8,13 @@ import "./CurrentSession.css";
 import SessionModal from "../../components/SessionModal/SessionModal";
 import { toast } from "sonner";
 import SessionCard from "../../components/SessionCard/SessionCard";
+import { IoChevronBackSharp } from "react-icons/io5";
 
 const CurrentSession = () => {
   const [currentSessionData, setCurrentSessionData] = useState<
     SessionInfo[] | null
   >(null);
-  const [isExerciseModalOpen, setIsExerciseModalOpen] = useState(false);
+  const [resetCount, setResetCount] = useState(0);
 
   const params = useParams();
   const sessionId = params.sessionId;
@@ -47,29 +48,35 @@ const CurrentSession = () => {
     getSessionInfo();
   }, [sessionId]);
 
-  const handleOpenExerciseModal = () => {
-    setIsExerciseModalOpen(true);
-    console.log("open", isExerciseModalOpen);
+  const saveSessionExercise = () => {
+    setResetCount((prev) => prev + 1);
+    toast.success(
+      <div className="toast">
+        <span>
+          <strong>Exercise Saved</strong>.
+        </span>
+        <span>Exercise Saved to Session</span>
+      </div>,
+      { style: { background: "var(--toast-error)" } }
+    );
   };
 
-  const handleCloseModal = () => {
-    setIsExerciseModalOpen(false);
-    console.log("close", isExerciseModalOpen);
-  };
-
-  console.log("final", isExerciseModalOpen);
   return (
-    <div className="page-container" key="current-session">
-      <div className="session-container">
-        <h2>Your Current Session</h2>
-        <button type="button" onClick={handleOpenExerciseModal}>
-          Add Exercise
-        </button>
-        <SessionModal
-          isModalOpen={isExerciseModalOpen}
-          onCloseModal={handleCloseModal}
-        />
-        <SessionCard sessionId={sessionId!} />
+    <div className="page-layout">
+      <div>
+        <IoChevronBackSharp />
+      </div>
+      <h1>Your Current Session</h1>
+      <div className="page-container ">
+        <SessionModal onSave={saveSessionExercise} />
+        <div className="current-session">
+          <h2>Exercises</h2>
+          <SessionCard
+            resetKey={resetCount}
+            sessionId={sessionId}
+            showInsights={false}
+          />
+        </div>
       </div>
     </div>
   );
