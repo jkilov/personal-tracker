@@ -5,6 +5,11 @@ import { RiCloseFill } from "react-icons/ri";
 
 import "./SessionModal.css";
 
+interface Props {
+  isModalOpen: boolean;
+  onCloseModal: () => void;
+}
+
 type ExerciseData = {
   exercise_id: string;
   exercise_name: string;
@@ -15,7 +20,7 @@ type ExerciseData = {
 
 //TODO: need to create a type for what session data returns from readSet
 
-const SessionModal = () => {
+const SessionModal = ({ isModalOpen, onCloseModal }: Props) => {
   const [isLoading, setIsLoading] = useState(true);
   const [exerciseData, setExerciseData] = useState<ExerciseData[] | null>([]);
   const [selectedExercise, setSelectedExercise] = useState<ExerciseData | null>(
@@ -46,17 +51,14 @@ const SessionModal = () => {
       (element) => element.exercise_name === selectedExerciseName
     );
 
-    setSelectedExercise(selectedExerciseData!);
+    if (selectedExerciseData) setSelectedExercise(selectedExerciseData);
+    return;
   };
 
-  const handleOpen = () => {
-    if (modalRef) modalRef.current?.showModal();
-    //TODO: we can refactor and derive state rather than creating a duplication
-  };
-
-  const handleClose = () => {
-    if (modalRef) modalRef.current?.close();
-  };
+  useEffect(() => {
+    if (isModalOpen) modalRef.current?.showModal();
+    if (!isModalOpen) modalRef.current?.close();
+  }, [isModalOpen]);
 
   if (isLoading) return <div>Loading.</div>;
 
@@ -66,24 +68,21 @@ const SessionModal = () => {
   //FIXME: remove booleans that arent actual and can be string unions (boo for booleans)
   return (
     <div>
-      <button type="button" onClick={handleOpen}>
-        Add Exercise
-      </button>
       <dialog ref={modalRef} className="session-card">
         <div>
-          <RiCloseFill onClick={handleClose} />
+          <RiCloseFill onClick={onCloseModal} />
 
           <h3>Add Workout</h3>
           <div className="exercise-select-container">
             <label htmlFor="exerciseList">Select Exercise</label>
             <select
               className="exercise-selector"
-              value={selectedExercise}
+              value={selectedExercise?.exercise_name ?? ""}
               name="exerciseList"
               id="exerciseList"
               onChange={(e) => handleExerciseSelection(e.target.value)}
             >
-              <option value="" disabled selected></option>
+              <option value="" disabled></option>
               {exerciseData?.map((exercise) => (
                 <option
                   id={exercise.exercise_id}
@@ -100,7 +99,7 @@ const SessionModal = () => {
             <div>
               <AddSet
                 exerciseId={selectedExercise.exercise_id}
-                handleClose={handleClose}
+                handleClose={onCloseModal}
               />
             </div>
           )}

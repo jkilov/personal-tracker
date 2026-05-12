@@ -13,6 +13,7 @@ const CurrentSession = () => {
   const [currentSessionData, setCurrentSessionData] = useState<
     SessionInfo[] | null
   >(null);
+  const [isExerciseModalOpen, setIsExerciseModalOpen] = useState(false);
 
   const params = useParams();
   const sessionId = params.sessionId;
@@ -46,12 +47,28 @@ const CurrentSession = () => {
     getSessionInfo();
   }, [sessionId]);
 
+  const handleOpenExerciseModal = () => {
+    setIsExerciseModalOpen(true);
+    console.log("open", isExerciseModalOpen);
+  };
+
+  const handleCloseModal = () => {
+    setIsExerciseModalOpen(false);
+    console.log("close", isExerciseModalOpen);
+  };
+
+  console.log("final", isExerciseModalOpen);
   return (
     <div className="page-container" key="current-session">
       <div className="session-container">
         <h2>Your Current Session</h2>
-        <SessionModal />
-
+        <button type="button" onClick={handleOpenExerciseModal}>
+          Add Exercise
+        </button>
+        <SessionModal
+          isModalOpen={isExerciseModalOpen}
+          onCloseModal={handleCloseModal}
+        />
         <SessionCard sessionId={sessionId!} />
       </div>
     </div>
