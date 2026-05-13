@@ -1,11 +1,11 @@
 import { useState, useEffect } from "react";
 import { readExerciseData } from "../../utils/supabase/exercise";
 import AddSet from "../AddSet/AddSet";
-import { IoIosArrowForward } from "react-icons/io";
 
 import "./SessionModal.css";
+import SelectExerciseModal from "../SelectExerciseModal/SelectExerciseModal";
 
-type ExerciseData = {
+export type ExerciseData = {
   exercise_id: string;
   exercise_name: string;
   body_part: string;
@@ -24,6 +24,8 @@ const SessionModal = ({ onSave }: Props) => {
   const [selectedExercise, setSelectedExercise] = useState<ExerciseData | null>(
     null
   );
+  const [isSelectExerciseModalOpen, setIsSelectExerciseModalOpen] =
+    useState(false);
 
   useEffect(() => {
     let isMounted = true;
@@ -51,17 +53,27 @@ const SessionModal = ({ onSave }: Props) => {
     return;
   };
 
+  const handleOpenSelectExerciseModal = () => {
+    setIsSelectExerciseModalOpen(true);
+  };
+
+  const handleCloseSelectExerciseModal = () => {
+    setIsSelectExerciseModalOpen(false);
+  };
+
   if (isLoading) return <div>Loading.</div>;
 
   //FIXME: change code here from getters and setters to commands and events
   //FIXME: remove booleans that arent actual and can be string unions (boo for booleans)
+
+  console.log("state test", isSelectExerciseModalOpen);
   return (
     <div className="session-card">
       <div>
         <h2>Add Workout</h2>
         <div className="exercise-select-container">
           <label htmlFor="exerciseList">Select Exercise</label>
-          <select
+          {/* <select
             className="exercise-selector"
             value={selectedExercise?.exercise_name ?? ""}
             name="exerciseList"
@@ -82,7 +94,17 @@ const SessionModal = ({ onSave }: Props) => {
                 </span>
               </option>
             ))}
-          </select>
+          </select> */}
+          <div>
+            <button type="button" onClick={handleOpenSelectExerciseModal}>
+              Select Exercise
+            </button>
+            <SelectExerciseModal
+              isOpen={isSelectExerciseModalOpen}
+              onClose={handleCloseSelectExerciseModal}
+              exerciseData={exerciseData ?? []}
+            />
+          </div>
         </div>
         {selectedExercise && (
           <div>

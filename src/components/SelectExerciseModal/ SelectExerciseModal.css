@@ -1,0 +1,43 @@
+.modal {
+    
+    border-radius: 13px;
+    border: none;
+    background: #333;
+    box-shadow: -10px -10px 20px 0 #3C3C3C, 10px 10px 20px 0 #1E1E1E, -4px -4px 8px 0 rgba(77, 77, 77, 0.25) inset, 4px 4px 8px 0 #1E1E1E inset;
+    height: 200px;
+    overflow:scroll;
+}
+
+.modal-container {
+    display: flex;
+    flex-direction: column;
+}
+
+.exercise-list{
+    display: flex;
+    flex-direction: column;
+}
+
+.exercise {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 1px solid #1E1E1E;
+}
+
+.exercise-search {
+    border-radius: 13px;
+    padding: 15px;
+    margin: 10px 0px;
+background: #333;
+border:none;
+box-shadow: -12px -12px 24px 0 #3E3E3E inset, 12px 12px 24px 0 #1E1E1E inset;
+}
+
+.modal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin: 15px 0px;
+
+}
