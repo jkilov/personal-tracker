@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { readExerciseData } from "../../utils/supabase/exercise";
 import AddSet from "../AddSet/AddSet";
+import { IoIosArrowForward } from "react-icons/io";
 
 import "./SessionModal.css";
 
@@ -76,6 +77,9 @@ const SessionModal = ({ onSave }: Props) => {
                 data-user-exercise="test" //need to fix
               >
                 {exercise.exercise_name}
+                <span>
+                  <IoIosArrowForward />
+                </span>
               </option>
             ))}
           </select>

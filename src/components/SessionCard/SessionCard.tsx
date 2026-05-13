@@ -38,7 +38,11 @@ interface Props {
 
 //FIXME: refactor
 
-const SessionCard = ({ sessionId, showInsights = true, resetKey }: Props) => {
+const SessionCard = ({
+  sessionId,
+  showInsights = true,
+  resetKey = 0,
+}: Props) => {
   const [formattedSetData, setFormattedSetData] = useState<FormattedSetData[]>(
     []
   );
@@ -137,8 +141,6 @@ const SessionCard = ({ sessionId, showInsights = true, resetKey }: Props) => {
 
     setAiInsights(result.data.message);
   };
-
-  if (formattedSetData.length === 0) return <p>No Exercises logged yet</p>;
 
   return (
     <div className="card-layout" key={resetKey}>

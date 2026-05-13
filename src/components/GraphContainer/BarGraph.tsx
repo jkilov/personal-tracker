@@ -54,40 +54,43 @@ const BarGraph = ({ rawTrainingData }: Props) => {
   return (
     <div className="graph">
       <h4>1 Rep Max</h4>
-      <select onChange={handleExerciseSelection}>
-        {exerciseName.map((exercise) => (
-          <option key={exercise} value={exercise}>
-            {exercise}
-          </option>
-        ))}
-      </select>
-      <ResponsiveContainer width="100%" aspect={1.618}>
-        <BarChart
-          data={barGraphShape}
-          margin={{
-            top: 5,
-            right: 0,
-            left: 0,
-            bottom: 5,
-          }}
-        >
-          <CartesianGrid strokeDasharray="3 3" />
-          <XAxis dataKey="date" />
-          <YAxis dataKey="rm" />
-          <Tooltip
-            contentStyle={{
-              backgroundColor: "var(--background)",
+      <div className="bar-graph">
+        <select onChange={handleExerciseSelection} value={selectedExercise}>
+          {exerciseName.map((exercise) => (
+            <option key={exercise} value={exercise}>
+              {exercise}
+            </option>
+          ))}
+        </select>
+        <ResponsiveContainer padding="0" width="100%" aspect={1.618}>
+          <BarChart
+            data={barGraphShape}
+            margin={{
+              top: 5,
+              right: 30,
+              left: 0,
+              bottom: 5,
             }}
-          />
-          <Bar
-            dataKey="rm"
-            name="1 Rep Max"
-            fill="#7494EA"
-            activeBar={{ fill: "#7CEA9C" }}
-            radius={[10, 10, 0, 0]}
-          />
-        </BarChart>
-      </ResponsiveContainer>
+          >
+            <CartesianGrid strokeDasharray="3 3" />
+            <XAxis dataKey="date" />
+            <YAxis dataKey="rm" />
+            <Tooltip
+              contentStyle={{
+                backgroundColor: "var(--background)",
+              }}
+              formatter={(value) => [`${value} kg`, "1 Rep Max"]}
+            />
+            <Bar
+              dataKey="rm"
+              name="1 Rep Max"
+              fill="#7494EA"
+              activeBar={{ fill: "#7CEA9C" }}
+              radius={[10, 10, 0, 0]}
+            />
+          </BarChart>
+        </ResponsiveContainer>
+      </div>
     </div>
   );
 };

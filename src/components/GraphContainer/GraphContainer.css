@@ -1,15 +1,12 @@
 .graph-container {
     display: flex;
     width: 100%;
-    justify-content: flex-start;
-    flex-wrap: wrap;
     gap: 16px;
 }
 
 .graph {
-    flex: 1 1 360px;
-    min-width: 0;
-    max-width: 560px;
+    flex: 1 1 0;
+    min-width: 450px;
     box-sizing: border-box;
     padding: 15px;
     border-radius: 13px;
@@ -19,4 +16,20 @@
 
 .graph h4 {
     text-align: center;
+}
+
+.graph select {
+    border: none;
+    border-color: 1px solid none;
+    border-radius: 13px;
+    padding: 10px;
+    background: #333;
+    box-shadow: -12px -12px 24px 0 #3E3E3E inset, 12px 12px 24px 0 #1E1E1E inset;
+}
+
+.bar-graph {
+    display: flex;
+    flex-direction: column;
+    padding: 0px;
+    align-items: center;
 }

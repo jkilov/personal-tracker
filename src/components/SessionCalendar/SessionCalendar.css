@@ -6,7 +6,7 @@
   justify-content: start;
   width: 100%;
   gap: 10rem;
-  align-items: center;
+  align-items: flex-start;
 }
 
 .calendar-contents{
@@ -71,6 +71,14 @@
       inset 1px 1px 2px rgba(255, 255, 255, 0.4),
       inset -1px -1px 2px rgba(0, 0, 0, 0.35),
       0 0 6px rgba(85, 214, 190, 0.55);
+  }
+
+  .session-card-slot {
+    min-width: 500px;
+    min-height: 700px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
 
   .day-trained.selected{

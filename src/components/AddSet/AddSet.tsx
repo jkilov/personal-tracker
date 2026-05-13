@@ -2,7 +2,6 @@ import { useState, useContext } from "react";
 import { useParams } from "react-router";
 import { createNewSet } from "../../utils/supabase/set";
 import { AuthContext } from "../../App";
-import { toast } from "sonner";
 
 import "../../App.css";
 import "./AddSet.css";
