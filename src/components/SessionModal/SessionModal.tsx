@@ -50,6 +50,7 @@ const SessionModal = ({ onSave }: Props) => {
     );
 
     if (selectedExerciseData) setSelectedExercise(selectedExerciseData);
+    setIsSelectExerciseModalOpen(false);
     return;
   };
 
@@ -66,7 +67,6 @@ const SessionModal = ({ onSave }: Props) => {
   //FIXME: change code here from getters and setters to commands and events
   //FIXME: remove booleans that arent actual and can be string unions (boo for booleans)
 
-  console.log("state test", isSelectExerciseModalOpen);
   return (
     <div className="session-card">
       <div>
@@ -103,6 +103,7 @@ const SessionModal = ({ onSave }: Props) => {
               isOpen={isSelectExerciseModalOpen}
               onClose={handleCloseSelectExerciseModal}
               exerciseData={exerciseData ?? []}
+              onSelectExercise={handleExerciseSelection}
             />
           </div>
         </div>

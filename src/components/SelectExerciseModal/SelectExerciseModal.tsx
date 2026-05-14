@@ -1,4 +1,4 @@
-import { useRef, useEffect } from "react";
+import { useRef, useEffect, useState } from "react";
 import { IoCloseOutline } from "react-icons/io5";
 import { IoIosArrowForward } from "react-icons/io";
 import { type ExerciseData } from "../SessionModal/SessionModal";
@@ -8,10 +8,18 @@ interface Props {
   isOpen: boolean;
   onClose: () => void;
   exerciseData: ExerciseData[];
+  onSelectExercise: (selectedExercise: string) => void;
 }
 
-const SelectExerciseModal = ({ isOpen, onClose, exerciseData }: Props) => {
+const SelectExerciseModal = ({
+  isOpen,
+  onClose,
+  exerciseData,
+  onSelectExercise,
+}: Props) => {
   const modalRef = useRef<HTMLDialogElement>(null);
+  const [shapedExerciseData, setShapedExerciseData] = useState(exerciseData);
+  const [exerciseInfo, setExerciseInfo] = useState<ExerciseData | null>(null);
 
   useEffect(() => {
     const modal = modalRef.current;
@@ -22,16 +30,21 @@ const SelectExerciseModal = ({ isOpen, onClose, exerciseData }: Props) => {
   }, [isOpen]);
 
   const handleExerciseSearch = (e: any) => {
-    const userInput = e.target.value;
-    if (userInput.length < 2) return exerciseData;
-    const filteredSearch = exerciseData.filter(
-      (exercise) => exercise.exercise_name === userInput
+    const userInput = e.target.value.toLowerCase();
+
+    if (userInput.length < 2) setShapedExerciseData(exerciseData);
+    const filteredSearch = exerciseData.filter((exercise) =>
+      exercise.exercise_name.toLowerCase().includes(userInput.trim())
     );
+    setShapedExerciseData(filteredSearch);
     console.log("F", filteredSearch);
   };
 
-  //FIXME: need to get the above working - the filter is not working.
+  const moreExerciseInfo = (exerciseDetails: ExerciseData) => {
+    setExerciseInfo(exerciseDetails);
+  };
 
+  //TODO: refactor the above - also the modal keeps changing size CLS is happening (cumulative layout shift)
   return (
     <dialog ref={modalRef} className="modal">
       <div className="modal-container">
@@ -47,14 +60,13 @@ const SelectExerciseModal = ({ isOpen, onClose, exerciseData }: Props) => {
             className="exercise-search"
             onChange={handleExerciseSearch}
           />
-          {exerciseData.map((exercise) => (
-            <div
-              className="exercise"
-              onClick={() => console.log(exercise.exercise_id)}
-            >
-              <p>{exercise.exercise_name}</p>
+          {shapedExerciseData.map((exercise) => (
+            <div key={exercise.exercise_id} className="exercise">
+              <p onClick={() => onSelectExercise(exercise.exercise_name)}>
+                {exercise.exercise_name}
+              </p>
               <span>
-                <IoIosArrowForward />
+                <IoIosArrowForward onClick={() => moreExerciseInfo(exercise)} />
               </span>
             </div>
           ))}
