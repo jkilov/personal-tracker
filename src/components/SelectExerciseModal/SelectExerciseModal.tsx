@@ -42,6 +42,7 @@ const SelectExerciseModal = ({
 
   const moreExerciseInfo = (exerciseDetails: ExerciseData) => {
     setExerciseInfo(exerciseDetails);
+    console.log("selected exercise", exerciseDetails);
   };
 
   //TODO: refactor the above - also the modal keeps changing size CLS is happening (cumulative layout shift)
@@ -70,6 +71,12 @@ const SelectExerciseModal = ({
               </span>
             </div>
           ))}
+          <img src="" />
+          <div>
+            <h4>{exerciseInfo?.exercise_name}</h4>
+            <p>Muscle Group: {exerciseInfo?.body_part}</p>
+            <p>equipment: {exerciseInfo?.equipment}</p>
+          </div>
         </div>
       </div>
     </dialog>
