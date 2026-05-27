@@ -9,6 +9,7 @@ import SessionModal from "../../components/SessionModal/SessionModal";
 import { toast } from "sonner";
 import SessionCard from "../../components/SessionCard/SessionCard";
 import { IoChevronBackSharp } from "react-icons/io5";
+import { useNavigate } from "react-router";
 
 const CurrentSession = () => {
   const [currentSessionData, setCurrentSessionData] = useState<
@@ -18,6 +19,7 @@ const CurrentSession = () => {
 
   const params = useParams();
   const sessionId = params.sessionId;
+  const navigate = useNavigate();
 
   //FIXME: fix useState here
   useEffect(() => {
@@ -61,9 +63,13 @@ const CurrentSession = () => {
     );
   };
 
+  const handlePreviousPage = () => {
+    navigate(-1);
+  };
+
   return (
     <div className="page-layout">
-      <div>
+      <div onClick={handlePreviousPage} className="back-btn">
         <IoChevronBackSharp />
       </div>
       <h1>Your Current Session</h1>

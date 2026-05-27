@@ -3,6 +3,9 @@ import { IoCloseOutline } from "react-icons/io5";
 import { IoIosArrowForward } from "react-icons/io";
 import { type ExerciseData } from "../SessionModal/SessionModal";
 import "./ SelectExerciseModal.css";
+import { retrieveSession } from "../../utils/supabase/auth-supabase";
+import { supabase } from "../../utils/supabase/client-supabase";
+import { IoIosArrowBack } from "react-icons/io";
 
 interface Props {
   isOpen: boolean;
@@ -20,6 +23,21 @@ const SelectExerciseModal = ({
   const modalRef = useRef<HTMLDialogElement>(null);
   const [shapedExerciseData, setShapedExerciseData] = useState(exerciseData);
   const [exerciseInfo, setExerciseInfo] = useState<ExerciseData | null>(null);
+  const [accessToken, setAccessToken] = useState<string | undefined>(undefined);
+  const [isImageLoaded, setIsImageLoaded] = useState(false);
+
+  //is this the right way to be getting access token
+  useEffect(() => {
+    const retrieveAccessToken = async () => {
+      const { data, error } = await retrieveSession();
+
+      if (error) return;
+
+      setAccessToken(data.session?.access_token);
+    };
+
+    retrieveAccessToken();
+  }, []);
 
   useEffect(() => {
     const modal = modalRef.current;
@@ -42,7 +60,21 @@ const SelectExerciseModal = ({
 
   const moreExerciseInfo = (exerciseDetails: ExerciseData) => {
     setExerciseInfo(exerciseDetails);
-    console.log("selected exercise", exerciseDetails);
+    setIsImageLoaded(false);
+  };
+
+  const handleBack = () => {
+    setExerciseInfo(null);
+  };
+
+  const url = exerciseInfo
+    ? supabase.storage
+        .from("exercise-images")
+        .getPublicUrl(exerciseInfo?.media_url_ref).data.publicUrl
+    : "";
+
+  const handleImageLoad = () => {
+    setIsImageLoaded(true);
   };
 
   //TODO: refactor the above - also the modal keeps changing size CLS is happening (cumulative layout shift)
@@ -50,32 +82,63 @@ const SelectExerciseModal = ({
     <dialog ref={modalRef} className="modal">
       <div className="modal-container">
         <div className="modal-header">
-          <div></div>
+          {exerciseInfo ? <IoIosArrowBack onClick={handleBack} /> : <div></div>}
           <h4>Find Exercise</h4>
           <IoCloseOutline onClick={onClose} />
         </div>
-        <div className="exercise-list">
-          <input
-            type="text"
-            placeholder="Search for an exercise..."
-            className="exercise-search"
-            onChange={handleExerciseSearch}
-          />
-          {shapedExerciseData.map((exercise) => (
-            <div key={exercise.exercise_id} className="exercise">
-              <p onClick={() => onSelectExercise(exercise.exercise_name)}>
-                {exercise.exercise_name}
-              </p>
-              <span>
-                <IoIosArrowForward onClick={() => moreExerciseInfo(exercise)} />
-              </span>
+        <div
+          className={
+            exerciseInfo
+              ? "exercise-block exercise-block-active "
+              : "exercise-block"
+          }
+        >
+          <div className="exercise-list">
+            <input
+              type="text"
+              placeholder="Search for an exercise..."
+              className="exercise-search"
+              onChange={handleExerciseSearch}
+            />
+
+            <div className="select-exercise-list">
+              {shapedExerciseData.map((exercise) => (
+                <div key={exercise.exercise_id} className="exercise">
+                  <p onClick={() => onSelectExercise(exercise.exercise_name)}>
+                    {exercise.exercise_name}
+                  </p>
+                  <span>
+                    <IoIosArrowForward
+                      style={{ cursor: "pointer" }}
+                      onClick={() => moreExerciseInfo(exercise)}
+                    />
+                  </span>
+                </div>
+              ))}
             </div>
-          ))}
-          <img src="" />
-          <div>
-            <h4>{exerciseInfo?.exercise_name}</h4>
-            <p>Muscle Group: {exerciseInfo?.body_part}</p>
-            <p>equipment: {exerciseInfo?.equipment}</p>
+          </div>
+          <div className="exercise-info-container">
+            {exerciseInfo && (
+              <>
+                {!isImageLoaded && <div className="exercise-img-skeleton" />}
+                <img
+                  key={url}
+                  className={
+                    isImageLoaded ? "exercise-img" : "exercise-img hidden"
+                  }
+                  src={url}
+                  onLoad={handleImageLoad}
+                  onError={handleImageLoad}
+                />
+              </>
+            )}
+
+            <div>
+              <h4>{exerciseInfo?.exercise_name}</h4>
+              <p>Muscle Group: {exerciseInfo?.body_part}</p>
+              <p>equipment: {exerciseInfo?.equipment}</p>
+              <p>Description</p>
+            </div>
           </div>
         </div>
       </div>

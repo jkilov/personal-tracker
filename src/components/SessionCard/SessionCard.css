@@ -32,7 +32,7 @@ overflow: hidden;
 
 .card-exercise-layout {
     display: flex;
-    justify-content: space-around;
+    justify-content: space-between;
     align-items: center;
     width: 500px;
     padding: 20px;
@@ -57,4 +57,64 @@ overflow: hidden;
 
 .weight {
     font-size: 0.7rem;
+}
+
+.clickable-icon {
+    transition: transform 200ms ease;
+}
+
+.clickable-icon.icon-open {
+    transform: rotate(180deg);
+}
+
+.set-info {
+    width: 500px;
+    margin: 0 20px 20px 20px;
+    table-layout: fixed;
+    border-collapse: collapse;
+}
+
+.set-info th,
+.set-info td {
+    width: 33.33%;
+    text-align: left;
+    padding: 6px 0;
+}
+
+.weight-styling {
+    font-size: 0.7rem;
+}
+
+.session-overview-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.session-overview-header h2 {
+    margin: 0;
+}
+
+.insights-panel {
+    padding: 20px;
+    text-align: left;
+}
+
+.body-parts-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.volume-insights {
+    width: 100%;
+    table-layout: fixed;
+    border-collapse: collapse;
+}
+
+.volume-insights th,
+.volume-insights td {
+    width: 50%;
+    text-align: left;
+    padding: 6px 0;
 }

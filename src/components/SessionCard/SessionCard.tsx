@@ -162,17 +162,19 @@ const SessionCard = ({
             {formattedSetData.map((exercise) => (
               <div key={exercise.exerciseName}>
                 <div>
-                  <table className="card-exercise-layout ">
-                    <tr>
+                  <table>
+                    <tr className="card-exercise-layout">
                       <td>
-                        <h3>{exercise.exerciseName}</h3>
-                      </td>
-                      <td>
-                        <span>Total Sets: {exercise.sets.length}</span>
+                        <h3>
+                          {exercise.exerciseName}:{" "}
+                          <span>{exercise.sets.length} Sets</span>
+                        </h3>
                       </td>
                       <td>
                         <IoIosArrowDown
-                          className="clickable-icon"
+                          className={`clickable-icon ${
+                            exercise.isOpen ? "icon-open" : ""
+                          }`}
                           onClick={() =>
                             toggleAdditionalSetInfo(exercise.exerciseName)
                           }
@@ -199,7 +201,10 @@ const SessionCard = ({
                         <tr key={`${exercise.exerciseName}-${set.setNumber}`}>
                           <td>{set.setNumber}</td>
                           <td>{set.reps}</td>
-                          <td>{set.weight}</td>
+                          <td>
+                            {set.weight}{" "}
+                            <span className="weight-styling">kg</span>
+                          </td>
                         </tr>
                       ))}
                     </tbody>
@@ -209,33 +214,39 @@ const SessionCard = ({
             ))}
           </div>
           {showInsights && (
-            <div className="card-panel">
-              <h2>Session Overview</h2>
-              <Tooltip
-                children={
-                  <div>
-                    <h6>Total Volume</h6>
-                    <span>
-                      Raw workload. Adds up reps × weight for every set.
-                    </span>
-                    <h6>Adjusted Volume</h6>
-                    <span>
-                      Rep-range weighted volume. Sets in more effective
-                      hypertrophy ranges count slightly more than very low or
-                      very high reps.
-                    </span>
-                  </div>
-                }
-              />
-              <button>X</button>
+            <div className="card-panel insights-panel">
+              <div className="session-overview-header">
+                <h2>Session Overview</h2>
+                <Tooltip
+                  children={
+                    <div>
+                      <h6>Total Volume</h6>
+                      <span>
+                        Raw workload. Adds up reps × weight for every set.
+                      </span>
+                      <h6>Adjusted Volume</h6>
+                      <span>
+                        Rep-range weighted volume. Sets in more effective
+                        hypertrophy ranges count slightly more than very low or
+                        very high reps.
+                      </span>
+                    </div>
+                  }
+                />
+              </div>
               <h3>Body Parts Trained</h3>
-              {formattedSetData.map((exercise) => (
-                <div key={exercise.exerciseName}>
-                  <span className="body-part-pill">{exercise.body_part}</span>
-                </div>
-              ))}
+              <div className="body-parts-row">
+                {formattedSetData.map((exercise) => (
+                  <span
+                    key={exercise.exerciseName}
+                    className="body-part-pill"
+                  >
+                    {exercise.body_part}
+                  </span>
+                ))}
+              </div>
               <h3>Volume Insights</h3>
-              <table>
+              <table className="volume-insights">
                 <thead>
                   <tr>
                     <td>Daily Volume</td>

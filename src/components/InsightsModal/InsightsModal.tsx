@@ -30,8 +30,6 @@ const InsightsModal = ({ sessionId, onClose, isOpen }: Props) => {
       }
     );
 
-    //TODO: the current setup doesnt pass the sessionID to Gemini, need to extract session ID when user clicks insights modal
-
     const response = await data.json();
     setAiInsight(response.message);
     setIsLoading(false);
@@ -77,37 +75,6 @@ const InsightsModal = ({ sessionId, onClose, isOpen }: Props) => {
           </div>
         </div>
         <h3>Insights</h3>
-        {/* 
-        {formattedSetData.map((exercise) => (
-          <div key={exercise.exerciseName}>
-            <span className="body-part-pill">{exercise.body_part}</span>
-          </div>
-        ))}
-        {formattedSetData.map((exercise) => (
-          <div key={exercise.exerciseName}>
-            <h3>{exercise.exerciseName}</h3>
-            <table>
-              <thead>
-                <tr>
-                  <th>Total Volume</th>
-                  <th>Adjusted Volume</th>
-                </tr>
-              </thead>
-              <tbody>
-                {exercise.sets.map((set, index) => (
-                  <tr key={exercise.exerciseName + "-" + index}>
-                    <td>{set.setNumber}</td>
-                    <td>
-                      {set.set_volume}
-                      <span className="weight-label"> KG</span>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-            <h3>Volume Progression</h3>
-          </div>
-        ))} */}
         <span></span>
         <span></span>
         <h3>Recommendations</h3>

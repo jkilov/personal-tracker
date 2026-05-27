@@ -19,11 +19,6 @@ td .weight-label {
     align-items: center;
   }
 
-  .tooltip {
-    z-index: 999;
-    position: absolute;
-  }
-
   .body-part-pill {
     border-radius: 100px;
  
