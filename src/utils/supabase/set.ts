@@ -56,14 +56,6 @@ if (setError) {
 }
   if (!setData) throw new Error("No data returned for calculation")
 
-  if (setData)  {
-    
-      const passedSessionId = setData[0].session_id
-    
-  
-  }
-
-
 //TODO: add more defensive programming
       return {data: setData, error: null}
     

@@ -3,9 +3,9 @@ import Auth from "../components/Auth";
 import { signInUser } from "../utils/supabase/auth-supabase";
 import { useNavigate } from "react-router";
 import type { AuthValues } from "./SignUp";
-import { Spinner } from "react-bootstrap";
 import { toast } from "sonner";
 import "../App.css";
+import { Spinner } from "react-bootstrap";
 
 interface Props {
   isAuthenticated: boolean;
@@ -17,7 +17,7 @@ export type SignInConfigType = {
 };
 
 const SignIn = ({ isAuthenticated }: Props) => {
-  let navigate = useNavigate();
+  const navigate = useNavigate();
 
   const [isLoading, setIsLoading] = useState(false);
 
@@ -34,7 +34,7 @@ const SignIn = ({ isAuthenticated }: Props) => {
     e.preventDefault();
     setIsLoading(true);
 
-    const { data, error } = await signInUser(values.email, values.password);
+    const { error } = await signInUser(values.email, values.password);
 
     if (error) {
       toast.error(
@@ -76,7 +76,10 @@ const SignIn = ({ isAuthenticated }: Props) => {
         formKey="signIn"
         buttonCTA={"Sign In"}
       />
-      <button onClick={handleCreateAccount}>Create Account</button>
+      <button onClick={handleCreateAccount}>
+        {" "}
+        {isLoading ? <Spinner /> : "Create Account"}
+      </button>
     </div>
   );
 };

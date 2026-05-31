@@ -28,7 +28,7 @@ const Tooltip = ({ children }: Props) => {
     <div onMouseLeave={hideTooltip} className="tooltip">
       <IoInformationCircle
         onMouseEnter={showTooltip}
-        className={isTooltipVisible && " hide-tooltip-symbol "}
+        className={isTooltipVisible ? "hide-tooltip-symbol" : undefined}
       />
       <dialog className="tooltip-container" ref={tooltipRef}>
         {children}

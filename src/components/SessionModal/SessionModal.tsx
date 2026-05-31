@@ -9,7 +9,7 @@ export type ExerciseData = {
   exercise_id: string;
   exercise_name: string;
   body_part: string;
-  media_url: string;
+  media_url_ref: string;
   equipment: string;
 };
 

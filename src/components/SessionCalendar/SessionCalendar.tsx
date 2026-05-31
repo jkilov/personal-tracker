@@ -175,7 +175,7 @@ const SessionCalendar = () => {
           <OrbitProgress color="#7CEA9C" size="medium" text="" textColor="" />
         )}
         {!isLoading && chosenSession && (
-          <SessionCard sessionId={chosenSession?.session_id} />
+          <SessionCard sessionId={chosenSession.session_id} />
         )}
       </div>
     </div>

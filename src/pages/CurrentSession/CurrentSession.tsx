@@ -1,9 +1,6 @@
 import { useState, useEffect } from "react";
 import { useParams } from "react-router";
-import {
-  type SessionInfo,
-  readSetWithExerciseData,
-} from "../../utils/supabase/set";
+import { readSetWithExerciseData } from "../../utils/supabase/set";
 import "./CurrentSession.css";
 import SessionModal from "../../components/SessionModal/SessionModal";
 import { toast } from "sonner";
@@ -12,9 +9,6 @@ import { IoChevronBackSharp } from "react-icons/io5";
 import { useNavigate } from "react-router";
 
 const CurrentSession = () => {
-  const [currentSessionData, setCurrentSessionData] = useState<
-    SessionInfo[] | null
-  >(null);
   const [resetCount, setResetCount] = useState(0);
 
   const params = useParams();
@@ -24,7 +18,7 @@ const CurrentSession = () => {
   //FIXME: fix useState here
   useEffect(() => {
     const getSessionInfo = async () => {
-      const { data, error } = await readSetWithExerciseData(sessionId!);
+      const { error } = await readSetWithExerciseData(sessionId!);
 
       if (error) {
         toast.error(
@@ -44,7 +38,6 @@ const CurrentSession = () => {
         });
         return;
       }
-      setCurrentSessionData(data);
     };
 
     getSessionInfo();
@@ -77,11 +70,13 @@ const CurrentSession = () => {
         <SessionModal onSave={saveSessionExercise} />
         <div className="current-session">
           <h2>Exercises</h2>
-          <SessionCard
-            resetKey={resetCount}
-            sessionId={sessionId}
-            showInsights={false}
-          />
+          {sessionId && (
+            <SessionCard
+              resetKey={resetCount}
+              sessionId={sessionId}
+              showInsights={false}
+            />
+          )}
         </div>
       </div>
     </div>

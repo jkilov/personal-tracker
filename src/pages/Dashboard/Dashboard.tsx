@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { toast } from "sonner";
 import { readUserData } from "../../utils/supabase/user";
 import { createSession } from "../../utils/supabase/session";
@@ -6,8 +6,7 @@ import { useNavigate } from "react-router";
 import { PulseLoader } from "react-spinners";
 import "../../App.css";
 import "./Dashboard.css";
-import { fetchSessionData, type Session } from "../../utils/supabase/session";
-import { UTCtoLocalDateConversion } from "../../utils/helper/localDateConversion";
+// import { fetchSessionData, type Session } from "../../utils/supabase/session";
 import SessionCalendar from "../../components/SessionCalendar/SessionCalendar";
 import InsightsGraphs from "../../components/GraphContainer/GraphContainer";
 
@@ -15,7 +14,7 @@ const Dashboard = () => {
   const navigate = useNavigate();
 
   const [isLoading, setIsLoading] = useState(false);
-  const [allSessions, setAllSessions] = useState<Session[] | null>(null);
+  // const [allSessions, setAllSessions] = useState<Session[] | null>(null);
 
   const handleCreateSession = async () => {
     setIsLoading(true);
@@ -46,19 +45,19 @@ const Dashboard = () => {
     });
   };
 
-  useEffect(() => {
-    const getAllSessions = async () => {
-      const { data: sessionArr, error } = await fetchSessionData();
+  // useEffect(() => {
+  //   const getAllSessions = async () => {
+  //     const { data: sessionArr, error } = await fetchSessionData();
 
-      if (error) {
-        console.error(error.message, error.cause);
-      }
+  //     if (error) {
+  //       console.error(error.message, error.cause);
+  //     }
 
-      setAllSessions(sessionArr);
-    };
+  //     setAllSessions(sessionArr);
+  //   };
 
-    getAllSessions();
-  }, []);
+  //   getAllSessions();
+  // }, []);
 
   return (
     <div className="dashboard-layout">

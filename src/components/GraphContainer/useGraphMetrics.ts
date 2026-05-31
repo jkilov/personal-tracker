@@ -25,7 +25,7 @@ export type FetchedTrainingData = {
   session: Session
 }
 
-export const useGraphMetrics = (name: string = "") => {
+export const useGraphMetrics = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<Error | null>(null);
   const [data, setData] = useState<FetchedTrainingData[]>([]);
@@ -37,7 +37,9 @@ export const useGraphMetrics = (name: string = "") => {
       try {
         setIsLoading(true);
         const { data: fitnessScoreData, error: fitnessScoreError } =
-          await supabase.from("fitness_scores").select(`
+          await supabase
+            .from("fitness_scores")
+            .select(`
                     total_daily_volume,
                     adjusted_daily_volume,
                     session!inner(session_date,
@@ -47,7 +49,7 @@ export const useGraphMetrics = (name: string = "") => {
                     )
                     )
                     `)
-                    ;
+            .overrideTypes<FetchedTrainingData[], { merge: false }>();
         
         if (cancelled) return;
         if (fitnessScoreError)

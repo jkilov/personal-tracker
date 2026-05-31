@@ -3,7 +3,6 @@ import { IoCloseOutline } from "react-icons/io5";
 import { IoIosArrowForward } from "react-icons/io";
 import { type ExerciseData } from "../SessionModal/SessionModal";
 import "./ SelectExerciseModal.css";
-import { retrieveSession } from "../../utils/supabase/auth-supabase";
 import { supabase } from "../../utils/supabase/client-supabase";
 import { IoIosArrowBack } from "react-icons/io";
 
@@ -23,21 +22,7 @@ const SelectExerciseModal = ({
   const modalRef = useRef<HTMLDialogElement>(null);
   const [shapedExerciseData, setShapedExerciseData] = useState(exerciseData);
   const [exerciseInfo, setExerciseInfo] = useState<ExerciseData | null>(null);
-  const [accessToken, setAccessToken] = useState<string | undefined>(undefined);
   const [isImageLoaded, setIsImageLoaded] = useState(false);
-
-  //is this the right way to be getting access token
-  useEffect(() => {
-    const retrieveAccessToken = async () => {
-      const { data, error } = await retrieveSession();
-
-      if (error) return;
-
-      setAccessToken(data.session?.access_token);
-    };
-
-    retrieveAccessToken();
-  }, []);
 
   useEffect(() => {
     const modal = modalRef.current;

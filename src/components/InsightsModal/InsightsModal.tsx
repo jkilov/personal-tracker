@@ -12,7 +12,7 @@ interface Props {
   onClose: () => void;
 }
 
-const InsightsModal = ({ sessionId, onClose, isOpen }: Props) => {
+const InsightsModal = ({ sessionId, onClose }: Props) => {
   const [aiInsight, setAiInsight] = useState<string | null>(null);
   const [accessToken, setAccessToken] = useState<string | undefined>(undefined);
   const [isLoading, setIsLoading] = useState(false);
@@ -49,7 +49,7 @@ const InsightsModal = ({ sessionId, onClose, isOpen }: Props) => {
 
   return (
     <div>
-      <dialog className="insights-card" open={isOpen}>
+      <dialog className="insights-card">
         <div>
           <div className="session-header">
             <div>

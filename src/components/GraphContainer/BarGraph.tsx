@@ -62,7 +62,7 @@ const BarGraph = ({ rawTrainingData }: Props) => {
             </option>
           ))}
         </select>
-        <ResponsiveContainer padding="0" width="100%" aspect={1.618}>
+        <ResponsiveContainer width="100%" aspect={1.618}>
           <BarChart
             data={barGraphShape}
             margin={{

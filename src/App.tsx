@@ -6,7 +6,6 @@ import ProtectedRoutes from "./components/ProtectedRoutes";
 import { authenticationCheck } from "./utils/supabase/auth-supabase";
 import SignUp from "./pages/SignUp";
 import Dashboard from "./pages/Dashboard/Dashboard";
-import SessionModal from "./components/SessionModal/SessionModal";
 import type { Session } from "@supabase/supabase-js";
 import CurrentSession from "./pages/CurrentSession/CurrentSession";
 export const AuthContext = createContext<Session | null>(null);
