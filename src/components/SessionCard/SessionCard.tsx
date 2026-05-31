@@ -237,10 +237,7 @@ const SessionCard = ({
               <h3>Body Parts Trained</h3>
               <div className="body-parts-row">
                 {formattedSetData.map((exercise) => (
-                  <span
-                    key={exercise.exerciseName}
-                    className="body-part-pill"
-                  >
+                  <span key={exercise.exerciseName} className="body-part-pill">
                     {exercise.body_part}
                   </span>
                 ))}
