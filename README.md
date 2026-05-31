@@ -39,7 +39,7 @@ Fitness OS demonstrates backend architecture with a focus on data integrity and 
 
 ---
 
-## 📊 Core Features
+## Core Features
 
 ### 1. Workout Logging
 Users create sessions, add exercises, and log sets (reps × weight). Frontend validation prevents invalid entries; backend validation enforces constraints at the database level.
@@ -94,7 +94,7 @@ Three complementary visualizations:
 
 ---
 
-## 🏗 Architecture
+## Architecture
 
 ```
 ┌─────────────────────────────────────┐
@@ -149,44 +149,6 @@ Three complementary visualizations:
    - Same input data always produces same output
    - No randomness, no state mutations
    - Proven via test that inserts data twice and compares results
-
----
-
-## 🚀 Getting Started
-
-### Prerequisites
-- Node.js 18+
-- Supabase account
-- Vercel account (optional, for deployment)
-
-### Local Development
-
-1. **Clone and install**
-   ```bash
-   git clone <repo>
-   cd personal-tracker
-   npm install
-   ```
-
-2. **Set up environment variables**
-   ```bash
-   cp .env.example .env.local
-   # Fill in:
-   VITE_SUPABASE_URL=your-supabase-url
-   VITE_SUPABASE_ANON_KEY=your-anon-key
-   ```
-
-3. **Run development server**
-   ```bash
-   npm run dev
-   # Open http://localhost:5173
-   ```
-
-4. **Deploy to Vercel**
-   ```bash
-   npm run build
-   vercel deploy
-   ```
 
 ---
 
