@@ -1,74 +1,238 @@
-# React + TypeScript + Vite
+# Growth OS - Fitness Tracker
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+**Live Demo:** https://personal-tracker-vert.vercel.app/
 
-Currently, two official plugins are available:
+A full-stack fitness tracking application that demonstrates backend engineering skills through deterministic scoring, database-level constraints, and server-side validation.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+---
 
-## React Compiler
+## What This Project Shows
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+Fitness OS demonstrates backend architecture with a focus on data integrity and system design:
 
-## Expanding the ESLint configuration
+- **Database Functions & Triggers** - Server-side scoring with automatic recalculation
+- **Deterministic Testing** - Proven consistency of business logic
+- **Backend Validation** - Security constraints at the database level
+- **API Integration** - Secure third-party API consumption via edge functions
+- **Data Aggregation** - Time-series analysis and trend visualization
+- **Batch Processing** - Retry logic and idempotency for robustness
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+---
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+## Tech Stack
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+### Frontend
+- **React** (functional components, hooks)
+- **TypeScript** (type-safe data flows)
+- **Recharts** (data visualization)
+- **Supabase Client** (real-time auth & queries)
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+### Backend
+- **PostgreSQL** (Supabase)
+- **plpgsql** (database functions)
+- **Database Triggers** (automatic score recalculation)
+- **Supabase Edge Functions** (Deno + TypeScript)
+
+### Infrastructure
+- **Vercel** (frontend deployment)
+- **Supabase** (database + auth + edge functions)
+
+---
+
+## 📊 Core Features
+
+### 1. Workout Logging
+Users create sessions, add exercises, and log sets (reps × weight). Frontend validation prevents invalid entries; backend validation enforces constraints at the database level.
+
+### 2. Scoring Engine
+**The Technical Highlight:** Deterministic scoring system with rep-range weighting.
+
+```
+Total Daily Volume = SUM(reps × weight) for all sets
+Adjusted Daily Volume = SUM(reps × weight × rep_multiplier)
+
+Rep Multiplier:
+  1-5 reps   → 0.9  (strength focus)
+  6-8 reps   → 1.0  (balanced)
+  9-12 reps  → 1.1  (hypertrophy - highest)
+  13-15 reps → 1.0  (balanced)
+  16-20 reps → 0.9  (endurance)
+  21+ reps   → 0.8  (cardio)
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+**Implementation:**
+- `calculate_daily_scores()` database function computes both metrics
+- Trigger on `sets` table (INSERT/UPDATE/DELETE) automatically recalculates
+- Backend validation prevents invalid data (reps ≤ 0 rejected at DB level)
+- `fitness_scores` table stores daily aggregates for historical tracking
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+**Why this matters:** Server-side scoring prevents client-side manipulation. Triggers ensure scores always reflect current data. Deterministic tests prove consistency.
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+### 3. Progress Analytics
+Three complementary visualizations:
+
+**Volume Progression (Line Chart)**
+- Total and adjusted daily volume over time
+- Sorted chronologically, shows trends
+- Data source: `fitness_scores` table grouped by date
+
+**Body Part Distribution (Radar Chart)**
+- Frequency count of sets per body part
+- Identifies training imbalances
+- Helps with program design decisions
+
+**1 Rep Max Estimation (Bar Chart)**
+- Estimated 1RM per exercise using Epley formula: `weight × (1 + reps/30)`
+- Exercise selector filters by chosen movement
+- Shows maximum estimated strength per session
+
+
+**Workout History (Calendar)**
+- Month view with workout indicators
+- Click day to view exercises and sets
+- Visual representation of training consistency
+
+---
+
+## 🏗 Architecture
+
 ```
-# personal-tracker
+┌─────────────────────────────────────┐
+│          React Frontend             │
+│  (Auth, Session, Analytics Views)   │
+└──────────────┬──────────────────────┘
+               │ HTTPS
+               ▼
+┌─────────────────────────────────────┐
+│   Supabase (Authentication)         │
+│   - Row Level Security (RLS)        │
+│   - JWT-based access control        │
+└──────────────┬──────────────────────┘
+               │
+     ┌─────────┴─────────┐
+     ▼                   ▼
+┌──────────────┐  ┌────────────────────────┐
+│  PostgreSQL  │  │ Edge Functions (Deno)  │
+│              │  │ - ExerciseDB API       │
+│ Tables:      │  │ - Batch Image Upload   │
+│ - user       │  │ - AI Recommendations   │
+│ - session    │  │                        │
+│ - sets       │  └────────────────────────┘
+│ - exercise   │
+│ - fitness_   │
+│   scores     │
+│              │
+│ Functions:   │
+│ - calculate_ │
+│   daily_     │
+│   scores()   │
+│              │
+│ Triggers:    │
+│ - update_    │
+│   scores     │
+└──────────────┘
+```
+
+**Key Design Decisions:**
+
+1. **Database Functions over Edge Functions for Scoring**
+   - Scoring is data operation, not business logic
+   - Runs inside database (faster, no network latency)
+   - Automatic via triggers (no client call needed)
+
+2. **Server-Side Validation**
+   - Frontend validates for UX (immediate feedback)
+   - Backend validates for security (enforced constraints)
+   - RAISE EXCEPTION prevents invalid data reaching database
+
+3. **Deterministic Scoring**
+   - Same input data always produces same output
+   - No randomness, no state mutations
+   - Proven via test that inserts data twice and compares results
+
+---
+
+## 🚀 Getting Started
+
+### Prerequisites
+- Node.js 18+
+- Supabase account
+- Vercel account (optional, for deployment)
+
+### Local Development
+
+1. **Clone and install**
+   ```bash
+   git clone <repo>
+   cd personal-tracker
+   npm install
+   ```
+
+2. **Set up environment variables**
+   ```bash
+   cp .env.example .env.local
+   # Fill in:
+   VITE_SUPABASE_URL=your-supabase-url
+   VITE_SUPABASE_ANON_KEY=your-anon-key
+   ```
+
+3. **Run development server**
+   ```bash
+   npm run dev
+   # Open http://localhost:5173
+   ```
+
+4. **Deploy to Vercel**
+   ```bash
+   npm run build
+   vercel deploy
+   ```
+
+---
+
+## 🧪 Testing & Validation
+
+### Deterministic Test
+Proves scoring consistency:
+```bash
+node src/scripts/testFitnessScoreDeterminism.js
+```
+
+Output: `Passed Deterministic Test` ✅
+
+**What it does:**
+1. Inserts test data (session, sets, exercises)
+2. Trigger fires → scores calculated → stored in `fitness_scores`
+3. Deletes scores (not data)
+4. Reinserts same data
+5. Trigger recalculates
+6. Compares first calculation vs second
+7. Passes if identical
+
+### Edge Cases Handled
+- Empty sessions (0 sets) → no score row created
+- Invalid data (reps ≤ 0) → RAISE EXCEPTION at DB level
+- Deleted sets → trigger recalculates daily total
+- Session ID changes on update → both old and new sessions recalculated
+
+---
+
+**This Project:**
+- Deterministic business logic at database layer
+- Automatic recalculation via triggers
+- Backend validation (can't bypass with DevTools)
+- Proven consistency via tests
+- Third-party API integration with error handling
+- Time-series data aggregation and visualization
+
+
+
+## 📈 What's Next
+
+**Potential Enhancements** (deferred for ship speed):
+- Personal record tracking with notifications when PRs are broken
+- Workout templates (save/reuse common routines)
+- Advanced filtering (date ranges, exercise families)
+- Progressive overload analysis
+
+These weren't added because the core product (deterministic scoring + analytics) was the priority.
