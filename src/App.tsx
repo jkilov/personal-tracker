@@ -9,6 +9,7 @@ import Dashboard from "./pages/Dashboard/Dashboard";
 import type { Session } from "@supabase/supabase-js";
 import CurrentSession from "./pages/CurrentSession/CurrentSession";
 import { AuthContext } from "./auth-context";
+import ErrorBoundary from "./components/Error/ErrorBoundary";
 import { Toaster } from "sonner";
 
 function App() {
@@ -19,7 +20,7 @@ function App() {
   useEffect(() => {
     const subscription = authenticationCheck((session) => {
       setIsAuthenticated(!!session);
-      if (session) setSessionDetails(session);
+      setSessionDetails(session ?? undefined);
 
       setIsLoading(false);
     });
@@ -30,7 +31,7 @@ function App() {
   if (isLoading) return <div>Loading...</div>;
 
   return (
-    <>
+    <ErrorBoundary>
       <AuthContext.Provider value={sessionDetails ?? null}>
         <Toaster richColors />
         <Routes>
@@ -51,7 +52,7 @@ function App() {
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </AuthContext.Provider>
-    </>
+    </ErrorBoundary>
   );
 }
 

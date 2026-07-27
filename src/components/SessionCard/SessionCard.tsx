@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { toast } from "sonner";
 import Tooltip from "../Tooltip";
 import { getInsights } from "../../services/getAiRecommendations";
@@ -26,7 +26,6 @@ export type FormattedSetData = {
   exerciseName: string;
   body_part: string;
   createdAt: string;
-  isOpen?: boolean;
   sets: SetData[];
 };
 
@@ -41,10 +40,6 @@ const SessionCard = ({
   showInsights = true,
   resetKey = 0,
 }: Props) => {
-  const [formattedSetData, setFormattedSetData] = useState<FormattedSetData[]>(
-    []
-  );
-
   const [rawSessionData, setRawSessionData] = useState<SessionInfo[] | null>(
     null
   );
@@ -53,29 +48,40 @@ const SessionCard = ({
     null
   );
   const [isInsightsViewable, setIsInsightsViewable] = useState(false);
+  const [openExercises, setOpenExercises] = useState<Set<string>>(new Set());
   const [isLoading, setIsLoading] = useState(false);
   const [aiInsights, setAiInsights] = useState<string | null>(null);
 
   useEffect(() => {
+    let cancelled = false;
+
     const getSessionData = async () => {
       const { data: sessionInformation, error } = await readSetWithExerciseData(
         sessionId
       );
 
+      if (cancelled) return;
+
       if (error) {
-        console.error(error.message);
+        console.error("Error loading session sets:", error.message);
         return;
       }
       setRawSessionData(sessionInformation);
     };
 
     getSessionData();
+
+    return () => {
+      cancelled = true;
+    };
   }, [resetKey, sessionId]);
 
-  useEffect(() => {
-    if (!rawSessionData) return;
+  const formattedSetData = useMemo<FormattedSetData[]>(() => {
+    if (!rawSessionData) return [];
 
-    const reshapedExerciseData = rawSessionData.reduce((acc, el) => {
+    const reshapedExerciseData = rawSessionData.reduce<
+      Record<string, FormattedSetData>
+    >((acc, el) => {
       const exerciseName = el.exercise.exercise_name;
 
       if (!acc[exerciseName]) {
@@ -83,7 +89,6 @@ const SessionCard = ({
           exerciseName,
           body_part: el.exercise.body_part,
           createdAt: el.created_at,
-          isOpen: false,
           sets: [],
         };
       }
@@ -96,26 +101,28 @@ const SessionCard = ({
       });
 
       return acc;
-    }, {} as Record<string, { exerciseName: string; body_part: string; createdAt: string; isOpen: boolean; sets: { setNumber: number; reps: number; weight: number; set_volume: number }[] }>);
-    const exerciseSetArr = Object.values(reshapedExerciseData);
-    setFormattedSetData(exerciseSetArr);
+    }, {});
+
+    return Object.values(reshapedExerciseData);
   }, [rawSessionData]);
 
   const toggleAdditionalSetInfo = (exerciseName: string) => {
-    const updatedIsOpen = formattedSetData.map((exercise) =>
-      exercise.exerciseName === exerciseName
-        ? { ...exercise, isOpen: !exercise.isOpen }
-        : exercise
-    );
-
-    setFormattedSetData(updatedIsOpen);
+    setOpenExercises((prev) => {
+      const next = new Set(prev);
+      if (next.has(exerciseName)) {
+        next.delete(exerciseName);
+      } else {
+        next.add(exerciseName);
+      }
+      return next;
+    });
   };
 
   const handleOpen = async () => {
     setIsInsightsViewable((prev) => !prev);
     const { data, error } = await getFitnessScoresBySession(sessionId);
     if (error) {
-      console.error("error received: " + error);
+      console.error("Error loading fitness scores:", error);
     }
     setFitnessScores(data);
   };
@@ -136,11 +143,11 @@ const SessionCard = ({
   };
 
   return (
-    <div className="card-layout" key={resetKey}>
+    <div className="card-layout">
       {showInsights && (
-        <h5 className="insights-btn" onClick={handleOpen}>
-          {isInsightsViewable ? "See Session Summary" : " See Insights "}
-        </h5>
+        <button type="button" className="insights-btn" onClick={handleOpen}>
+          {isInsightsViewable ? "See Session Summary" : "See Insights"}
+        </button>
       )}
       <div className="card-viewport">
         <div
@@ -153,64 +160,71 @@ const SessionCard = ({
                 sets.
               </p>
             )}
-            {formattedSetData.map((exercise) => (
-              <div key={exercise.exerciseName}>
-                <div>
-                  <table>
-                    <tbody>
-                      <tr className="card-exercise-layout">
-                        <td>
-                          <h3>
-                            {exercise.exerciseName}:{" "}
-                            <span>
-                              {exercise.sets.length}{" "}
-                              {exercise.sets.length === 1 ? "Set" : "Sets"}
-                            </span>
-                          </h3>
-                        </td>
-                        <td>
-                          <IoIosArrowDown
-                            className={`clickable-icon ${
-                              exercise.isOpen ? "icon-open" : ""
-                            }`}
-                            onClick={() =>
-                              toggleAdditionalSetInfo(exercise.exerciseName)
-                            }
-                          />
-                        </td>
-                      </tr>
-                    </tbody>
-                  </table>
-                </div>
-                {exercise.isOpen && (
-                  <table
-                    className={`set-info ${
-                      exercise.isOpen ? "set-info-visible" : ""
-                    }`}
-                  >
-                    <thead>
-                      <tr>
-                        <th>Sets</th>
-                        <th>Reps</th>
-                        <th>Weight</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {exercise.sets.map((set) => (
-                        <tr key={`${exercise.exerciseName}-${set.setNumber}`}>
-                          <td>{set.setNumber}</td>
-                          <td>{set.reps}</td>
+            {formattedSetData.map((exercise) => {
+              const isOpen = openExercises.has(exercise.exerciseName);
+
+              return (
+                <div key={exercise.exerciseName}>
+                  <div>
+                    <table>
+                      <tbody>
+                        <tr className="card-exercise-layout">
                           <td>
-                            {set.weight}{" "}
-                            <span className="weight-styling">kg</span>
+                            <h3>
+                              {exercise.exerciseName}:{" "}
+                              <span>
+                                {exercise.sets.length}{" "}
+                                {exercise.sets.length === 1 ? "Set" : "Sets"}
+                              </span>
+                            </h3>
+                          </td>
+                          <td>
+                            <button
+                              type="button"
+                              className="icon-btn"
+                              aria-label={`${isOpen ? "Hide" : "Show"} sets for ${exercise.exerciseName}`}
+                              aria-expanded={isOpen}
+                              onClick={() =>
+                                toggleAdditionalSetInfo(exercise.exerciseName)
+                              }
+                            >
+                              <IoIosArrowDown
+                                className={`clickable-icon ${
+                                  isOpen ? "icon-open" : ""
+                                }`}
+                              />
+                            </button>
                           </td>
                         </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                )}
-              </div>
-            ))}
+                      </tbody>
+                    </table>
+                  </div>
+                  {isOpen && (
+                    <table className="set-info set-info-visible">
+                      <thead>
+                        <tr>
+                          <th>Sets</th>
+                          <th>Reps</th>
+                          <th>Weight</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {exercise.sets.map((set) => (
+                          <tr key={`${exercise.exerciseName}-${set.setNumber}`}>
+                            <td>{set.setNumber}</td>
+                            <td>{set.reps}</td>
+                            <td>
+                              {set.weight}{" "}
+                              <span className="weight-styling">kg</span>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  )}
+                </div>
+              );
+            })}
           </div>
           {showInsights && (
             <div className="card-panel insights-panel">
@@ -276,12 +290,13 @@ const SessionCard = ({
                     textColor=""
                   />
                 ) : (
-                  <h5
+                  <button
+                    type="button"
                     className="insights-btn"
                     onClick={handleAiRecommendations}
                   >
                     Generate with AI
-                  </h5>
+                  </button>
                 )}
                 <span>{aiInsights}</span>
               </div>

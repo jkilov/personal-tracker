@@ -38,6 +38,13 @@
     border-bottom: 1px solid #1E1E1E;
 }
 
+.exercise-name-btn {
+    padding: 16px 0;
+    text-align: left;
+    justify-content: flex-start;
+    flex: 1;
+}
+
 .exercise-search {
     border-radius: 13px;
     padding: 15px;
@@ -58,9 +65,9 @@ box-shadow: -12px -12px 24px 0 #3E3E3E inset, 12px 12px 24px 0 #1E1E1E inset;
     width: 100px;
     aspect-ratio: 1;
     border-radius: 13px;
-border: 7px solid #1E1E1E;
-background: url(<path-to-image>) lightgray 50% / cover no-repeat, #333;
-box-shadow: -12px -12px 24px 0 #414141, 12px 12px 24px 0 #1E1E1E, -4px -4px 8px 0 rgba(77, 77, 77, 0.25) inset, 4px 4px 8px 0 #1E1E1E inset;
+    border: 7px solid #1E1E1E;
+    background: #333;
+    box-shadow: -12px -12px 24px 0 #414141, 12px 12px 24px 0 #1E1E1E, -4px -4px 8px 0 rgba(77, 77, 77, 0.25) inset, 4px 4px 8px 0 #1E1E1E inset;
 }
 
 .exercise-info-container {

@@ -26,7 +26,9 @@ export type FetchedTrainingData = {
 }
 
 export const useGraphMetrics = () => {
-  const [isLoading, setIsLoading] = useState(false);
+  // Starts true: the fetch begins on mount, so the first render is a loading
+  // state (otherwise the charts flash empty before the spinner appears).
+  const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
   const [data, setData] = useState<FetchedTrainingData[]>([]);
 

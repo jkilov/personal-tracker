@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import "./SessionCalendar.css";
 import clsx from "clsx";
 import { OrbitProgress } from "react-loading-indicators";
@@ -43,6 +43,9 @@ const SessionCalendar = () => {
     null
   );
   const [daySelected, setDaySelected] = useState<number | null>(null);
+  // Monotonic id so only the LATEST day-click's response is applied
+  // (rapid clicks would otherwise let a slow earlier response win).
+  const requestIdRef = useRef(0);
 
   const todayYear = new Date().getFullYear();
   const todayMonth = new Date().getMonth();
@@ -74,6 +77,8 @@ const SessionCalendar = () => {
     const month = selectedMonth - 1;
     setSelectedDate(new Date(selectedYear, month, 1));
     setIsCurrentDate(false);
+    setDaySelected(null);
+    setChosenSession(null);
   };
 
   const goForwardMonths = () => {
@@ -81,6 +86,8 @@ const SessionCalendar = () => {
 
     setSelectedDate(new Date(selectedYear, newMonth, 1));
     setIsCurrentDate(isSelectedDateExceedsTodayDate(selectedYear, newMonth));
+    setDaySelected(null);
+    setChosenSession(null);
   };
 
   const trainedDates = (day: number) => {
@@ -99,6 +106,8 @@ const SessionCalendar = () => {
   };
 
   const onSelectedSession = async (date: number) => {
+    const requestId = ++requestIdRef.current;
+
     setIsLoading(true);
     setDaySelected(date);
     const selectedSession = new Date(selectedYear, selectedMonth, date);
@@ -106,6 +115,9 @@ const SessionCalendar = () => {
     const { data, error } = await fetchSessionByDate(
       toLocalIsoDate(selectedSession)
     );
+
+    if (requestId !== requestIdRef.current) return;
+
     setIsLoading(false);
 
     if (!data) {
@@ -153,17 +165,37 @@ const SessionCalendar = () => {
       <div className="calendar-contents">
         <div>
           <div className="select-month-navigation">
-            <IoIosArrowBack onClick={goBackMonths} />
+            <button
+              type="button"
+              className="icon-btn"
+              aria-label="Previous month"
+              onClick={goBackMonths}
+            >
+              <IoIosArrowBack />
+            </button>
             <h3>{monthAsString}</h3>
-            {!isCurrentDate && <IoIosArrowForward onClick={goForwardMonths} />}
+            {!isCurrentDate && (
+              <button
+                type="button"
+                className="icon-btn"
+                aria-label="Next month"
+                onClick={goForwardMonths}
+              >
+                <IoIosArrowForward />
+              </button>
+            )}
           </div>
           <div className="calendar">
             {daysOfMonthArray.map((day) => (
               <div key={day} className="day-container">
                 <span>{day}</span>
                 <div className="day-indicator">
-                  <div
+                  <button
+                    type="button"
+                    aria-label={`View session for ${monthAsString} ${day}`}
+                    aria-pressed={daySelected === day}
                     className={clsx(
+                      "icon-btn",
                       "day-indicator-inner",
                       trainedDates(day) && "day-trained",
                       daySelected === day && "selected"

@@ -61,9 +61,14 @@ const CurrentSession = () => {
 
   return (
     <div className="page-layout">
-      <div onClick={handlePreviousPage} className="back-btn">
+      <button
+        type="button"
+        className="icon-btn back-btn"
+        aria-label="Back to dashboard"
+        onClick={handlePreviousPage}
+      >
         <IoChevronBackSharp />
-      </div>
+      </button>
       <h1>Your Current Session</h1>
       <div className="page-container ">
         <SessionModal onSave={saveSessionExercise} />

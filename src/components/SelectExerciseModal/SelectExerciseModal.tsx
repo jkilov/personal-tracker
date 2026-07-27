@@ -20,7 +20,8 @@ const SelectExerciseModal = ({
   onSelectExercise,
 }: Props) => {
   const modalRef = useRef<HTMLDialogElement>(null);
-  const [shapedExerciseData, setShapedExerciseData] = useState(exerciseData);
+  const searchInputRef = useRef<HTMLInputElement>(null);
+  const [searchTerm, setSearchTerm] = useState("");
   const [exerciseInfo, setExerciseInfo] = useState<ExerciseData | null>(null);
   const [isImageLoaded, setIsImageLoaded] = useState(false);
 
@@ -28,18 +29,27 @@ const SelectExerciseModal = ({
     const modal = modalRef.current;
     if (!modal) return;
 
-    if (isOpen && !modal.open) modal.showModal();
+    if (isOpen && !modal.open) {
+      modal.showModal();
+      searchInputRef.current?.focus();
+    }
     if (!isOpen && modal.open) modal.close();
   }, [isOpen]);
 
-  const handleExerciseSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const userInput = e.target.value.toLowerCase();
+  // Derived during render from the prop — no state snapshot to go stale.
+  const normalizedSearch = searchTerm.trim().toLowerCase();
+  const filteredExercises = normalizedSearch
+    ? exerciseData.filter((exercise) =>
+        exercise.exercise_name.toLowerCase().includes(normalizedSearch)
+      )
+    : exerciseData;
 
-    if (userInput.length < 2) setShapedExerciseData(exerciseData);
-    const filteredSearch = exerciseData.filter((exercise) =>
-      exercise.exercise_name.toLowerCase().includes(userInput.trim())
-    );
-    setShapedExerciseData(filteredSearch);
+  // Fires on Escape, on close(), and via the close button — resets the
+  // modal's local state so reopening starts from a clean list.
+  const handleDialogClose = () => {
+    setSearchTerm("");
+    setExerciseInfo(null);
+    onClose();
   };
 
   const moreExerciseInfo = (exerciseDetails: ExerciseData) => {
@@ -51,10 +61,10 @@ const SelectExerciseModal = ({
     setExerciseInfo(null);
   };
 
-  const url = exerciseInfo
+  const url = exerciseInfo?.media_url_ref
     ? supabase.storage
         .from("exercise-images")
-        .getPublicUrl(exerciseInfo?.media_url_ref).data.publicUrl
+        .getPublicUrl(exerciseInfo.media_url_ref).data.publicUrl
     : "";
 
   const handleImageLoad = () => {
@@ -62,12 +72,30 @@ const SelectExerciseModal = ({
   };
 
   return (
-    <dialog ref={modalRef} className="modal" onClose={onClose}>
+    <dialog ref={modalRef} className="modal" onClose={handleDialogClose}>
       <div className="modal-container">
         <div className="modal-header">
-          {exerciseInfo ? <IoIosArrowBack onClick={handleBack} /> : <div></div>}
+          {exerciseInfo ? (
+            <button
+              type="button"
+              className="icon-btn"
+              aria-label="Back to exercise list"
+              onClick={handleBack}
+            >
+              <IoIosArrowBack />
+            </button>
+          ) : (
+            <div></div>
+          )}
           <h4>Find Exercise</h4>
-          <IoCloseOutline onClick={onClose} />
+          <button
+            type="button"
+            className="icon-btn"
+            aria-label="Close"
+            onClick={handleDialogClose}
+          >
+            <IoCloseOutline />
+          </button>
         </div>
         <div
           className={
@@ -78,24 +106,32 @@ const SelectExerciseModal = ({
         >
           <div className="exercise-list">
             <input
+              ref={searchInputRef}
               type="text"
               placeholder="Search for an exercise..."
               className="exercise-search"
-              onChange={handleExerciseSearch}
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
             />
 
             <div className="select-exercise-list">
-              {shapedExerciseData.map((exercise) => (
+              {filteredExercises.map((exercise) => (
                 <div key={exercise.exercise_id} className="exercise">
-                  <p onClick={() => onSelectExercise(exercise.exercise_name)}>
+                  <button
+                    type="button"
+                    className="icon-btn exercise-name-btn"
+                    onClick={() => onSelectExercise(exercise.exercise_name)}
+                  >
                     {exercise.exercise_name}
-                  </p>
-                  <span>
-                    <IoIosArrowForward
-                      style={{ cursor: "pointer" }}
-                      onClick={() => moreExerciseInfo(exercise)}
-                    />
-                  </span>
+                  </button>
+                  <button
+                    type="button"
+                    className="icon-btn"
+                    aria-label={`View details for ${exercise.exercise_name}`}
+                    onClick={() => moreExerciseInfo(exercise)}
+                  >
+                    <IoIosArrowForward />
+                  </button>
                 </div>
               ))}
             </div>
@@ -110,6 +146,7 @@ const SelectExerciseModal = ({
                     isImageLoaded ? "exercise-img" : "exercise-img hidden"
                   }
                   src={url}
+                  alt={`${exerciseInfo.exercise_name} demonstration`}
                   onLoad={handleImageLoad}
                   onError={handleImageLoad}
                 />

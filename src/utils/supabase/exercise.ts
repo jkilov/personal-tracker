@@ -1,7 +1,6 @@
 import {supabase} from "./client-supabase"
 
 
-//READ
 
 // Supabase caps a single select at 1000 rows; the exercise catalog is larger,
 // so fetch in ordered pages until a page comes back short.

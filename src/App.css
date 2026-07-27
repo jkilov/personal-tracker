@@ -83,3 +83,25 @@
   font-size: 0.75rem;
   color: var(--error);
 }
+
+/* Bare button for icon/inline controls: strips the global neumorphic button
+   chrome while keeping real <button> semantics for keyboard and screen readers. */
+.icon-btn {
+  background: none;
+  background-color: transparent;
+  border: none;
+  box-shadow: none;
+  padding: 0;
+  margin: 0;
+  font: inherit;
+  color: inherit;
+  cursor: pointer;
+  border-radius: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.icon-btn:hover {
+  border-color: transparent;
+}

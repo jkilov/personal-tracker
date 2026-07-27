@@ -1,7 +1,6 @@
 import { supabase } from "./client-supabase";
 
 
-//CREATE
 
 export const createUserData = async(userId: string, fName: string, lName: string, email: string) => {
     const {error, status, statusText} = await supabase.from("user").insert({
@@ -12,7 +11,6 @@ export const createUserData = async(userId: string, fName: string, lName: string
 }
 
 
-//READ
 
 export const readUserData = async()=> {
     const {data,status, error} = await supabase

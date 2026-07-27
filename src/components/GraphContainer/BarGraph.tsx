@@ -55,7 +55,7 @@ const BarGraph = ({ rawTrainingData }: Props) => {
     <div className="graph">
       <h4>1 Rep Max</h4>
       <div className="bar-graph">
-        <select onChange={handleExerciseSelection} value={selectedExercise}>
+        <select onChange={handleExerciseSelection} value={validatedExercise ?? ""}>
           {exerciseName.map((exercise) => (
             <option key={exercise} value={exercise}>
               {exercise}

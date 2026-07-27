@@ -26,20 +26,22 @@ const SessionModal = ({ onSave }: Props) => {
     useState(false);
 
   useEffect(() => {
-    let isMounted = true;
+    let cancelled = false;
 
-    if (isMounted) {
-      const getExerciseData = async () => {
-        const { data, error } = await readExerciseData();
-        if (error) console.error("Error loading exercises: ", error.message);
-        setExerciseData(data);
-        setIsLoading(false);
-      };
-      getExerciseData();
-    }
+    const getExerciseData = async () => {
+      const { data, error } = await readExerciseData();
+
+      if (cancelled) return;
+
+      if (error) console.error("Error loading exercises: ", error.message);
+      setExerciseData(data);
+      setIsLoading(false);
+    };
+
+    getExerciseData();
 
     return () => {
-      isMounted = false;
+      cancelled = true;
     };
   }, []);
 
