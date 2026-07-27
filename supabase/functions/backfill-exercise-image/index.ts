@@ -1,133 +1,109 @@
-// Follow this setup guide to integrate the Deno language server with your editor:
-// https://deno.land/manual/getting_started/setup_your_environment
-// This enables autocomplete, go to definition, etc.
-
-
 // Setup type definitions for built-in Supabase Runtime APIs
 import {createClient} from  "jsr:@supabase/supabase-js@2"
 import "@supabase/functions-js/edge-runtime.d.ts"
 
-
-console.log("Hello from Functions!")
-
-
-
-
 const supabase = createClient(
- Deno.env.get("REMOTE_SUPABASE_URL")!,
- Deno.env.get("REMOTE_SUPABASE_SERVICE_ROLE_KEY")!,
+  Deno.env.get("SUPABASE_URL")!,
+  Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!,
 )
 
+const BATCH_SIZE = 10 // small batches to stay well inside the edge-function time limit
 
-const runSleeper = async() =>  new Promise((resolve) => {
-  setTimeout(()=>{
-    console.log("waiting new batch")
-    resolve()}, 
-    3000)
-})
+// This is an operator job, not a user endpoint: it makes billed RapidAPI calls
+// and writes with the service role. verify_jwt alone is satisfied by the public
+// anon key, so require the service-role key itself as the bearer token.
+const isOperatorRequest = (req: Request) => {
+  const authHeader = req.headers.get("Authorization") ?? ""
+  const token = authHeader.replace(/^bearer /i, "")
+  return token === Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")
+}
 
+// Processes ONE batch per invocation and reports progress; the driver script
+// (src/scripts/storeImageExercises.js) re-invokes until the backfill completes.
 Deno.serve(async (req) => {
-let processed = 0
-let totalRows = 0
 
-while (true) {
-  //TODO: add sleeper function for batching
-
-try {
-
-
-const {data: exerciseData, error: exerciseTableError, count} = await supabase
-.from("exercise")
-.select("*", {count: "exact"})
-.is("media_url_ref", null)
-.limit(10) // 10 selected to avoid timeouts
-
-totalRows = count
-
-
-if (exerciseTableError) throw new Error( "Cannot retrieve exercise table")
-
-  if (!exerciseData || exerciseData.length === 0) return new Response(
-    JSON.stringify({message: "Batch completed, no more exercises to process", processed, remaining: totalRows - processed}),
-   {headers: {"Content-Type": "application/json"}}
-   )
-
-
-for (let i = 0; i< exerciseData.length; i++) {
-
-  const imageUrl =  `https://exercisedb.p.rapidapi.com/image?exerciseId=${exerciseData[i].external_id}&resolution=180`;
-  const options = {
-    method: "GET",
-    headers: {
-      "x-rapidapi-key": Deno.env.get("RAPID_API_KEY"),
-      "x-rapidapi-host": Deno.env.get("RAPID_API_HOST"),
-    }
+  if (!isOperatorRequest(req)) {
+    return new Response(
+      JSON.stringify({message: "Unauthorized"}),
+      {status: 401, headers: {"Content-Type": "application/json"}}
+    )
   }
 
-  const imageResponse = await fetch(imageUrl,options)
+  let processed = 0
 
+  try {
 
-  if (!imageResponse.ok) throw new Error("Image fetch failed")
+    const {data: exerciseData, error: exerciseTableError, count} = await supabase
+      .from("exercise")
+      .select("*", {count: "exact"})
+      .is("media_url_ref", null)
+      .limit(BATCH_SIZE)
 
-    const gifImage = await imageResponse.blob()
+    if (exerciseTableError) throw new Error("Cannot retrieve exercise table")
 
-    const fileName = `${exerciseData[i].external_id}.gif`
+    const totalRemaining = count ?? 0
 
+    if (!exerciseData || exerciseData.length === 0) {
+      return new Response(
+        JSON.stringify({message: "Batch completed, no more exercises to process", processed, remaining: 0}),
+        {headers: {"Content-Type": "application/json"}}
+      )
+    }
 
-    const {data: fileUpload, error: uploadError} = await supabase.storage
-    .from("exercise-images")
-    .upload(fileName, gifImage, {
-      contentType: "image/gif",
-      upsert: true
-    })
+    for (const exercise of exerciseData) {
 
-    //TODO: handle if file exists to skip and then set above upsert to false
+      const imageUrl = `https://exercisedb.p.rapidapi.com/image?exerciseId=${exercise.external_id}&resolution=180`
+      const options = {
+        method: "GET",
+        headers: {
+          "x-rapidapi-key": Deno.env.get("RAPID_API_KEY") ?? "",
+          "x-rapidapi-host": Deno.env.get("RAPID_API_HOST") ?? "",
+        }
+      }
 
-    if(uploadError) throw new Error("Upload failure")
+      const imageResponse = await fetch(imageUrl, options)
+
+      if (!imageResponse.ok) throw new Error("Image fetch failed")
+
+      const gifImage = await imageResponse.blob()
+      const fileName = `${exercise.external_id}.gif`
+
+      const {data: fileUpload, error: uploadError} = await supabase.storage
+        .from("exercise-images")
+        .upload(fileName, gifImage, {
+          contentType: "image/gif",
+          upsert: true
+        })
+
+      if (uploadError) throw new Error("Upload failure")
 
       if (fileUpload.path) {
+        const {error: updateExerciseTableError} = await supabase.from("exercise")
+          .update({media_url_ref: `${fileName}`})
+          .eq("exercise_id", exercise.exercise_id)
 
+        if (updateExerciseTableError) {
+          throw new Error("error uploading media_url_ref to exercise table")
+        }
 
-
-      const {error: updateExerciseTableError} = await supabase.from('exercise')
-      .update({media_url_ref: `${fileName}`})
-      .eq('exercise_id', exerciseData[i].exercise_id)
-    
-  
-if (updateExerciseTableError){ throw new Error("error uploading media_url_ref to exercise table")
-}
-
-    ++processed
-    console.log( `processed: ${processed}, remaining: ${totalRows - processed})`,
-  )
-
-
-    
+        ++processed
+        console.log(`processed: ${processed}, remaining: ${totalRemaining - processed}`)
       }
+    }
+
+    return new Response(
+      JSON.stringify({message: "Batch processed", processed, remaining: totalRemaining - processed}),
+      {headers: {"Content-Type": "application/json"}}
+    )
+
+  } catch (error) {
+    // Log full detail server-side; never return internals to the client.
+    console.error("backfill batch failed", error)
+    return new Response(
+      JSON.stringify({message: "Internal server error", processed}),
+      {status: 500, headers: {"Content-Type": "application/json"}}
+    )
   }
-
-
-await runSleeper()
-
- } catch (error) {
- console.error("failed to fetch external_ids", error)
-
- return new Response(JSON.stringify({message: "error received: " + error.message, processed, remaining: totalRows - processed},
-  
- ), {status: 500,
-  headers: {"Content-Type": "application/json"}
-})
-
-}
-}
-
-
-return new Response(
- JSON.stringify({processed: processed, remaining: totalRows - processed}),
-{headers: {"Content-Type": "application/json"}}
-)
-
-
 })
 
 
@@ -135,17 +111,12 @@ return new Response(
 
 
  1. Run `supabase start` (see: https://supabase.com/docs/reference/cli/supabase-start)
- 2. Make an HTTP request:
+ 2. Make an HTTP request (the Authorization bearer must be the service-role key):
 
 
  curl -i --location --request POST 'http://127.0.0.1:54321/functions/v1/backfill-exercise-image' \
-   --header 'Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6ImFub24iLCJleHAiOjE5ODM4MTI5OTZ9.CRXP1A7WOeoJeXxjNni43kdQwgnWNReilDMblYTn_I0' \
-   --header 'Content-Type: application/json' \
-   --data '{"name":"Functions"}'
+   --header 'Authorization: Bearer <service-role-key>' \
+   --header 'Content-Type: application/json'
 
 
 */
-
-
-
-

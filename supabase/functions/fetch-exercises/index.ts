@@ -1,13 +1,6 @@
-// Follow this setup guide to integrate the Deno language server with your editor:
-// https://deno.land/manual/getting_started/setup_your_environment
-// This enables autocomplete, go to definition, etc.
-
 // Setup type definitions for built-in Supabase Runtime APIs
 import "@supabase/functions-js/edge-runtime.d.ts"
 import {createClient} from  "jsr:@supabase/supabase-js@2"
-
-console.log("Hello from Functions!")
-
 
 const supabase = createClient(
   Deno.env.get("SUPABASE_URL")!,
@@ -29,17 +22,30 @@ const rowCleanUp = (str: string) => {
   
 
 
+// This is an operator job, not a user endpoint: it makes billed RapidAPI calls
+// and writes with the service role. verify_jwt alone is satisfied by the public
+// anon key, so require the service-role key itself as the bearer token.
+const isOperatorRequest = (req: Request) => {
+  const authHeader = req.headers.get("Authorization") ?? ""
+  const token = authHeader.replace(/^bearer /i, "")
+  return token === Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")
+}
+
 Deno.serve(async (req) => {
 
-
-
+  if (!isOperatorRequest(req)) {
+    return new Response(
+      JSON.stringify({message: "Unauthorized"}),
+      {status: 401, headers: {"Content-Type": "application/json"}}
+    )
+  }
 
   const url ="https://exercisedb.p.rapidapi.com/exercises?limit=0"
   const options = {
     method: "GET",
     headers: {
-      "x-rapidapi-key": Deno.env.get("RAPID_API_KEY"),
-      "x-rapidapi-host": Deno.env.get("RAPID_API_HOST"),
+      "x-rapidapi-key": Deno.env.get("RAPID_API_KEY") ?? "",
+      "x-rapidapi-host": Deno.env.get("RAPID_API_HOST") ?? "",
     }
   }
 
@@ -47,7 +53,17 @@ Deno.serve(async (req) => {
   try {
 
     const request = await fetch(url, options)
+
+    if (!request.ok) {
+      throw new Error(`ExerciseDB request failed with status ${request.status}`)
+    }
+
     const exerciseData = await request.json()
+
+    if (!Array.isArray(exerciseData)) {
+      throw new Error("ExerciseDB returned an unexpected response shape")
+    }
+
     const totalFromApi = exerciseData.length
 
     const {count: existingCount, error: countError} = await supabase
@@ -59,7 +75,7 @@ Deno.serve(async (req) => {
     }
 
 
-    if (existingCount >= totalFromApi) {
+    if ((existingCount ?? 0) >= totalFromApi) {
       return new Response(JSON.stringify({message: " Exercise already seeded. Import skipped", inserted: 0, existingCount}),
       {headers: {"Content-Type": "application/json"}}
       )
@@ -78,7 +94,7 @@ const rows = exerciseData.map(exercise => ({
 
 }))
 
-    const {data, error, count} = await supabase
+    const {error, count} = await supabase
     .from("exercise")
     .upsert(rows, { count: "exact"})
 
@@ -94,8 +110,10 @@ const rows = exerciseData.map(exercise => ({
 
     
   } catch (error) {
+    // Log full detail server-side; never return internals to the client.
+    console.error(error)
     return new Response (
-      JSON.stringify({message: error.message}), 
+      JSON.stringify({message: "Internal server error"}),
       {status: 500,
       headers: { "Content-Type": "application/json" } },
     )

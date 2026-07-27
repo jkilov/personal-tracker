@@ -1,78 +1,95 @@
+// Manual verification probe for the deterministic scoring trigger.
+//
+// Inserts the same set data twice (deleting the derived fitness_scores row in
+// between) and compares the recalculated scores. Requires a database where the
+// trigger exists, plus env vars pointing at real rows:
+//   VITE_API_URL           - Supabase project URL
+//   SUPABASE_SERVICE_KEY   - service-role key (bypasses RLS; operator use only)
+//   TEST_USER_ID           - existing user id to attribute the test set to
+//   TEST_SESSION_ID        - existing session id to insert the test set into
+//   TEST_EXERCISE_ID       - existing exercise id for the test set
+//
+// NOTE: this writes to and deletes from the target database. Do not point it
+// at data you care about. Exits non-zero on failure so it can gate automation.
+
 import { createClient } from "@supabase/supabase-js"
 import dotenv from "dotenv"
 
-
-
 dotenv.config()
 
-const supabaseUrl = process.env.VITE_API_URL
-const supabaseServiceKey = process.env.SUPABASE_SERVICE_KEY
-//removed service role key for testing
+const requiredEnv = [
+    "VITE_API_URL",
+    "SUPABASE_SERVICE_KEY",
+    "TEST_USER_ID",
+    "TEST_SESSION_ID",
+    "TEST_EXERCISE_ID",
+]
 
+const missing = requiredEnv.filter((name) => !process.env[name])
 
+if (missing.length > 0) {
+    console.error(`Missing required env vars: ${missing.join(", ")}`)
+    process.exit(1)
+}
 
-const supabase = createClient(supabaseUrl, supabaseServiceKey)
+const supabase = createClient(process.env.VITE_API_URL, process.env.SUPABASE_SERVICE_KEY)
 
-const testDeterminism = async() => {
+const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms))
 
-    const sleeper = new Promise(resolve => {
-        setTimeout(resolve, 2000)
-    })
+const testDeterminism = async () => {
 
-    const testData1 = {
-        user_id: "7d2620a8-b770-44f4-b1e8-5d2a506942ac",
-        session_id: "f93c594b-bdf6-4744-ac90-9154957ebf9a",
-        exercise_id: "f59bf69d-ef30-478e-b3b0-e4d1fcef5d3b",
+    const testData = {
+        user_id: process.env.TEST_USER_ID,
+        session_id: process.env.TEST_SESSION_ID,
+        exercise_id: process.env.TEST_EXERCISE_ID,
         reps: 20,
-        weight: 100
+        weight: 100,
     }
 
-    const testData2 = {
-        user_id: "7d2620a8-b770-44f4-b1e8-5d2a506942ac",
-        session_id: "2d5bedf5-1c75-4d6d-ba89-0b8aa22fccf9",
-        exercise_id: "c2aad793-e365-4215-ab32-e23b3b96b84d",
-        reps: 20,
-        weight: 100
+    const readScores = async () => {
+        const { data, error } = await supabase.from("fitness_scores")
+            .select("total_daily_volume, adjusted_daily_volume")
+            .eq("session_id", testData.session_id)
+
+        if (error || !data || data.length === 0) {
+            console.error("Failed to read fitness_scores:", error?.message ?? "no rows returned")
+            process.exit(1)
+        }
+
+        return data[0]
     }
 
- await supabase.from("sets")
-.insert(testData1)
-.select()
+    const insertSet = async () => {
+        const { error } = await supabase.from("sets").insert(testData).select()
 
+        if (error) {
+            console.error("Failed to insert test set:", error.message)
+            process.exit(1)
+        }
+    }
 
+    await insertSet()
+    await sleep(2000) // allow the trigger to recalculate
+    const firstRun = await readScores()
 
+    await supabase.from("fitness_scores")
+        .delete()
+        .eq("session_id", testData.session_id)
 
-await sleeper
+    await insertSet()
+    await sleep(2000) // allow the trigger to recalculate
+    const secondRun = await readScores()
 
-const {data: scoresOne} = await supabase.from("fitness_scores")
-.select("total_daily_volume, adjusted_daily_volume")
-.eq("session_id", testData1.session_id)
+    const isDeterministic =
+        firstRun.total_daily_volume === secondRun.total_daily_volume &&
+        firstRun.adjusted_daily_volume === secondRun.adjusted_daily_volume
 
-const storedDataFirstRun = scoresOne
+    if (!isDeterministic) {
+        console.error("Fails Deterministic Test", { firstRun, secondRun })
+        process.exit(1)
+    }
 
-await supabase.from('fitness_scores')
-    .delete()
-    .eq('session_id', testData1.session_id)
-
-
-await supabase.from("sets")
-.insert(testData1)
-.select()
-
-
-await sleeper
-
-const {data: scoresTwo} = await supabase.from("fitness_scores")
-.select("total_daily_volume, adjusted_daily_volume")
-.eq("session_id", testData1.session_id)
-
-const storedDataSecondRun = scoresTwo
-
-const isTotalDailyVolumeDeterministic = storedDataFirstRun[0].total_daily_volume === storedDataSecondRun[0].total_daily_volume
-const isAdjustedDeterministic = storedDataFirstRun[0].adjusted_daily_volume === storedDataSecondRun[0].adjusted_daily_volume
-
-console.log(isTotalDailyVolumeDeterministic && isAdjustedDeterministic ? "Passed Deterministic Test" : "Fails Deterministic Test" )
-
+    console.log("Passed Deterministic Test")
 }
 
 testDeterminism()

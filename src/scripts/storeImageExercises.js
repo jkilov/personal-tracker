@@ -23,16 +23,15 @@ const runBackFill = async() => {
 console.log("starting backfill")
 
 
-    const url = "https://sudaxmkqsdilkjylccqu.supabase.co/functions/v1/backfill-exercise-image"
+    const url = `${process.env.VITE_API_URL}/functions/v1/backfill-exercise-image`
+    // The backfill function is operator-only: it requires the service-role key
+    // as the bearer token. Never expose this key outside local operator use.
     const options = {
         method : "POST",
         headers: {
-        Authorization: `Bearer ${process.env.SUPABASE_ANON_KEY}`,
-
-        //TODO: update with hardcoded key when running to fill images
+        Authorization: `Bearer ${process.env.SUPABASE_SERVICE_KEY}`,
            "Content-Type": "application/json"
-        }, 
-        body: JSON.stringify({name: "Functions"})
+        },
     }
 
 

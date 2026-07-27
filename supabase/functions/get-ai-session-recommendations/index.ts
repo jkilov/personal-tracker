@@ -1,16 +1,10 @@
-// Follow this setup guide to integrate the Deno language server with your editor:
-// https://deno.land/manual/getting_started/setup_your_environment
-// This enables autocomplete, go to definition, etc.
-
 // Setup type definitions for built-in Supabase Runtime APIs
 import "@supabase/functions-js/edge-runtime.d.ts"
 import {createClient} from "jsr:@supabase/supabase-js@2"
 
-console.log("Hello from Functions!")
-
 const supabase = createClient(
-  Deno.env.get("SUPABASE_URL"),
-Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")
+  Deno.env.get("SUPABASE_URL")!,
+  Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!,
 );
 
 
@@ -35,9 +29,37 @@ const pathname = url.pathname
 const splitPathname = pathname.split("/")
 const sessionId = splitPathname[splitPathname.length-1]
 
+// External input: reject anything that is not a UUID before it reaches the database.
+const UUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
 
+if (!UUID_PATTERN.test(sessionId)) {
+  return new Response(
+    JSON.stringify({message: "Invalid session id"}),
+    {status: 400, headers: {...corsHeaders, "Content-Type": "application/json"}}
+  )
+}
 
+// The service-role client bypasses RLS, so ownership must be checked here:
+// resolve the caller from their JWT and only query their own sets.
+const authHeader = req.headers.get("Authorization") ?? ""
 
+if (!/^bearer /i.test(authHeader)) {
+  return new Response(
+    JSON.stringify({message: "Unauthorized"}),
+    {status: 401, headers: {...corsHeaders, "Content-Type": "application/json"}}
+  )
+}
+
+const jwt = authHeader.slice("Bearer ".length)
+
+const {data: userData, error: userError} = await supabase.auth.getUser(jwt)
+
+if (userError || !userData?.user) {
+  return new Response(
+    JSON.stringify({message: "Unauthorized"}),
+    {status: 401, headers: {...corsHeaders, "Content-Type": "application/json"}}
+  )
+}
 
     const {data, error} = await supabase.from("sets")
     .select(`
@@ -49,8 +71,19 @@ const sessionId = splitPathname[splitPathname.length-1]
       exercise!inner(exercise_name, body_part, equipment)
       `)
     .eq("session_id", sessionId)
+    .eq("user_id", userData.user.id)
 
-      if (error) throw new Error("Unable to fetch session Info: " + JSON.stringify(error))
+      if (error) {
+        console.error("Unable to fetch session info:", error)
+        throw new Error("Unable to fetch session info")
+      }
+
+      if (!data || data.length === 0) {
+        return new Response(
+          JSON.stringify({message: "No session data found"}),
+          {status: 404, headers: {...corsHeaders, "Content-Type": "application/json"}}
+        )
+      }
 
  const prompt = ` 
  You are a fitness and exercise expert. Analyze the workout session data below and deliver a concise summary of key insights and actionable recommendations.
@@ -70,7 +103,7 @@ Use the workout session data that is delimited by quotation marks:
 
       const geminiKey = Deno.env.get("GEMINI_API_KEY")
 
-      if (!geminiKey) throw new Error("Auth issue accessing data")
+      if (!geminiKey) throw new Error("GEMINI_API_KEY is not configured")
 
       const geminiRequest = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent`,
 {method: "POST",
@@ -114,18 +147,16 @@ Use the workout session data that is delimited by quotation marks:
       );
 
   } catch (error) {
-    console.log(error)
-    console.log("finished")
-    return new Response(JSON.stringify(error.message),
-    {
-      status: 500,
-      headers: {
-        ...corsHeaders,
-        "Content-Type": "application/json"}},
-  )}
-
-  
-    
+    // Log full detail server-side; never return internals to the client.
+    console.error(error)
+    return new Response(
+      JSON.stringify({message: "Internal server error"}),
+      {
+        status: 500,
+        headers: {...corsHeaders, "Content-Type": "application/json"},
+      },
+    )
+  }
 })
 
 /* To invoke locally:
