@@ -8,10 +8,10 @@ A full-stack fitness tracking application that demonstrates backend engineering 
 
 ## What This Project Shows
 
-Fitness OS demonstrates backend architecture with a focus on data integrity and system design:
+Growth OS demonstrates backend architecture with a focus on data integrity and system design:
 
 - **Database Functions & Triggers** - Server-side scoring with automatic recalculation
-- **Deterministic Testing** - Proven consistency of business logic
+- **Deterministic Scoring Checks** - A manual verification script confirms recalculation consistency
 - **Backend Validation** - Security constraints at the database level
 - **API Integration** - Secure third-party API consumption via edge functions
 - **Data Aggregation** - Time-series analysis and trend visualization
@@ -65,6 +65,7 @@ Rep Multiplier:
 - Trigger on `sets` table (INSERT/UPDATE/DELETE) automatically recalculates
 - Backend validation prevents invalid data (reps ≤ 0 rejected at DB level)
 - `fitness_scores` table stores daily aggregates for historical tracking
+- The full schema — tables, function, triggers, and RLS policies — is committed at [`supabase/schema.sql`](supabase/schema.sql)
 
 **Why this matters:** Server-side scoring prevents client-side manipulation. Triggers ensure scores always reflect current data. Deterministic tests prove consistency.
 
@@ -152,24 +153,61 @@ Three complementary visualizations:
 
 ---
 
+## 🚀 Getting Started
+
+### Prerequisites
+- Node.js 20.19+ (required by Vite 7)
+- A Supabase project (database, auth, storage, and the edge functions under `supabase/functions/`)
+
+### Install & Run
+
+```bash
+npm install
+npm run dev
+```
+
+The app runs at `http://localhost:5173`.
+
+### Environment Variables
+
+Create a `.env` file in the project root (never commit it — it is gitignored):
+
+```bash
+VITE_API_URL="https://<your-project-ref>.supabase.co"   # Supabase project URL
+VITE_API_KEY="<your-supabase-anon-key>"                 # Supabase anon (public) key
+```
+
+The edge functions additionally read `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY`, `GEMINI_API_KEY`, `RAPID_API_KEY`, and `RAPID_API_HOST` from Supabase function secrets (never from the repo). The operator scripts in `src/scripts/` read `SUPABASE_SERVICE_KEY` (service-role key, local use only) plus, for the determinism script, `TEST_USER_ID`/`TEST_SESSION_ID`/`TEST_EXERCISE_ID`.
+
+### Other Commands
+
+```bash
+npm run lint      # ESLint
+npm run build     # type check (tsc -b) + production build
+npm run preview   # serve the production build locally
+```
+
+---
+
 ## 🧪 Testing & Validation
 
-### Deterministic Test
-Proves scoring consistency:
+### Deterministic Scoring Check (manual)
+
+A manual verification script — not an automated test suite — that checks the scoring trigger recalculates identically for identical input:
+
 ```bash
 node src/scripts/testFitnessScoreDeterminism.js
 ```
 
-Output: `Passed Deterministic Test` ✅
+It requires the env vars listed above (including `TEST_*` ids pointing at real rows in a database you control), writes and deletes real data, and exits non-zero on failure.
 
 **What it does:**
-1. Inserts test data (session, sets, exercises)
-2. Trigger fires → scores calculated → stored in `fitness_scores`
-3. Deletes scores (not data)
-4. Reinserts same data
-5. Trigger recalculates
-6. Compares first calculation vs second
-7. Passes if identical
+1. Inserts a test set → trigger calculates scores into `fitness_scores`
+2. Deletes the derived scores (not the data)
+3. Reinserts the same set → trigger recalculates
+4. Compares the two calculations; passes only if identical
+
+**Known limitation:** there is no automated test suite (no unit or integration tests, no CI test gate). This script is the only verification tooling.
 
 ### Edge Cases Handled
 - Empty sessions (0 sets) → no score row created
@@ -179,15 +217,13 @@ Output: `Passed Deterministic Test` ✅
 
 ---
 
-**This Project:**
-- Deterministic business logic at database layer
+## Highlights
+
+- Deterministic business logic at the database layer
 - Automatic recalculation via triggers
 - Backend validation (can't bypass with DevTools)
-- Proven consistency via tests
 - Third-party API integration with error handling
 - Time-series data aggregation and visualization
-
-
 
 ## What's Next
 
