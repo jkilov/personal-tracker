@@ -31,7 +31,9 @@ supabase/.env.local
 supabase/functions/**/.env
 
 
+# build artifacts
+*.tsbuildinfo
+
 # other
-thingsToFixBeforeFinishing.md
 
 
