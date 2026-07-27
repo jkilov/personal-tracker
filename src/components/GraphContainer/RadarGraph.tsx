@@ -57,5 +57,3 @@ export const RadarGraph = ({ rawTrainingData }: Props) => {
     </div>
   );
 };
-
-//question: when do we decide to do logic on the frontend or on the backend - surely ther above data transofrmation can be done on the backend in supabase?

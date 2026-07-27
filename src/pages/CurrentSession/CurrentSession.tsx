@@ -15,7 +15,6 @@ const CurrentSession = () => {
   const sessionId = params.sessionId;
   const navigate = useNavigate();
 
-  //FIXME: fix useState here
   useEffect(() => {
     const getSessionInfo = async () => {
       const { error } = await readSetWithExerciseData(sessionId!);
@@ -28,7 +27,7 @@ const CurrentSession = () => {
             </span>
             <span>{error.message}</span>
           </div>,
-          { style: { background: "var(--toast-error)" } }
+          { style: { background: "var(--error)" } }
         );
         console.error("error loading Session Info: ", {
           message: error.message,
@@ -52,7 +51,7 @@ const CurrentSession = () => {
         </span>
         <span>Exercise Saved to Session</span>
       </div>,
-      { style: { background: "var(--toast-error)" } }
+      { style: { background: "var(--success)" } }
     );
   };
 

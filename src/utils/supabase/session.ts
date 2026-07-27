@@ -25,6 +25,17 @@ export const fetchSessionData = async() => {
     return {data, error}
 }
 
+export const fetchSessionIdByDate = async(date: string) => {
+
+    const {data, error} = await supabase
+    .from("session")
+    .select("session_id")
+    .eq("session_date", date)
+    .maybeSingle()
+
+    return {data, error}
+}
+
 export type SessionByDate = {
     session_date: string;
     session_id: string;

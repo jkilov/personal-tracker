@@ -1,7 +1,8 @@
 import { useState, useContext } from "react";
 import { useParams } from "react-router";
+import { toast } from "sonner";
 import { createNewSet } from "../../utils/supabase/set";
-import { AuthContext } from "../../App";
+import { AuthContext } from "../../auth-context";
 
 import "../../App.css";
 import "./AddSet.css";
@@ -122,8 +123,22 @@ const AddSet = ({ exerciseId, onReset, onSave }: Props) => {
     }, []);
 
     const { error } = await createNewSet(newArr);
+
+    if (error) {
+      toast.error(
+        <div className="toast">
+          <span>
+            <strong>There was an error</strong>.
+          </span>
+          <span>Failed to save exercise sets</span>
+        </div>,
+        { style: { background: "var(--error)" } }
+      );
+      return;
+    }
+
     onSave();
-    console.log("Error creating set: ", error);
+    onReset();
   };
 
   const handleChange = (title: string, field: FieldKey, value: number) => {
@@ -193,7 +208,7 @@ const AddSet = ({ exerciseId, onReset, onSave }: Props) => {
                 onBlur={() => handleBlur(set.title, "Reps")}
               />
               {handleValidation(set.title, set.repLabel) && (
-                <span className="error-text">Value must be greater than 1</span>
+                <span className="error-text">Value must be at least 1</span>
               )}
             </div>
             <div className="inner-container">
@@ -220,7 +235,7 @@ const AddSet = ({ exerciseId, onReset, onSave }: Props) => {
                 <span className="input-suffix">kg</span>
               </div>
               {handleValidation(set.title, set.weightLabel) && (
-                <span className="error-text">Value must be greater than 1</span>
+                <span className="error-text">Value must be at least 1</span>
               )}
             </div>
           </div>

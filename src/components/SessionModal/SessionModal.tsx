@@ -13,8 +13,6 @@ export type ExerciseData = {
   equipment: string;
 };
 
-//TODO: need to create a type for what session data returns from readSet
-
 interface Props {
   onSave: () => void;
 }
@@ -32,7 +30,8 @@ const SessionModal = ({ onSave }: Props) => {
 
     if (isMounted) {
       const getExerciseData = async () => {
-        const data = await readExerciseData();
+        const { data, error } = await readExerciseData();
+        if (error) console.error("Error loading exercises: ", error.message);
         setExerciseData(data);
         setIsLoading(false);
       };
@@ -64,41 +63,20 @@ const SessionModal = ({ onSave }: Props) => {
 
   if (isLoading) return <div>Loading.</div>;
 
-  //FIXME: change code here from getters and setters to commands and events
-  //FIXME: remove booleans that arent actual and can be string unions (boo for booleans)
-
   return (
     <div className="session-card">
       <div>
         <h2>Add Workout</h2>
         <div className="exercise-select-container">
-          <label htmlFor="exerciseList">Select Exercise</label>
-          {/* <select
-            className="exercise-selector"
-            value={selectedExercise?.exercise_name ?? ""}
-            name="exerciseList"
-            id="exerciseList"
-            onChange={(e) => handleExerciseSelection(e.target.value)}
-          >
-            <option value="" disabled></option>
-            {exerciseData?.map((exercise) => (
-              <option
-                id={exercise.exercise_id}
-                value={exercise.exercise_name}
-                key={exercise.exercise_id}
-                data-user-exercise="test" //need to fix
-              >
-                {exercise.exercise_name}
-                <span>
-                  <IoIosArrowForward />
-                </span>
-              </option>
-            ))}
-          </select> */}
           <div>
             <button type="button" onClick={handleOpenSelectExerciseModal}>
               Select Exercise
             </button>
+            {selectedExercise && (
+              <p className="selected-exercise-name">
+                Selected: <strong>{selectedExercise.exercise_name}</strong>
+              </p>
+            )}
             <SelectExerciseModal
               isOpen={isSelectExerciseModalOpen}
               onClose={handleCloseSelectExerciseModal}
@@ -110,6 +88,7 @@ const SessionModal = ({ onSave }: Props) => {
         {selectedExercise && (
           <div>
             <AddSet
+              key={selectedExercise.exercise_id}
               onSave={onSave}
               exerciseId={selectedExercise.exercise_id}
               onReset={() => setSelectedExercise(null)}

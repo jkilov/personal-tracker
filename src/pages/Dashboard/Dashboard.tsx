@@ -1,12 +1,16 @@
 import { useState } from "react";
 import { toast } from "sonner";
 import { readUserData } from "../../utils/supabase/user";
-import { createSession } from "../../utils/supabase/session";
+import {
+  createSession,
+  fetchSessionIdByDate,
+} from "../../utils/supabase/session";
+import { toLocalIsoDate } from "../../utils/helper/localDateConversion";
+import { signOutUser } from "../../utils/supabase/auth-supabase";
 import { useNavigate } from "react-router";
 import { PulseLoader } from "react-spinners";
 import "../../App.css";
 import "./Dashboard.css";
-// import { fetchSessionData, type Session } from "../../utils/supabase/session";
 import SessionCalendar from "../../components/SessionCalendar/SessionCalendar";
 import InsightsGraphs from "../../components/GraphContainer/GraphContainer";
 
@@ -14,54 +18,64 @@ const Dashboard = () => {
   const navigate = useNavigate();
 
   const [isLoading, setIsLoading] = useState(false);
-  // const [allSessions, setAllSessions] = useState<Session[] | null>(null);
 
   const handleCreateSession = async () => {
     setIsLoading(true);
 
-    const { data: userData } = await readUserData();
-    const uid = userData.user_id;
+    const { data: userData, error: userError } = await readUserData();
 
-    const { data: sessionData, error } = await createSession(uid);
-
-    if (error) {
-      toast.error("session already exists", {
+    if (userError || !userData) {
+      toast.error("Unable to load your profile", {
         style: { background: "var(--error)" },
       });
       setIsLoading(false);
       return;
     }
 
-    const sessionId = sessionData?.session_id;
-    setIsLoading(true);
+    const { data: sessionData, error } = await createSession(userData.user_id);
+
+    if (error) {
+      const { data: existingSession } = await fetchSessionIdByDate(
+        toLocalIsoDate(new Date())
+      );
+
+      if (existingSession?.session_id) {
+        setIsLoading(false);
+        navigate(`/session/${existingSession.session_id}`);
+        return;
+      }
+
+      toast.error("Unable to create session", {
+        style: { background: "var(--error)" },
+      });
+      setIsLoading(false);
+      return;
+    }
+
+    setIsLoading(false);
     toast.success("New session created", {
       duration: 2000,
       style: { background: "var(--success)" },
-      onAutoClose: () => {
-        setIsLoading(false);
-        //TODO:come back to
-        navigate(`/session/${sessionId}`);
-      },
     });
+    navigate(`/session/${sessionData?.session_id}`);
   };
 
-  // useEffect(() => {
-  //   const getAllSessions = async () => {
-  //     const { data: sessionArr, error } = await fetchSessionData();
+  const handleSignOut = async () => {
+    const { error } = await signOutUser();
 
-  //     if (error) {
-  //       console.error(error.message, error.cause);
-  //     }
-
-  //     setAllSessions(sessionArr);
-  //   };
-
-  //   getAllSessions();
-  // }, []);
+    if (error) {
+      toast.error(error.message, {
+        style: { background: "var(--error)" },
+      });
+    }
+  };
 
   return (
     <div className="dashboard-layout">
-      <h1>Home</h1>
+      <div className="dashboard-header">
+        <h1>Home</h1>
+        <button onClick={handleSignOut}>Sign Out</button>
+      </div>
       <div className="add-session">
         <h2>Start a New Workout</h2>
 

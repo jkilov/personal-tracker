@@ -2,26 +2,34 @@
     display: flex;
     flex-direction: column;
     align-items: start;
+    width: 100%;
 }
 
 .page-container {
     display: flex;
-    width: 100vw;
-    justify-content: space-around;
-gap: 50px;
+    width: 100%;
+    justify-content: center;
+    align-items: flex-start;
+    gap: 60px;
+    flex-wrap: wrap;
+    margin-top: 20px;
 }
 
 .exercise-container {
-    display :flex;
+    display: flex;
     flex-direction: column;
 }
+
 .current-session {
     display: flex;
-    flex-direction: column;;
+    flex-direction: column;
+    align-items: flex-start;
 }
 
+.current-session h2 {
+    margin-top: 0;
+}
 
 .back-btn {
     cursor: pointer;
-  
 }

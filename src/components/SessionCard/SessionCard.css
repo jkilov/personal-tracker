@@ -59,6 +59,13 @@ overflow: hidden;
     font-size: 0.7rem;
 }
 
+.empty-card-text {
+    margin: 0;
+    padding: 30px 20px;
+    color: var(--placeholder);
+    text-align: center;
+}
+
 .clickable-icon {
     transition: transform 200ms ease;
 }

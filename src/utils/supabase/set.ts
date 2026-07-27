@@ -56,7 +56,6 @@ if (setError) {
 }
   if (!setData) throw new Error("No data returned for calculation")
 
-//TODO: add more defensive programming
       return {data: setData, error: null}
     
     

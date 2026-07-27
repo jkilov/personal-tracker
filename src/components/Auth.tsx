@@ -1,4 +1,5 @@
 import type { AuthValues } from "../pages/SignUp";
+import "./Auth.css";
 
 type authConfigType = {
   key: keyof AuthValues;
@@ -47,7 +48,7 @@ interface Props {
   onChange: (inputKey: string, value: string) => void;
   handleSubmit: (e: React.SubmitEvent) => void;
   formKey: string;
-  buttonCTA: string | any;
+  buttonCTA: React.ReactNode;
 }
 
 const Auth = ({
@@ -58,30 +59,27 @@ const Auth = ({
   buttonCTA,
   values,
 }: Props) => {
-  //i thought of creating one state object to hold all values but thought only necessary for bigger multi input forms not just two inputs
-
   const updatedArr = authConfig.filter((input) => input.form === formKey);
 
   return (
-    <div>
-      <form onSubmit={handleSubmit}>
-        {updatedArr.map((input) => (
-          <div key={input.key}>
-            <label htmlFor={input.form}>{input.label}</label>
-            <input
-              id={input.label}
-              type={input.type}
-              value={values[input.key] as keyof AuthValues}
-              onChange={(e) => onChange(input.key, e.target.value)}
-              required
-            />
-          </div>
-        ))}
-        <button type="submit">{buttonCTA}</button>
-      </form>
-
-      <br />
-    </div>
+    <form className="auth-form" onSubmit={handleSubmit}>
+      {updatedArr.map((input) => (
+        <div key={input.key} className="auth-field">
+          <label htmlFor={`${input.form}-${input.key}`}>{input.label}</label>
+          <input
+            id={`${input.form}-${input.key}`}
+            className="auth-input"
+            type={input.type}
+            value={values[input.key] as keyof AuthValues}
+            onChange={(e) => onChange(input.key, e.target.value)}
+            required
+          />
+        </div>
+      ))}
+      <button className="auth-submit" type="submit">
+        {buttonCTA}
+      </button>
+    </form>
   );
 };
 

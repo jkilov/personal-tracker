@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { toast } from "sonner";
 import Tooltip from "../Tooltip";
 import { getInsights } from "../../services/getAiRecommendations";
 import { TrophySpin } from "react-loading-indicators";
@@ -13,7 +14,6 @@ import {
   type FitnessScores,
   getFitnessScoresBySession,
 } from "../../utils/supabase/fitness-score";
-import InsightsModal from "../InsightsModal/InsightsModal";
 
 export type SetData = {
   setNumber: number;
@@ -36,8 +36,6 @@ interface Props {
   resetKey?: number;
 }
 
-//FIXME: refactor
-
 const SessionCard = ({
   sessionId,
   showInsights = true,
@@ -58,8 +56,6 @@ const SessionCard = ({
   const [isLoading, setIsLoading] = useState(false);
   const [aiInsights, setAiInsights] = useState<string | null>(null);
 
-  //FIXME: refactor
-
   useEffect(() => {
     const getSessionData = async () => {
       const { data: sessionInformation, error } = await readSetWithExerciseData(
@@ -75,8 +71,6 @@ const SessionCard = ({
 
     getSessionData();
   }, [resetKey, sessionId]);
-
-  //FIXME: refactor
 
   useEffect(() => {
     if (!rawSessionData) return;
@@ -126,18 +120,17 @@ const SessionCard = ({
     setFitnessScores(data);
   };
 
-  const handleClose = () => {
-    setIsInsightsViewable(false);
-  };
-
   const handleAiRecommendations = async () => {
     setIsLoading(true);
     const result = await getInsights(sessionId);
+    setIsLoading(false);
+
     if (!result.ok) {
-      setIsLoading(false);
+      toast.error("Failed to load AI recommendations", {
+        style: { background: "var(--error)" },
+      });
       return;
     }
-    setIsLoading(false);
 
     setAiInsights(result.data.message);
   };
@@ -154,33 +147,39 @@ const SessionCard = ({
           className={`card-track ${isInsightsViewable ? "show-insights" : ""}`}
         >
           <div className="card-panel">
-            <InsightsModal
-              sessionId={sessionId}
-              onClose={handleClose}
-              isInsightsViewable={isInsightsViewable}
-            />
+            {formattedSetData.length === 0 && (
+              <p className="empty-card-text">
+                No exercises logged yet. Select an exercise to add your first
+                sets.
+              </p>
+            )}
             {formattedSetData.map((exercise) => (
               <div key={exercise.exerciseName}>
                 <div>
                   <table>
-                    <tr className="card-exercise-layout">
-                      <td>
-                        <h3>
-                          {exercise.exerciseName}:{" "}
-                          <span>{exercise.sets.length} Sets</span>
-                        </h3>
-                      </td>
-                      <td>
-                        <IoIosArrowDown
-                          className={`clickable-icon ${
-                            exercise.isOpen ? "icon-open" : ""
-                          }`}
-                          onClick={() =>
-                            toggleAdditionalSetInfo(exercise.exerciseName)
-                          }
-                        />
-                      </td>
-                    </tr>
+                    <tbody>
+                      <tr className="card-exercise-layout">
+                        <td>
+                          <h3>
+                            {exercise.exerciseName}:{" "}
+                            <span>
+                              {exercise.sets.length}{" "}
+                              {exercise.sets.length === 1 ? "Set" : "Sets"}
+                            </span>
+                          </h3>
+                        </td>
+                        <td>
+                          <IoIosArrowDown
+                            className={`clickable-icon ${
+                              exercise.isOpen ? "icon-open" : ""
+                            }`}
+                            onClick={() =>
+                              toggleAdditionalSetInfo(exercise.exerciseName)
+                            }
+                          />
+                        </td>
+                      </tr>
+                    </tbody>
                   </table>
                 </div>
                 {exercise.isOpen && (
@@ -236,9 +235,13 @@ const SessionCard = ({
               </div>
               <h3>Body Parts Trained</h3>
               <div className="body-parts-row">
-                {formattedSetData.map((exercise) => (
-                  <span key={exercise.exerciseName} className="body-part-pill">
-                    {exercise.body_part}
+                {[
+                  ...new Set(
+                    formattedSetData.map((exercise) => exercise.body_part)
+                  ),
+                ].map((bodyPart) => (
+                  <span key={bodyPart} className="body-part-pill">
+                    {bodyPart}
                   </span>
                 ))}
               </div>

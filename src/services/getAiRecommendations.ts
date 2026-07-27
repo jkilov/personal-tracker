@@ -13,7 +13,7 @@ export const getInsights = async (sessionId: string, ) => {
  
         const accessToken = sessionData.session.access_token
   const res = await fetch(
-    `https://sudaxmkqsdilkjylccqu.supabase.co/functions/v1/get-ai-session-recommendations/${sessionId}`,
+    `${import.meta.env.VITE_API_URL}/functions/v1/get-ai-session-recommendations/${sessionId}`,
     {
       method: "GET",
       headers: {
@@ -30,7 +30,7 @@ export const getInsights = async (sessionId: string, ) => {
   return { ok: true, data } as const
   
 } catch (error) {
-  console.log(error)
+  console.error(error)
   return { ok: false, error: error instanceof Error ? error.message : String(error) } as const
 }
 }

@@ -17,10 +17,6 @@ const InsightsGraphs = () => {
     return <Error />;
   }
 
-  // if (error) {
-  //   return <span>An error occurred. Please Refresh the page</span>;
-  // }
-
   return (
     <div className="graph-container">
       <LineGraph rawTrainingData={rawTrainingData} />

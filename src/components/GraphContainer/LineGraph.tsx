@@ -1,4 +1,3 @@
-import { useState, useEffect } from "react";
 import { type FetchedTrainingData } from "./useGraphMetrics";
 import "./GraphContainer.css";
 
@@ -24,24 +23,14 @@ type LineGraphDataShape = {
 };
 
 const LineGraph = ({ rawTrainingData }: Props) => {
-  const [formattedFitnessData, setFormattedFitnessData] = useState<
-    LineGraphDataShape[]
-  >([]);
-
-  //FIXME: we can change the below to compute and derive rather than storing in stte
-  useEffect(() => {
-    const formattedData = rawTrainingData.map((el) => ({
+  const formattedFitnessData: LineGraphDataShape[] = rawTrainingData
+    .map((el) => ({
       date: el.session.session_date,
       total_daily_volume: el.total_daily_volume,
       adjusted_daily_volume: el.adjusted_daily_volume,
-    }));
+    }))
+    .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
 
-    formattedData.sort(
-      (a, b) => new Date(a.date).getTime() - new Date(b.date).getTime()
-    );
-
-    setFormattedFitnessData(formattedData);
-  }, [rawTrainingData]);
   return (
     <div className="graph">
       <h4>Total Volume Progression</h4>

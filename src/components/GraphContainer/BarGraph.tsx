@@ -96,6 +96,3 @@ const BarGraph = ({ rawTrainingData }: Props) => {
 };
 
 export default BarGraph;
-
-//questions
-//if i want to add a for loop - can ido so inside like a map for filter method

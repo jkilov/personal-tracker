@@ -1,12 +1,16 @@
 import Auth from "../components/Auth";
 import { signUpUser } from "../utils/supabase/auth-supabase";
 import { createUserData } from "../utils/supabase/user.ts";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { toast } from "sonner";
 
 import { useNavigate } from "react-router";
 
 import "../App.css";
+
+interface Props {
+  isAuthenticated: boolean;
+}
 
 export type AuthValues = {
   fName?: string;
@@ -15,7 +19,7 @@ export type AuthValues = {
   password: string;
 };
 
-const SignUp = () => {
+const SignUp = ({ isAuthenticated }: Props) => {
   const navigate = useNavigate();
 
   const [values, setValues] = useState<AuthValues>({
@@ -24,6 +28,12 @@ const SignUp = () => {
     email: "",
     password: "",
   });
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      navigate("/dashboard");
+    }
+  }, [isAuthenticated, navigate]);
 
   const handleChange = (inputKey: string, value: string) => {
     setValues((prev) => ({ ...prev, [inputKey]: value }));
@@ -34,7 +44,7 @@ const SignUp = () => {
     if (error) {
       toast.error(error.message, {
         style: {
-          background: "var(--toast-error)",
+          background: "var(--error)",
         },
       });
       return;
@@ -52,7 +62,7 @@ const SignUp = () => {
     }
 
     toast.success("Successfully created account", {
-      style: { background: "var(--toast-success" },
+      style: { background: "var(--success)" },
     });
     setValues({ fName: "", lName: "", email: "", password: "" });
   };
@@ -67,16 +77,20 @@ const SignUp = () => {
   };
 
   return (
-    <div>
-      <h3>Create an account.</h3>
-      <Auth
-        onChange={handleChange}
-        values={values}
-        handleSubmit={handleSubmit}
-        formKey="signUp"
-        buttonCTA="Create Account"
-      />
-      <button onClick={handleSignInAccount}>Sign in</button>
+    <div className="auth-page">
+      <div className="auth-card">
+        <h3>Create an account</h3>
+        <Auth
+          onChange={handleChange}
+          values={values}
+          handleSubmit={handleSubmit}
+          formKey="signUp"
+          buttonCTA="Create Account"
+        />
+        <button className="auth-secondary-btn" onClick={handleSignInAccount}>
+          Sign in
+        </button>
+      </div>
     </div>
   );
 };

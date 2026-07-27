@@ -8,6 +8,10 @@ import {
   fetchSessionByDate,
   fetchSessionData,
 } from "../../utils/supabase/session";
+import {
+  toLocalIsoDate,
+  parseIsoDateAsLocal,
+} from "../../utils/helper/localDateConversion";
 import { toast } from "sonner";
 import SessionCard from "../SessionCard/SessionCard";
 
@@ -91,7 +95,6 @@ const SessionCalendar = () => {
         session.getDate()
       ).toDateString()
     );
-    //TODO: confirm if we need to do the above since will be stringified due to JSON passing over network to supabase
     return normalizeDate.includes(calendarDateToString);
   };
 
@@ -99,10 +102,14 @@ const SessionCalendar = () => {
     setIsLoading(true);
     setDaySelected(date);
     const selectedSession = new Date(selectedYear, selectedMonth, date);
-    const selectedSessionToString = selectedSession.toDateString();
 
-    const { data, error } = await fetchSessionByDate(selectedSessionToString);
+    const { data, error } = await fetchSessionByDate(
+      toLocalIsoDate(selectedSession)
+    );
+    setIsLoading(false);
+
     if (!data) {
+      setChosenSession(null);
       console.error({
         message: error?.message,
         hint: error?.hint,
@@ -111,7 +118,6 @@ const SessionCalendar = () => {
       });
       return;
     }
-    setIsLoading(false);
 
     setChosenSession(data);
   };
@@ -128,13 +134,13 @@ const SessionCalendar = () => {
         });
         toast.error(error.message, {
           style: {
-            background: "var(--toast-error)",
+            background: "var(--error)",
           },
         });
       }
       if (data) {
         setRawSessionDates(
-          data?.map((session) => new Date(session.session_date))
+          data?.map((session) => parseIsoDateAsLocal(session.session_date))
         );
       }
     };

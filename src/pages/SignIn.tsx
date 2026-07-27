@@ -44,12 +44,10 @@ const SignIn = ({ isAuthenticated }: Props) => {
           </span>
           <span>{error.message}</span>
         </div>,
-        { style: { background: "var(--toast-error)" } }
+        { style: { background: "var(--error)" } }
       );
       setIsLoading(false);
     } else {
-      // handleUserAuth(data);
-
       setValues({ email: "", password: "" });
       setIsLoading(false);
       navigate("/dashboard");
@@ -67,19 +65,20 @@ const SignIn = ({ isAuthenticated }: Props) => {
   }, [isAuthenticated, navigate]);
 
   return (
-    <div>
-      <h3>Sign In</h3>
-      <Auth
-        onChange={handleChange}
-        values={values}
-        handleSubmit={handleSignIn}
-        formKey="signIn"
-        buttonCTA={"Sign In"}
-      />
-      <button onClick={handleCreateAccount}>
-        {" "}
-        {isLoading ? <Spinner /> : "Create Account"}
-      </button>
+    <div className="auth-page">
+      <div className="auth-card">
+        <h3>Sign In</h3>
+        <Auth
+          onChange={handleChange}
+          values={values}
+          handleSubmit={handleSignIn}
+          formKey="signIn"
+          buttonCTA={isLoading ? <Spinner size="sm" /> : "Sign In"}
+        />
+        <button className="auth-secondary-btn" onClick={handleCreateAccount}>
+          Create Account
+        </button>
+      </div>
     </div>
   );
 };

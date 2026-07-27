@@ -1,14 +1,14 @@
-import { useEffect, useState, createContext } from "react";
+import { useEffect, useState } from "react";
 import "./App.css";
 import SignIn from "./pages/SignIn";
-import { Route, Routes } from "react-router";
+import { Navigate, Route, Routes } from "react-router";
 import ProtectedRoutes from "./components/ProtectedRoutes";
 import { authenticationCheck } from "./utils/supabase/auth-supabase";
 import SignUp from "./pages/SignUp";
 import Dashboard from "./pages/Dashboard/Dashboard";
 import type { Session } from "@supabase/supabase-js";
 import CurrentSession from "./pages/CurrentSession/CurrentSession";
-export const AuthContext = createContext<Session | null>(null);
+import { AuthContext } from "./auth-context";
 import { Toaster } from "sonner";
 
 function App() {
@@ -24,10 +24,8 @@ function App() {
       setIsLoading(false);
     });
 
-    console.log("auth: ", isAuthenticated);
-
     return () => subscription.unsubscribe();
-  }, [isAuthenticated]);
+  }, []);
 
   if (isLoading) return <div>Loading...</div>;
 
@@ -41,13 +39,16 @@ function App() {
           >
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/session/:sessionId" element={<CurrentSession />} />
-            {/* <Route path="/modal/:sessionId" element={<SessionModal />} /> */}
           </Route>
           <Route
             path="/"
             element={<SignIn isAuthenticated={isAuthenticated} />}
           />
-          <Route path="/sign-up" element={<SignUp />} />
+          <Route
+            path="/sign-up"
+            element={<SignUp isAuthenticated={isAuthenticated} />}
+          />
+          <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </AuthContext.Provider>
     </>

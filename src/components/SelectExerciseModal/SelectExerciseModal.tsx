@@ -2,7 +2,7 @@ import { useRef, useEffect, useState } from "react";
 import { IoCloseOutline } from "react-icons/io5";
 import { IoIosArrowForward } from "react-icons/io";
 import { type ExerciseData } from "../SessionModal/SessionModal";
-import "./ SelectExerciseModal.css";
+import "./SelectExerciseModal.css";
 import { supabase } from "../../utils/supabase/client-supabase";
 import { IoIosArrowBack } from "react-icons/io";
 
@@ -32,7 +32,7 @@ const SelectExerciseModal = ({
     if (!isOpen && modal.open) modal.close();
   }, [isOpen]);
 
-  const handleExerciseSearch = (e: any) => {
+  const handleExerciseSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
     const userInput = e.target.value.toLowerCase();
 
     if (userInput.length < 2) setShapedExerciseData(exerciseData);
@@ -40,7 +40,6 @@ const SelectExerciseModal = ({
       exercise.exercise_name.toLowerCase().includes(userInput.trim())
     );
     setShapedExerciseData(filteredSearch);
-    console.log("F", filteredSearch);
   };
 
   const moreExerciseInfo = (exerciseDetails: ExerciseData) => {
@@ -62,9 +61,8 @@ const SelectExerciseModal = ({
     setIsImageLoaded(true);
   };
 
-  //TODO: refactor the above - also the modal keeps changing size CLS is happening (cumulative layout shift)
   return (
-    <dialog ref={modalRef} className="modal">
+    <dialog ref={modalRef} className="modal" onClose={onClose}>
       <div className="modal-container">
         <div className="modal-header">
           {exerciseInfo ? <IoIosArrowBack onClick={handleBack} /> : <div></div>}
@@ -121,8 +119,7 @@ const SelectExerciseModal = ({
             <div>
               <h4>{exerciseInfo?.exercise_name}</h4>
               <p>Muscle Group: {exerciseInfo?.body_part}</p>
-              <p>equipment: {exerciseInfo?.equipment}</p>
-              <p>Description</p>
+              <p>Equipment: {exerciseInfo?.equipment}</p>
             </div>
           </div>
         </div>

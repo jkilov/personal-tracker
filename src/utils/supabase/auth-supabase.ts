@@ -28,6 +28,13 @@ return {data, error}
 
 
 
+export const signOutUser = async() => {
+  const { error } = await supabase.auth.signOut()
+
+  return { error }
+}
+
+
 export const getUser = async() => {
 
   const {data : {user}} = await supabase.auth.getUser()
